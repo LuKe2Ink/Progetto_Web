@@ -2,6 +2,7 @@ const User = require('../models/Users');
 const mongoose = require('mongoose')
 const moment = require('moment') 
 
+//vedere se utilizzare session token con refresh token
 const userRegister = async (req, res) => {
     //todo register userRegister 
     res.json();

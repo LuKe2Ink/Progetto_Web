@@ -4,6 +4,8 @@ const mongoose = require('mongoose')
 const moment = require('moment'); 
 const EventsType = require('../models/EventsType');
 
+
+//todo fare a tutti il controllo se è son settati tutti i dati del body
 const eventsList = async (req, res) => {
   let data = req.body;
   const user = await Users.findById(data.user_id);
@@ -66,7 +68,7 @@ const eventCreate = async (req, res) => {
       return res.status(412).json({ 'message': 'Prerequisited not valid'})
 
   const type = await EventsType.findById(data.event_type_id);
-  const typeObjId = new mongoose.Types.ObjectId(data.eevent_type_idvent);
+  const typeObjId = new mongoose.Types.ObjectId(data.event_type_idvent);
   if(!type)
     return res.status(404).json({ 'message': 'The event type is not found' });  
   const user = await EventsType.findById(data.user_id);
@@ -110,7 +112,7 @@ const eventModify = async (req, res) => {
   event.event_type = typeObjId;
   await event.save()
 
-  res.status(202).json({'status': 'ok'});
+  res.status(200).json({'status': 'ok'});
 }
 
 const eventDelete = async (req, res) => {
@@ -122,9 +124,9 @@ const eventDelete = async (req, res) => {
   if(!event)
     return res.status(404).json({ 'message': 'Event not found' });
 
-  await event.deleteOne()
+  await event.remove()
   
-  res.status(202).json({'status': 'ok'});
+  res.status(200).json({'status': 'ok'});
 }
 
 module.exports = {

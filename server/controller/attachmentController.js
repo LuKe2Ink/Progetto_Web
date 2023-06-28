@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const moment = require('moment') 
 
 const attachmentAdd = async (req, res) => {
+    let data = req.body
     //todo add attachmentAdd 
     res.json();
 }
