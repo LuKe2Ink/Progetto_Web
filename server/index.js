@@ -40,6 +40,6 @@ app.use('/history', require('./router/historyRouter'));
 app.use('/user', require('./router/userRouter')); 
 
 
-console.log(app._router)
+// console.log(app._router)
 
 module.exports = app;

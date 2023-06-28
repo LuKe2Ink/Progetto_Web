@@ -18,7 +18,7 @@ const eventSchema = new mongoose.Schema({
         required: true 
     },
     people: {
-      type: [[{type: String }]],
+      type: [{type: String }],
       required: false
     },
     event_type: {
