@@ -19,7 +19,8 @@ const userSchema = new mongoose.Schema({
     },
     active:{
         type: Boolean,
-        require: true
+        require: false,
+        default: true
     },
     
   }, { collection: 'users' });

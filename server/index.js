@@ -2,10 +2,10 @@ const express = require('express');
 const app = express();
 const cors = require('cors')
 const http = require('http');
+const mongoose = require('mongoose');
+const { isAuthenticated } = require('./router/authToken/tokenVerify')
 // const moment = require('moment');
 app.use(cors());
-
-const mongoose = require('mongoose');
 
 const connectDB = () => {
     try {
@@ -33,10 +33,10 @@ connectDB();
 
 //all main routes
 // app.use('/', require('./router/root'));
-app.use('/events', require('./router/eventsRouter'));
-app.use('/types', require('./router/eventsTypeRouter'));
-app.use('/attachment', require('./router/attachmentRouter'));
-app.use('/history', require('./router/historyRouter'));
+app.use('/events', isAuthenticated, require('./router/eventsRouter'));
+app.use('/types', isAuthenticated, require('./router/eventsTypeRouter'));
+app.use('/attachment', isAuthenticated, require('./router/attachmentRouter'));
+app.use('/history', isAuthenticated, require('./router/historyRouter'));
 app.use('/user', require('./router/userRouter')); 
 
 

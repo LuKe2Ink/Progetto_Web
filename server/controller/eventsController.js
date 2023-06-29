@@ -124,7 +124,7 @@ const eventDelete = async (req, res) => {
   if(!event)
     return res.status(404).json({ 'message': 'Event not found' });
 
-  await event.remove()
+  let eventDeleted = await Events.findByIdAndDelete(data.event_id)
   
   res.status(200).json({'status': 'ok'});
 }
