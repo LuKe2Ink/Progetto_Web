@@ -11,10 +11,10 @@ const userRegister = async (req, res) => {
   let data = req.body
 
   if(!data || !data.username || !data.password || !data.mail)
-    return res.status(412).json({ 'message': 'Prerequisited not valid'});
+    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
 
   if(data.username=='' || data.password=='' || data.mail=='')
-    return res.status(412).json({ 'message': 'Prerequisited not valid'});
+    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
     
   let salt = await bcrypt.genSalt(saltRounds);
   let cryptedPass = await bcrypt.hash(data.password, salt);
@@ -23,12 +23,12 @@ const userRegister = async (req, res) => {
     username: data.username
   })
   if(findUsername.length > 0)
-    return res.status(412).json({ 'message': 'Username already existing'});
+    return res.json({ 'status': 'ko', 'message': 'Username already existing'});
   let findMail = await User.find({
     mail: data.mail
   })
   if(findMail.length > 0)
-    return res.status(412).json({ 'message': 'Mail already existing'});
+    return res.json({'status': 'ko',  'message': 'Mail already existing'});
 
   const user = await User.create({
     username: data.username,
@@ -43,10 +43,10 @@ const userRegister = async (req, res) => {
 const userModify = async (req, res) => {
   let data = req.body
   if(!data || !data.user_id)
-    return res.status(412).json({ 'message': 'Prerequisited not valid'});
+    return res.json({'status': 'ko',  'message': 'Prerequisited not valid'});
 
   if(data.user_id=='')
-    return res.status(412).json({ 'message': 'Prerequisited not valid'});
+    return res.json({'status': 'ko',  'message': 'Prerequisited not valid'});
 
   const objId = new mongoose.Types.ObjectId(data.user_id);
   const user = User.findById(objId)
@@ -70,7 +70,7 @@ const userModify = async (req, res) => {
   await user.save()
   
 
-  res.send({'status': 'ok'})
+  res.json({'status': 'ok'})
 }
 
 const userDelete = async (req, res) => {
@@ -81,7 +81,7 @@ const userDelete = async (req, res) => {
     return user;
   const objId = new mongoose.Types.ObjectId(user[0]._id);
   const userDeleted = await User.findByIdAndDelete(objId)
-  res.send({'status': 'ok', 'redirect': '/user/register', 'user': userDeleted._id})
+  res.json({'status': 'ok', 'redirect': '/user/register', 'user': userDeleted._id})
 }
 
 const userLogin = async (req, res) => {
@@ -111,7 +111,8 @@ const userLogin = async (req, res) => {
   }
 
   res.json({ 
-    accessToken: accessToken
+    accessToken: accessToken,
+    user_id: user[0]._id
   });
 }
 
@@ -142,7 +143,7 @@ async function checkPassword(data, res){
   
   let compare = await bcrypt.compare(data.password, user[0].password)
   if(!compare){
-    return res.sendStatus(401);
+    return res.json({'status': 'ko', 'message': 'Password or username not corret' });
   }
   return user;
 }

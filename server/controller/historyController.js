@@ -10,14 +10,14 @@ const historyAdd = async (req, res) => {
 
     if((!data.event_type_id && data.event_type_id!='')
         || (!data.event_id && data.event_id!=''))
-        return res.status(412).json({ 'message': 'Prerequisited not valid'})
+        return res.json({'status': 'ko',  'message': 'Prerequisited not valid'})
     const type = await EventsType.findById(data.event_type_id);
     if(!type)
-        return res.status(404).json({ 'message': 'The event type is not found' });
+        return res.json({'status': 'ko',  'message': 'The event type is not found' });
     const event = await EventsType.findById(data.event_id);
     const eventObjId = new mongoose.Types.ObjectId(data.event_id);
     if(!event)
-        return res.status(404).json({ 'message': 'The event is not found' });
+        return res.json({'status': 'ko',  'message': 'The event is not found' });
       
     let jsonDuration = makeDurationJson(type, data)
     
@@ -27,7 +27,7 @@ const historyAdd = async (req, res) => {
         event: eventObjId
     })
 
-    res.status(200).json({'status': 'ok'});
+    res.json({'status': 'ok'});
 }
 
 const historyModify = async (req, res) => {
@@ -35,18 +35,18 @@ const historyModify = async (req, res) => {
 
     if((!data.event_type_id && data.event_type_id!='')
         || (!data.event_id && data.event_id!='') || (!data.history_id && data.history_id!=''))
-        return res.status(412).json({ 'message': 'Prerequisited not valid'})
+        return res.json({'status': 'ko', 'message': 'Prerequisited not valid'})
     const type = await EventsType.findById(data.event_type_id);
     if(!type)
-        return res.status(404).json({ 'message': 'The event type is not found' });
+        return res.json({'status': 'ko', 'message': 'The event type is not found' });
     const event = await EventsType.findById(data.event_id);
     const eventObjId = new mongoose.Types.ObjectId(data.event_id);
     if(!event)
-        return res.status(404).json({ 'message': 'The event is not found' });
+        return res.json({ 'status': 'ko', 'message': 'The event is not found' });
     const history = await EventsType.findById(data.history_id);
     const historyObjId = new mongoose.Types.ObjectId(data.history_id);
     if(!history)
-        return res.status(404).json({ 'message': 'The event is not found' });
+        return res.json({ 'status': 'ko', 'message': 'The event is not found' });
       
     let jsonDuration = makeDurationJson(type, data)
   
@@ -56,14 +56,14 @@ const historyModify = async (req, res) => {
 
     await history.save();
 
-    res.json();
+    res.json({ 'status': 'ok'});
 }
 
 function makeDurationJson(type, data){
     let jsonDuration = {};
     if(type.tipology == "normal"){
         if(!data.duration && data.event_type_id<=0) 
-            return res.status(412).json({ 
+            return res.json({ 'status': 'ok', 
                 'message': 'Prerequisited not valid',
                 'problem' : 'duration'
             });

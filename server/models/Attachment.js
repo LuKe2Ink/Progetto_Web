@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 
 const attachmentSchema = new mongoose.Schema({
     link: {
-        type: String, 
-        required: true 
+      type: String, 
+      required: false 
     },
     event: {
       type: mongoose.Schema.Types.ObjectId,
@@ -18,7 +18,7 @@ const attachmentSchema = new mongoose.Schema({
       type: {
         fileName:{
           type: String,
-          require:true
+          require:false
         },
         date:{
           type: String,
@@ -26,9 +26,10 @@ const attachmentSchema = new mongoose.Schema({
         },
         size:{
           type: Number,
-          require:true
+          require:false
         }
-        }
+        },
+        require
     }
   }, { collection: 'attachment' });
 

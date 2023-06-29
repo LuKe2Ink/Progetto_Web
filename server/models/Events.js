@@ -21,6 +21,11 @@ const eventSchema = new mongoose.Schema({
       type: [{type: String }],
       required: false
     },
+    finished: {
+      type: Boolean,
+      require: false,
+      defaults: true
+    },
     event_type: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "EventsType",

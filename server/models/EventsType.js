@@ -23,6 +23,11 @@ const eventsTypeSchema = new mongoose.Schema({
         type: Boolean,
         require: true,
         default: false
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Users",
+      required: false
     }
   }, { collection: 'events_type' });
 
