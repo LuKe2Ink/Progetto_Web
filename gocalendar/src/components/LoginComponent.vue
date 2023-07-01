@@ -3,6 +3,7 @@
   import axios from 'axios';
   import router from '../router/router';
   import swal from 'sweetalert';
+  import config from '../../configApi.json';
 
   export default defineComponent({
     setup() {
@@ -17,17 +18,18 @@
         };
 
         // Send the login request to the server
-        const response = await axios.post('http://localhost:3000/user/login', formData);
+        const response = await axios.post(config.apiAddress+':'+config.apiPort+'/user/login', formData);
         const data = response.data;
         if(data.status == 'ko'){
           swal({
             title: "Error",
             text: data.message,
-            icon: "error"
+            icon: "error",
+            className: "sweetAlert"
           })
         } else {
-          const token = response.data.accessToken;
-          localStorage.setItem('token', token);
+          localStorage.setItem('token', response.data.accessToken);
+          localStorage.setItem('user_id', response.data.user_id);
           router.push('/calendar')
         }
           

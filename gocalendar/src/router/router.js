@@ -22,7 +22,7 @@ const routes = [
     {
       path: '/calendar',
       name: 'calendar',
-      component: () => import('../components/CalendarComponent.vue'),
+      component: () => import('../pages/CalendarComponent.vue'),
       beforeEnter: requireAuth
     },
     {

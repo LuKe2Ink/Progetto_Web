@@ -3,6 +3,7 @@ $secondary-color: #3D7DBD;
 $text-color: #CDF6FF;
 $border-color: #6573BC;
 $shadow-color: #00244B;
+$header-height: 150px;
 
 .container {
     text-align: center;
@@ -10,20 +11,30 @@ $shadow-color: #00244B;
     background-color: $secondary-color;
     border-radius: 10px;
     border: 1px solid $border-color;
-    max-width: calc(100vh - 60vh);
+    max-width: calc(100vh - 40vh);
+    min-height: fit-content;
     margin: auto;
+    margin-top: $header-height;
     color: $text-color;
+    padding: 50px 0;
+
+    form{
+        display: inline-flexbox;     
+    }
 
     .row{
         margin-top: 10px;
         margin-bottom: 10px;
+        vertical-align: middle;
     }
 
     label {
+        font-size: 200%;
+        height: fit-content;
+        margin: auto;
         text-align: start;
-        width: 100px;
+        min-width: 180px;
         display: inline-block;
-        font-size: large;
         margin-right: 5px;
     }
 
@@ -32,7 +43,7 @@ $shadow-color: #00244B;
         height: 30px;
         border: 1px solid grey;
         border-radius: 5px;
-        max-width: 100px;
+        max-width: 200px;
     }
 
     button {
@@ -42,7 +53,7 @@ $shadow-color: #00244B;
         border-radius: 10px;
         color: $text-color;
         background-color: #00527F;
-        font-size: large;
+        font-size: 150%;
         height: 40px;
         width: 60%;
         margin-top: 20px;
@@ -56,10 +67,14 @@ $shadow-color: #00244B;
     }
 
     .link{
-        color: #00A3C2;
+        color: #EB9A28;
     }
     .link:visited{
-        color: #00A3C2;
+        color: #EB9A28;
     }
+}
+
+.sweet-text{
+    font-size: 150%;
 }
 

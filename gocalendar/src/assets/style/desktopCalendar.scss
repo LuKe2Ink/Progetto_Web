@@ -1,0 +1,35 @@
+$primary-color: #0085b6;
+$secondary-color: #3D7DBD;
+$text-color: #CDF6FF;
+$border-color: #6573BC;
+$shadow-color: #00244B;
+$header-height: 150px;
+
+.container {
+    text-align: center;
+    box-shadow: 2px 2px 10px $shadow-color;
+    background-color: $secondary-color;
+    border-radius: 10px;
+    border: 1px solid $border-color;
+    max-width: 100%;
+    margin: auto;
+    margin-inline: 50px;
+    margin-top: $header-height;
+    color: $text-color;
+    padding: 50px 0;
+
+    table, td, th{
+        border-right: solid black;
+        border-collapse: collapse; 
+    }
+
+    td:last-child, th:last-child{
+        border-right: none;
+    }
+
+    table{
+        font-size: 200%;
+        width: 100%;
+    }
+}
+

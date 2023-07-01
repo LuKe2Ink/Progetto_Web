@@ -4,12 +4,13 @@ const cors = require('cors')
 const http = require('http');
 const mongoose = require('mongoose');
 const { isAuthenticated } = require('./router/authToken/tokenVerify')
+const config = require("../config.json")
 // const moment = require('moment');
 app.use(cors());
 
 const connectDB = () => {
     try {
-        mongoose.connect('mongodb://127.0.0.1:27017/web_project')
+        mongoose.connect(config.mongoAddress+':'+config.mongoPort+'/'+config.mongoDb)
         .then(() => {
             console.log('Connected to MongoDB');
         })
@@ -18,14 +19,14 @@ const connectDB = () => {
     }
 }
 
-app.listen('3000', () => {
-  console.log('Node API server started on port ' + '3000');
-});
+// app.listen('3000', () => {
+//   console.log('Node API server started on port ' + '3000');
+// });
 
 const server = http.createServer(app);
-const port = 8080; 
-server.listen(port, () => {
-  console.log('Server listening on port '+port);
+const port = 3000; 
+server.listen(3000, () => {
+  console.log('Server listening on port '+3000);
 });
 
 app.use(express.json());

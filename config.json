@@ -1,0 +1,5 @@
+{
+    "mongoAddress":"mongodb:\/\/127.0.0.1",
+    "mongoPort": "27017",
+    "mongoDb": "web_project"
+}

@@ -9,23 +9,22 @@
 </script>
 
 <template>
-  <header style="display: flex;">
+  <header>
   
     <img alt="GoCalendar logo" class="logo" src="./assets/logo.png" />
     <div class="navHeader">
       <nav>
-        <RouterLink to="/register" class="link"><p>Register</p><em class="pi pi-user-plus"></em></RouterLink>
-        <RouterLink to="/login" class="link"><p>Login</p><em class="pi pi-sign-in"></em></RouterLink>
+        <div class="login"><RouterLink to="/login" class="link"><i class="fa-solid fa-right-to-bracket"></i> Login</RouterLink></div>
       </nav>
     </div>
   </header>
 
-  <div class="container mt-3">
+  <div>
       <RouterView/>
   </div>
   
 </template>
 
-<style>
+<style lang="scss">
   @import './assets/style/navHeader.scss'; 
 </style>

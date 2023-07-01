@@ -8,6 +8,8 @@ const saltRounds = 10;
 
 //vedere se utilizzare session token con refresh token
 const userRegister = async (req, res) => {
+  //todo controllo password(?)
+
   let data = req.body
 
   if(!data || !data.username || !data.password || !data.mail)

@@ -1,10 +1,52 @@
+$primary-color: #0085b6;
+$secondary-color: #3D7DBD;
+$icon-color: #EB9A28;
+$border-color: #6573BC;
+$shadow-color: #00244B;
 
-.log
-
-.diocane{
-    display: flex !important;
+body{
+    margin: 0px;
 }
 
-.link{text-decoration: none;}
+.logo{
+    margin: auto;
+    margin-left: 10px;
+    height: 80px;
+}
 
+header{
+    font-size: 200%;
+    height: 90px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    display: inline-flex;
+    background-color: $shadow-color;
+    
+    i{
+        color: $icon-color;
+    }
+
+    .navHeader{
+        width: 100%;
+        display: flex;
+        align-items: flex-end;
+        justify-content: end;
+    }
+
+    .navHeader nav{
+        margin-right: 15px;
+        height: 100%;
+        align-items: center;
+        display: flex;
+    }
+
+    .link{
+        border-radius: 5px;
+        border: 1px solid $icon-color;
+        color: $icon-color;
+        text-decoration: none;
+        padding: 5px;
+    }
+}
 
