@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
 function isAuthenticated(req, res, next) {
     try {
-    let token = req.get("authorization");
+    let token = req.get("Authorization");
+    console.log(token)
     if (!token){
         return res.json({'status': 'ko', 'redirect': '/user/login'});
     }
@@ -10,6 +11,7 @@ function isAuthenticated(req, res, next) {
     req.username = decoded.username;
     next();
     } catch (error) {
+        console.log(error)
         return res.json({'status': 'ko', 'redirect': '/user/login'});
     // console.error(error);
     }

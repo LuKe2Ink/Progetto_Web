@@ -14,8 +14,18 @@ const eventSchema = new mongoose.Schema({
         required: false 
     },
     date: {
-        type: String, 
-        required: true 
+      day: {
+        type: Number, 
+        required: true
+      },
+      month: {
+        type: Number, 
+        required: true
+      },
+      year: {
+        type: Number, 
+        required: true
+      } 
     },
     people: {
       type: [{type: String }],

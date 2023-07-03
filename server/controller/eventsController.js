@@ -8,6 +8,7 @@ const EventsType = require('../models/EventsType');
 //todo fare a tutti il controllo se è son settati tutti i dati del body
 const eventsList = async (req, res) => {
   let data = req.body;
+  console.log(req.body)
   
   if(!data.user_id)
     return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})

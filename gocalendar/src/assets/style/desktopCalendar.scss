@@ -4,6 +4,7 @@ $text-color: #CDF6FF;
 $border-color: #6573BC;
 $shadow-color: #00244B;
 $header-height: 150px;
+$tr-height: 100px;
 
 .container {
     text-align: center;
@@ -21,9 +22,55 @@ $header-height: 150px;
     table, td, th{
         border-right: solid black;
         border-collapse: collapse; 
+        word-wrap:break-word 
+    }
+    tr{
+      width: 100%;
+      height: $tr-height;
+    }
+    th{
+      max-width: 0;
+      width: 14%;
+      clear: left;
+    }
+    td {
+      max-width: 0;
+      width: 14%;
+      vertical-align: top;
+      border-top: solid black;
+      clear: left;
     }
 
-    td:last-child, th:last-child{
+    .eventList{
+      max-height: $tr-height;
+      overflow: hidden;
+      height: 100px;
+      height: 100%;
+      width: calc(100% - 10px);
+      margin-left: 5px;
+      padding: 0px;
+      list-style-type: none;
+      float:  left;
+      clear: left;
+    }
+    .eventList:hover{
+      overflow: overlay;
+    }
+    .eventSingle{
+      border: 1px solid white;
+      border-radius: 5px;
+      height: 40px;
+      p{
+        text-align: start;
+        width: calc(100% - 10px);
+        margin: auto;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis; 
+      }
+    }
+
+    table:last-child, td:last-child, th:last-child{
         border-right: none;
     }
 
@@ -32,4 +79,84 @@ $header-height: 150px;
         width: 100%;
     }
 }
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
+.modal {
+  background: #FFFFFF;
+  box-shadow: 2px 2px 20px 1px;
+  overflow-x: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header,
+.modal-footer {
+  padding: 15px;
+  display: flex;
+}
+
+.modal-header {
+  position: relative;
+  border-bottom: 1px solid #eeeeee;
+  color: #4AAE9B;
+  justify-content: space-between;
+}
+
+.modal-footer {
+  border-top: 1px solid #eeeeee;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.modal-body {
+  position: relative;
+  padding: 20px 10px;
+}
+
+.btn-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: none;
+  font-size: 20px;
+  padding: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #4AAE9B;
+  background: transparent;
+}
+
+.btn-green {
+  color: white;
+  background: #4AAE9B;
+  border: 1px solid #4AAE9B;
+  border-radius: 2px;
+}
+
+
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey; 
+  border-radius: 5px;
+}
+  
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #4AAE9B; 
+  border-radius: 5px;
+}
