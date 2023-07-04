@@ -75,7 +75,7 @@ const eventSingle = async (req, res) => {
 }
 
 const eventCreate = async (req, res) => {
-  let data = res.body;
+  let data = req.body;
   if(!data.title|| !data.date || !data.location || !data.description 
       || !data.event_type_id || !data.user_id)
       return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
@@ -107,36 +107,38 @@ const eventCreate = async (req, res) => {
 }
 
 const eventModify = async (req, res) => {
-  let data = res.body;
+  let data = req.body;
+  console.log(data)
   if(!data.title|| !data.date || !data.location || !data.description 
         || !data.event_type_id || !data.event_id )
     return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
 
-  if(data.title == '' || data.date == '' || data.location == ''
+  if(data.title == '' || data.location == ''
     || data.description == '' || data.event_type_id == '' || data.event_id == '')
     return res.json({'status': 'ko', 'message': 'Prerequisited not valid'})
 
   const type = await EventsType.findById(data.event_type_id);
-  const typeObjId = new mongoose.Types.ObjectId(data.eevent_type_idvent);
+  const typeObjId = new mongoose.Types.ObjectId(data.event_type_id);
   if(!type)
     return res.json({ 'status': 'ko', 'message': 'The event type is not found' });
 
   let event = await Events.findById(data.event_id)
   if(!event)
     return res.json({ 'status': 'ko', 'message': 'Event not found' });
-  event.title = data.tile;
+  event.title = data.title;
   event.data = data.date;
   event.location = data.location;
   event.people = data.people;
   event.description = data.description;
   event.event_type = typeObjId;
-  await event.save()
+  let hola = await event.save()
+    console.log(hola)
 
   res.json({'status': 'ok'});
 }
 
 const eventDelete = async (req, res) => {
-  let data = res.body;
+  let data = req.body;
   if(data.event_id == '')
     return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
   if(!data.event_id)

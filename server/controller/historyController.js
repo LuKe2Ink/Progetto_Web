@@ -31,7 +31,7 @@ const historyAdd = async (req, res) => {
 }
 
 const historyModify = async (req, res) => {
-    let data = res.body;
+    let data = req.body;
 
     if((!data.event_type_id && data.event_type_id!='')
         || (!data.event_id && data.event_id!='') || (!data.history_id && data.history_id!=''))

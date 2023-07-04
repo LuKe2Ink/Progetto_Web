@@ -4,6 +4,9 @@
 
   export default {
     name: 'App',
+    data(){
+      user_id: localStorage.getItem('user_id')
+    }
   };
 </script>
 
@@ -14,7 +17,7 @@
     <h1>{{ count }}</h1>
     <div class="navHeader">
       <nav>
-        <div class="login"><RouterLink to="/login" class="link"><i class="fa-solid fa-right-to-bracket"></i> Login</RouterLink></div>
+        <div v-if="user_id != null" class="login"><RouterLink to="/login" class="link"><i class="fa-solid fa-right-to-bracket"></i> Login</RouterLink></div>
       </nav>
     </div>
   </header>
