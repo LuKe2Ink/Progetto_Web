@@ -6,7 +6,7 @@ $shadow-color: #00244B;
 $header-height: 100px;
 $tr-height: 100px;
 
-.container {
+.contenitore {
     text-align: center;
     box-shadow: 2px 2px 10px $shadow-color;
     background-color: $secondary-color;
@@ -145,6 +145,12 @@ $tr-height: 100px;
 .modal-footer {
   padding: 15px;
   display: flex;
+  h1{
+    margin-block: 0px;
+    p{
+      margin-block: 0px;
+    }
+  }
 }
 
 .modal-header {
@@ -169,6 +175,9 @@ $tr-height: 100px;
   padding: 20px 10px;
   .typesInput{
     width: fit-content;
+  }
+  .modalBodySlot *{
+    margin-block: 40px;
   }
 }
 
@@ -232,18 +241,19 @@ textarea {
   background: none;
   color: $muted-color;
   font-size: 18px;
-  padding: 10px 10px 10px 5px;
+  padding-top: 15px;
   display: block;
   border: none;
   border-radius: 0;
   margin-left: 0px;
+  margin-bottom: 10px;
   border-bottom: 1px solid $muted-color;
   &:focus {
     outline: none;
   }
   &:focus ~ label,
   &:valid ~ label {
-    top: -14px;
+    top: -2px;
     font-size: 12px;
     color: $hl-color;
   }
@@ -270,11 +280,11 @@ label {
 .bar {
   position: relative;
   display: block;
-  width: 100%;
+  width: 80%;
   &:before {
+    margin-bottom: 10px;
     content: '';
     height: 2px;
-    width: 0;
     bottom: 0px;
     position: absolute;
     background: $hl-color;

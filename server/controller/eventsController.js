@@ -20,16 +20,7 @@ const eventsList = async (req, res) => {
   const objId = new mongoose.Types.ObjectId(data.user_id);
   if(!user)
     return res.json({'status': 'ko', 'message': 'The user is not found' });
-  const events = await Events.aggregate([
-    {$match: {user: objId}},
-    {$lookup:{ 
-      from: 'events_type', 
-      localField:'event_type', 
-      foreignField:'_id',
-      as:'type'
-    }},
-    {$unwind: '$type'}
-  ]);
+  const events = await Events.find({user: objId});
   res.json(events);
 }
 
@@ -88,8 +79,8 @@ const eventCreate = async (req, res) => {
   const typeObjId = new mongoose.Types.ObjectId(data.event_type_idvent);
   if(!type)
     return res.json({ 'status': 'ko', 'message': 'The event type is not found' });  
-  const user = await EventsType.findById(data.user_id);
-  const userObjId = new mongoose.Types.ObjectId(data.event);
+  const user = await Users.findById(data.user_id);
+  const userObjId = new mongoose.Types.ObjectId(data.user_id);
   if(!user)
     return res.json({'status': 'ko',  'message': 'The user is not found' });  
   
@@ -103,7 +94,7 @@ const eventCreate = async (req, res) => {
     user: userObjId
   })
   await event.save();
-  res.json(event);
+  res.json({'status': 'ok', 'data': event});
 }
 
 const eventModify = async (req, res) => {
@@ -131,10 +122,9 @@ const eventModify = async (req, res) => {
   event.people = data.people;
   event.description = data.description;
   event.event_type = typeObjId;
-  let hola = await event.save()
-    console.log(hola)
+  let eventModify = await event.save()
 
-  res.json({'status': 'ok'});
+  res.json({'status': 'ok', 'data': eventModify});
 }
 
 const eventDelete = async (req, res) => {

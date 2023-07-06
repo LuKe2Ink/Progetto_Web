@@ -3,9 +3,7 @@
     import axios from 'axios';
     import router from '../router/router';
     import swal from 'sweetalert';
-    import moment from 'moment';
     import config from '../../configApi.json';
-    console.log(config.apiAddress+':'+config.apiPort+'/events/list')
     
     async function eventList(){
         const dataBody = {
@@ -16,13 +14,16 @@
         );
         const data = response.data;
         if(data.status == 'ko'){
-            console.log(data)
-            swal({
+            await swal({
                 title: "Error",
                 text: data.message,
                 icon: "error",
                 className: "sweetAlert"
             })
+            localStorage.setItem('user_id', null)
+            localStorage.setItem('token', null)
+            await router.push("/login")
+            return null
         }
         return data;
     }
@@ -36,8 +37,7 @@
         );
         const data = response.data;
         if(data.status == 'ko'){
-            console.log(data)
-            swal({
+            await swal({
                 title: "Error",
                 text: data.message,
                 icon: "error",
@@ -48,8 +48,18 @@
     }
     
     let events = await eventList();
-    let eventTypes = await typeList();
-    console.log(eventTypes)
+    let eventTypes = null;
+    if(events)
+      eventTypes = await typeList();
+    let fakeEvent = {
+      description: '',
+      title: '',
+      location: '',
+      people: [],
+      type: {
+        _id:''
+      }
+    }
 
     export default defineComponent({
         setup() {
@@ -61,7 +71,6 @@
               })
               typeConvert[element._id] = element.name
           });
-          console.log(jsonOptions)
           const options = ref(jsonOptions)
           let titolo = ref('')
           let descrizione = ref('')
@@ -101,7 +110,7 @@
             result.forEach(element => {
                 week.push(element);
                 if(week[week.length-1].dayOfWeek == 6){
-                    days.push({prova: week});
+                    days.push(week);
                     week = []
                 }
             });
@@ -120,82 +129,144 @@
         data(){
             return{
                 show: false,
-                singleEvent: '',
+                singleEvent: null,
                 titleInput:false,
                 descrizioneInput: false,
                 titoloInput: false,
                 luogoInput: false,
                 personeInput: false,
-                tipoInput: false
+                tipoInput: false,
+                creationEvent: false,
+                selectedCell:{
+                  week: 0,
+                  day:0
+                }
             }
         },
         methods: {
             modalSwitch(){
               this.show = !this.show;
-              this.setInputAllFalse();
+              this.creationEvent = false;
+              this.setInput(false);
+              if(fakeEvent.date)
+                delete fakeEvent.date
             },
-            eventSingle(event){
+            eventSingle(event, week, day){
+              this.selectedCell.week = week;
+              this.selectedCell.day = day;
               this.show = true
-              console.log(event)
               this.singleEvent = event
-              this.descrizione = ref(event.description)
-              this.titolo = ref(event.title)
-              this.luogo = ref(event.location) 
-              let people = event.people.join(', ')
-              this.persone = ref(people)
-              this.tipo = ref(event.type._id)
+              this.setInputValue(event)
+            },
+            createEvent(day, week, Indexday){
+              this.selectedCell.week = week;
+              this.selectedCell.day = Indexday;
+              this.setInputValue(fakeEvent)
+              fakeEvent["date"] = {
+                day: parseInt(day),
+                month: 7,
+                year: 2023
+              }
+              this.show = true
+              this.setInput(true)
+              this.creationEvent=true;
             },
             inputShow(input){
               input=!input;
             },
             async submitForm(){
+              if(this.singleEvent==null){
+                let dataBody = this.checkInput(fakeEvent);
+                if(dataBody){
+                  dataBody["date"]=fakeEvent.date
+                  const response = await axios.put(config.apiAddress+':'+config.apiPort+'/events/create', 
+                    dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+                  );
+                  const data = response.data;
+                  if(data.status == 'ko'){
+                      swal({
+                          title: "Error",
+                          text: data.message,
+                          icon: "error",
+                          className: "sweetAlert"
+                      })
+                  } else {
+                    this.days[this.selectedCell.week][this.selectedCell.day].event.push(data.data)
+                  }
+                }
+                
+              } else {
+                let dataBody = this.checkInput(this.singleEvent);
+                if(dataBody){
+                  dataBody["date"]=this.singleEvent.date
+                    const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/modify', 
+                      dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+                  );
+                  const data = response.data;
+                  if(data.status == 'ko'){
+                      swal({
+                          title: "Error",
+                          text: data.message,
+                          icon: "error",
+                          className: "sweetAlert"
+                      })
+                  } else {
+                    let predicate = (element) => element._id == data.data._id;
+                    let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
+                    this.days[this.selectedCell.week][this.selectedCell.day].event[index] = data.data
+                  }
+                }
+                
+                this.setInput(false);
+              }
+            },
+            checkInput(event){
+              let dataBody = null;
               let personeForm = this.persone.replace(' ', '')
-              let personeEvento = this.singleEvent.people.join(',')
-              if(this.titolo != this.singleEvent.title
-                || this.descrizione != this.singleEvent.description
-                || this.luogo != this.singleEvent.location
+              let personeEvento = ''
+              if(event.people)
+                personeEvento = event.people.join(',')
+              if(this.titolo != event.title
+                || this.descrizione != event.description
+                || this.luogo != event.location
                 || personeForm != personeEvento
-                || this.tipo != this.singleEvent.type._id){
-                const dataBody = {
+                || this.tipo != event.event_type){
+                  dataBody = {
                   user_id: localStorage.getItem('user_id'),
                   title: this.titolo,
                   description: this.descrizione,
-                  date: this.singleEvent.date,
                   people: personeForm.split(','),
                   location: this.luogo,
                   event_type_id: this.tipo,
-                  event_id: this.singleEvent._id
-                }
-                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/modify', 
-                    dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-                );
-                const data = response.data;
-                if(data.status == 'ko'){
-                    console.log(data)
-                    swal({
-                        title: "Error",
-                        text: data.message,
-                        icon: "error",
-                        className: "sweetAlert"
-                    })
-                } else {
-                  events = await eventList()
+                  event_id: event._id ? event._id : ''
                 }
               }
+              return dataBody;
             },
-            setInputAllFalse(){
-              this.descrizioneInput = false
-              this.titoloInput = false
-              this.luogoInput = false
-              this.personeInput = false
-              this.tipoInput = false
+            setInput(bool){
+              if(!this.creationEvent){
+                this.singleEvent = null
+                this.descrizioneInput = bool
+                this.titoloInput = bool
+                this.luogoInput = bool
+                this.personeInput = bool
+                this.tipoInput = bool
+              }
+            },
+            setInputValue(jsonEvent){
+              this.descrizione = ref(jsonEvent.description)
+              this.titolo = ref(jsonEvent.title)
+              this.luogo = ref(jsonEvent.location) 
+              let people = jsonEvent.people.join(', ')
+              this.persone = ref(people)
+              this.tipo = ref(jsonEvent.event_type)
             }
         },
     });
 </script>
 
 <template>
-    <div class="container">
+    <div class="contenitore">
         <table>
             <tbody>
                 <tr>
@@ -207,16 +278,16 @@
                     <th>Sabato</th>
                     <th class="lastTh">Domenica</th>
                 </tr>
-                <tr :key="days" v-for="week in days">
-                    <td v-for="day in week.prova">
+                <tr :key="days" v-for="(week, indexWeek) in days">
+                    <td v-for="(day, indexDay) in week">
                       <div class="events">
                         <div v-if="day.day != ''" class="dayNumber"><p>{{ day.day }}</p></div>
                         <div v-if="day.event.length > 0" class="eventList">
-                            <div @click="eventSingle(event)" class="eventSingle" v-for="event in day.event">
+                            <div @click="eventSingle(event, indexWeek, indexDay)" class="eventSingle" v-for="event in day.event">
                                 <p>{{ event.title }}</p>
                             </div>
                         </div>
-                        <div v-if="day.day != ''" class="addEvent"><i class="fa-solid fa-calendar-plus fa-2xs"></i></div>
+                        <div @click="createEvent(day.day, indexWeek, indexDay)" v-if="day.day != ''" class="addEvent"><i class="fa-solid fa-calendar-plus fa-2xs"></i></div>
                       </div>
                     </td>
                 </tr>
@@ -226,9 +297,9 @@
     <transition v-if="show" name="modal-fade">
     <div class="modal-backdrop" >
       <div class="modal">
-        <form @submit.prevent="submitForm">
-          <header class="modal-header" id="modalTitle" v-on:click.self="setInputAllFalse">
-            <h1 @click="">
+        <form @submit.prevent="submitForm()">
+          <header class="modal-header" id="modalTitle" v-on:click.self="setInput(false)">
+            <h1>
               <div class="group" v-if="titoloInput">
                 <input v-model="titolo" type="text" required="required">
                 <span class="highlight"></span>
@@ -236,15 +307,15 @@
                 <label>Titolo</label>
               </div>
               <p v-if="!titoloInput" @click="titoloInput = !titoloInput">
-                Titolo: {{ titolo }}
+                {{ titolo }}
               </p>
             </h1>
             <button type="button" class="btn-close" @click="modalSwitch">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </header>
-          <section class="modal-body" id="modalDescription" v-on:click.self="setInputAllFalse">
-            <slot name="body">
+          <section class="modal-body" id="modalDescription" v-on:click.self="setInput(false)">
+            <slot name="body" class="modalBodySlot">
               <div class="group" v-if="descrizioneInput">
                 <input v-model="descrizione" type="text" required="required">
                 <span class="highlight"></span>
@@ -283,6 +354,7 @@
                 Etichetta: {{ typeConvert[tipo] }}
               </p>
             </slot>
+            <div v-if="singleEvent==null" class="submitButton"><button type="submit">Hola</button></div>
           </section>
           <!-- <footer class="modal-footer">
             <slot name="footer">
@@ -295,6 +367,6 @@
   </transition>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
     @import '../assets/style/desktopCalendar.scss'; 
 </style>

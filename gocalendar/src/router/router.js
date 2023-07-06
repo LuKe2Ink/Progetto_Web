@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 const requireAuth = (to, from, next) => {
   const token = localStorage.getItem('token');
+  console.log(token);
   if (token != null) {
     // User is authorized, proceed with navigation
     next();
@@ -34,12 +35,12 @@ const routes = [
     {
       path: '/register',
       name: 'register',
-      component: () => import ('../components/RegisterComponent.vue'),
+      component: () => import('../components/RegisterComponent.vue'),
     },
     {
       path: '/login',
       name: 'login',
-      component: () => import ('../components/LoginComponent.vue'),
+      component: () => import('../pages/LoginPage.vue'),
     }
   ]
 

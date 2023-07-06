@@ -5,13 +5,13 @@
   import swal from 'sweetalert';
   import config from '../../configApi.json';
 
+
   export default defineComponent({
     setup() {
       const username = ref('')
       const password = ref('')
 
       const submitForm = async () => {
-        console.log(username, password)
         const formData = {
             username: username.value,
             password: password.value,
@@ -21,7 +21,7 @@
         const response = await axios.post(config.apiAddress+':'+config.apiPort+'/user/login', formData);
         const data = response.data;
         if(data.status == 'ko'){
-          swal({
+          await swal({
             title: "Error",
             text: data.message,
             icon: "error",
@@ -30,9 +30,9 @@
         } else {
           localStorage.setItem('token', response.data.accessToken);
           localStorage.setItem('user_id', response.data.user_id);
+
           router.push('/calendar')
         }
-          
       }
 
       return {
