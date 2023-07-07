@@ -33,7 +33,7 @@ const eventSchema = new mongoose.Schema({
     },
     finished: {
       type: Boolean,
-      require: false,
+      require: true,
       defaults: false
     },
     event_type: {

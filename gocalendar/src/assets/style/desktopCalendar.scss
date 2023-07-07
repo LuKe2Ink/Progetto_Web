@@ -18,6 +18,18 @@ $tr-height: 100px;
     margin-top: $header-height;
     color: $text-color;
 
+    .month{
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .prevMonth, .nextMonth{
+        cursor: pointer;
+        margin-inline: 15px;
+      }
+    }
+
+
     table, td, th{
         border-right: solid black;
         border-collapse: collapse; 

@@ -1,5 +1,5 @@
 <script>
-    import { defineComponent, ref, resolveTransitionHooks } from 'vue';
+    import { defineComponent, ref } from 'vue';
     import axios from 'axios';
     import router from '../router/router';
     import swal from 'sweetalert';
@@ -147,6 +147,7 @@
             modalSwitch(){
               this.show = !this.show;
               this.creationEvent = false;
+              this.singleEvent = null
               this.setInput(false);
               if(fakeEvent.date)
                 delete fakeEvent.date
@@ -178,7 +179,7 @@
               if(this.singleEvent==null){
                 let dataBody = this.checkInput(fakeEvent);
                 if(dataBody){
-                  dataBody["date"]=fakeEvent.date
+                  dataBody["date"]=fakeEvent.date;
                   const response = await axios.put(config.apiAddress+':'+config.apiPort+'/events/create', 
                     dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
                   );
@@ -216,7 +217,6 @@
                     this.days[this.selectedCell.week][this.selectedCell.day].event[index] = data.data
                   }
                 }
-                
                 this.setInput(false);
               }
             },
@@ -245,7 +245,6 @@
             },
             setInput(bool){
               if(!this.creationEvent){
-                this.singleEvent = null
                 this.descrizioneInput = bool
                 this.titoloInput = bool
                 this.luogoInput = bool
@@ -267,6 +266,11 @@
 
 <template>
     <div class="contenitore">
+      <div class="month">
+        <div class="prevMonth"><i class="fa-solid fa-circle-left"></i></div>
+        <h1>Luglio</h1>
+        <div class="nextMonth"><i class="fa-solid fa-circle-right"></i></div>
+      </div>
         <table>
             <tbody>
                 <tr>
@@ -344,7 +348,7 @@
                 Persone: {{ persone }}
               </p>
               <div v-if="tipoInput" class="typesInput">
-                <select v-model="tipo">
+                <select v-model="tipo" required>
                   <option v-for="option in options" :value="option.value">
                     {{ option.text }}
                   </option>

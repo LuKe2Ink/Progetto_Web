@@ -76,7 +76,7 @@ const eventCreate = async (req, res) => {
       return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
 
   const type = await EventsType.findById(data.event_type_id);
-  const typeObjId = new mongoose.Types.ObjectId(data.event_type_idvent);
+  const typeObjId = new mongoose.Types.ObjectId(data.event_type_id);
   if(!type)
     return res.json({ 'status': 'ko', 'message': 'The event type is not found' });  
   const user = await Users.findById(data.user_id);
@@ -91,7 +91,8 @@ const eventCreate = async (req, res) => {
     people: data.people,
     description: data.description,
     event_type: typeObjId,
-    user: userObjId
+    user: userObjId,
+    finished: false
   })
   await event.save();
   res.json({'status': 'ok', 'data': event});
