@@ -28,10 +28,12 @@
             className: "sweetAlert"
           })
         } else {
+          console.log(response.data.user_id)
           localStorage.setItem('token', response.data.accessToken);
           localStorage.setItem('user_id', response.data.user_id);
-
-          router.push('/calendar')
+          setTimeout(() => {
+            router.push('/calendar')
+          }, 300);
         }
       }
 

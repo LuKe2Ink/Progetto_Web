@@ -12,10 +12,6 @@ const eventsHistorySchema = new mongoose.Schema({
           type: Number,
           require: false
         },
-        seconds:{
-          type: Number,
-          require: false 
-        },
         page:{
           type: Number,
           require: false
@@ -25,7 +21,7 @@ const eventsHistorySchema = new mongoose.Schema({
           required: false
         }
       },
-      require: true
+      require: false
     },  
     date: {
         type: String, 

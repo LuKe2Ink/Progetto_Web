@@ -25,16 +25,19 @@ const eventSchema = new mongoose.Schema({
       year: {
         type: Number, 
         required: true
-      } 
+      },
+      time: {
+        type: String,
+        require: true
+      },
+      finished_time: {
+        type: String,
+        require: false
+      }
     },
     people: {
       type: [{type: String }],
       required: false
-    },
-    finished: {
-      type: Boolean,
-      require: true,
-      defaults: false
     },
     event_type: {
       type: mongoose.Schema.Types.ObjectId,

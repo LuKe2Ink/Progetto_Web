@@ -4,6 +4,7 @@
     import router from '../router/router';
     import swal from 'sweetalert';
     import config from '../../configApi.json';
+    import moment from 'moment';
     
     async function eventList(){
         const dataBody = {
@@ -46,6 +47,49 @@
         }
         return data
     }
+
+    function getDaysInMonth(month, year){
+      console.log(month, year)
+      var date = new Date(year, month, 1);
+
+      var result = [];
+      while (date.getMonth() == month) {
+          let event = [];
+          //mettere questo nel controller, passare, la month e lo year
+          event = events.filter(element => (element.date.day == date.getDate() 
+            && element.date.month == month && element.date.year))
+          result.push({
+              day: date.getDate(),
+              dayOfWeek:date.getDay(),
+              event: event
+          })
+          date.setDate(date.getDate() + 1);
+        }
+        while(result[0].dayOfWeek!=0){
+            result.unshift({
+                day: "",
+                dayOfWeek: result[0].dayOfWeek-1,
+                event:[]
+            })
+        }
+        while(result[result.length-1].dayOfWeek!=6){
+            result.push({
+                    day: "",
+                    dayOfWeek: result[result.length-1].dayOfWeek+1,
+                    event:[]
+                })
+        }
+        let days = []
+        let week = []
+        result.forEach(element => {
+            week.push(element);
+            if(week[week.length-1].dayOfWeek == 6){
+                days.push(week);
+                week = []
+            }
+        });
+        return days;
+    }
     
     let events = await eventList();
     let eventTypes = null;
@@ -57,74 +101,70 @@
       location: '',
       people: [],
       type: {
+        tipology: 'normal',
         _id:''
       }
     }
 
     export default defineComponent({
-        setup() {
-          let typeConvert = {};
-          let jsonOptions = []
+        // setup() {
+          // let typeConvert = {};
+          // let jsonOptions = []
+          // eventTypes.forEach(element => {
+          //     jsonOptions.push({
+          //       text: element.name, value: element._id
+          //     })
+          //     typeConvert[element._id] = element.name
+          // });
+          // this.options = ref(jsonOptions)
+          // this.titolo = ref('')
+          // this.descrizione = ref('')
+          // this.luogo = ref('') 
+          // this.persone = ref('')
+          // this.tipo = ref('')
+          // this.oraInizio = ref('')
+          // this.oraFine = ref('')
+          // let month = moment().get('M')
+          // let year = moment().get('Y')
+          // //dinamico di default prende mese e anno corrente
+          // this.days = getDaysInMonth(month, year);
+          // // return {
+          // //     days,
+          // //     descrizione,
+          // //     titolo,
+          // //     luogo,
+          // //     persone,
+          // //     tipo,
+          // //     oraInizio,
+          // //     oraFine,
+          // //     options,
+          // //     typeConvert,
+          // //     month,
+          // //     year
+          // // }
+        // },
+        created(){
+          console.log()
+          this.typeConvert = {};
+          let jsonOptions = [];
           eventTypes.forEach(element => {
               jsonOptions.push({
                 text: element.name, value: element._id
               })
-              typeConvert[element._id] = element.name
+              this.typeConvert[element._id] = element.name
           });
-          const options = ref(jsonOptions)
-          let titolo = ref('')
-          let descrizione = ref('')
-          let luogo = ref('') 
-          let persone = ref('')
-          let tipo = ref('')
+          this.options = ref(jsonOptions)
+          this.titolo = ref('')
+          this.descrizione = ref('')
+          this.luogo = ref('') 
+          this.persone = ref('')
+          this.tipo = ref('')
+          this.oraInizio = ref('')
+          this.oraFine = ref('')
+          this.month = moment().get('M')
+          this.year = moment().get('Y')
           //dinamico di default prende mese e anno corrente
-          var monthIndex = 7 - 1; // 0..11 instead of 1..12
-          var date = new Date(2023, monthIndex, 1);
-          var result = [];
-          while (date.getMonth() == monthIndex) {
-              let event = [];
-              event = events.filter(element => element.date.day == date.getDate())
-              result.push({
-                  day: date.getDate(),
-                  dayOfWeek:date.getDay(),
-                  event: event
-              })
-              date.setDate(date.getDate() + 1);
-            }
-            while(result[0].dayOfWeek!=0){
-                result.unshift({
-                    day: "",
-                    dayOfWeek: result[0].dayOfWeek-1,
-                    event:[]
-                })
-            }
-            while(result[result.length-1].dayOfWeek!=6){
-                result.push({
-                        day: "",
-                        dayOfWeek: result[result.length-1].dayOfWeek+1,
-                        event:[]
-                    })
-            }
-            let days = []
-            let week = []
-            result.forEach(element => {
-                week.push(element);
-                if(week[week.length-1].dayOfWeek == 6){
-                    days.push(week);
-                    week = []
-                }
-            });
-
-            return {
-                days,
-                descrizione,
-                titolo,
-                luogo,
-                persone,
-                tipo,
-                options,
-                typeConvert
-            }
+          this.days = getDaysInMonth(this.month, this.year);
         },
         data(){
             return{
@@ -136,14 +176,43 @@
                 luogoInput: false,
                 personeInput: false,
                 tipoInput: false,
+                oraInput: false,
                 creationEvent: false,
+                modify: false,
+                monthName: ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"],
                 selectedCell:{
                   week: 0,
                   day:0
-                }
+                },
+                days:null,
+                descrizione:null,
+                titolo:null,
+                luogo:null,
+                persone:null,
+                tipo:null,
+                oraInizio:null,
+                oraFine:null,
+                options:null,
+                typeConvert:null,
+                month:null,
+                year:null
             }
         },
         methods: {
+            changeMonth(sequence){
+              this.month += sequence;
+              console.log(this.month)
+              if(this.month==-1){
+                this.month = 11;
+                this.year -= 1
+              } else if(this.month==12){
+                this.month = 0;
+                this.year += 1
+              }
+              this.days = getDaysInMonth(this.month, this.year)
+              this.show = true;
+              this.show = false
+            },
             modalSwitch(){
               this.show = !this.show;
               this.creationEvent = false;
@@ -165,8 +234,8 @@
               this.setInputValue(fakeEvent)
               fakeEvent["date"] = {
                 day: parseInt(day),
-                month: 7,
-                year: 2023
+                month: this.month,
+                year: this.year
               }
               this.show = true
               this.setInput(true)
@@ -176,10 +245,12 @@
               input=!input;
             },
             async submitForm(){
+              //creazione
               if(this.singleEvent==null){
                 let dataBody = this.checkInput(fakeEvent);
                 if(dataBody){
                   dataBody["date"]=fakeEvent.date;
+                  dataBody.date["time"] = this.oraInizio
                   const response = await axios.put(config.apiAddress+':'+config.apiPort+'/events/create', 
                     dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
                   );
@@ -192,33 +263,60 @@
                           className: "sweetAlert"
                       })
                   } else {
+                    console.log(data.data)
                     this.days[this.selectedCell.week][this.selectedCell.day].event.push(data.data)
                   }
                 }
-                
               } else {
+                //modifica
                 let dataBody = this.checkInput(this.singleEvent);
                 if(dataBody){
                   dataBody["date"]=this.singleEvent.date
-                    const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/modify', 
+                  dataBody.date.time = this.oraInizio
+                  if(this.oraFine != '')
+                    dataBody.date["finished_time"] = this.oraFine
+                  const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/modify', 
                       dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
                   );
                   const data = response.data;
                   if(data.status == 'ko'){
-                      swal({
+                      await swal({
                           title: "Error",
                           text: data.message,
                           icon: "error",
                           className: "sweetAlert"
                       })
                   } else {
+                    if(this.oraFine != '' && data.data.event_type.tipology != 'special '){
+                      let date = moment()
+                      date.set('hours', this.oraInizio.split(":")[0])
+                      date.set('minutes', this.oraInizio.split(":")[1])
+                      date.set('seconds', 0)
+                      let startTime = date.clone()
+                      date.set('hours', this.oraFine.split(":")[0])
+                      date.set('minutes', this.oraFine.split(":")[1])
+                      date.set('seconds', 0)
+                      let end = date.clone()
+                      var duration = moment.duration(end.diff(startTime));
+                      var minutes = duration.asMinutes();
+                      const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', 
+                        {event_type_id: dataBody.event_type_id, event_id: dataBody.event_id, duration: minutes}, 
+                        {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+                      );
+                    }
+                    console.log(data.data)
                     let predicate = (element) => element._id == data.data._id;
                     let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
                     this.days[this.selectedCell.week][this.selectedCell.day].event[index] = data.data
+                    console.log(this.days[this.selectedCell.week][this.selectedCell.day].event[index])
                   }
                 }
                 this.setInput(false);
               }
+              this.modalSwitch()
+            },
+            async submitSpecialType(){
+              
             },
             checkInput(event){
               let dataBody = null;
@@ -230,7 +328,9 @@
                 || this.descrizione != event.description
                 || this.luogo != event.location
                 || personeForm != personeEvento
-                || this.tipo != event.event_type){
+                || this.tipo != event.event_type
+                || (event.date && this.oraInizio != event.date.time)
+                || (event.date && this.oraFine != event.date.finished_time)){
                   dataBody = {
                   user_id: localStorage.getItem('user_id'),
                   title: this.titolo,
@@ -250,6 +350,8 @@
                 this.luogoInput = bool
                 this.personeInput = bool
                 this.tipoInput = bool
+                this.oraInput = bool
+                this.modify = bool
               }
             },
             setInputValue(jsonEvent){
@@ -259,6 +361,17 @@
               let people = jsonEvent.people.join(', ')
               this.persone = ref(people)
               this.tipo = ref(jsonEvent.event_type)
+              if(jsonEvent.date){
+                this.oraInizio = ref(jsonEvent.date.time)
+                if(jsonEvent.date.finished_time){
+                  this.oraFine = ref(jsonEvent.date.finished_time)
+                } else {
+                  this.oraFine = ref('')
+                }
+              } else {
+                this.oraInizio = ref('')
+              }
+              
             }
         },
     });
@@ -267,9 +380,9 @@
 <template>
     <div class="contenitore">
       <div class="month">
-        <div class="prevMonth"><i class="fa-solid fa-circle-left"></i></div>
-        <h1>Luglio</h1>
-        <div class="nextMonth"><i class="fa-solid fa-circle-right"></i></div>
+        <div class="prevMonth" @click="changeMonth(-1)"><i class="fa-solid fa-circle-left"></i></div>
+        <h1>{{ monthName[month] }}</h1>
+        <div class="nextMonth" @click="changeMonth(+1)"><i class="fa-solid fa-circle-right"></i></div>
       </div>
         <table>
             <tbody>
@@ -282,12 +395,14 @@
                     <th>Sabato</th>
                     <th class="lastTh">Domenica</th>
                 </tr>
-                <tr :key="days" v-for="(week, indexWeek) in days">
+                <tr v-for="(week, indexWeek) in days">
                     <td v-for="(day, indexDay) in week">
                       <div class="events">
                         <div v-if="day.day != ''" class="dayNumber"><p>{{ day.day }}</p></div>
                         <div v-if="day.event.length > 0" class="eventList">
-                            <div @click="eventSingle(event, indexWeek, indexDay)" class="eventSingle" v-for="event in day.event">
+                            <div :key="event" v-bind:style="{ borderColor: event.type.color }"
+                              @click="eventSingle(event, indexWeek, indexDay)" 
+                                class="eventSingle" v-for="event in day.event">
                                 <p>{{ event.title }}</p>
                             </div>
                         </div>
@@ -305,12 +420,12 @@
           <header class="modal-header" id="modalTitle" v-on:click.self="setInput(false)">
             <h1>
               <div class="group" v-if="titoloInput">
-                <input v-model="titolo" type="text" required="required">
+                <input v-model="titolo" class="inputTitle" type="text" required="required">
                 <span class="highlight"></span>
                 <span class="bar"></span>
                 <label>Titolo</label>
               </div>
-              <p v-if="!titoloInput" @click="titoloInput = !titoloInput">
+              <p v-if="!titoloInput" @click="titoloInput = !titoloInput; modify = true">
                 {{ titolo }}
               </p>
             </h1>
@@ -319,6 +434,7 @@
             </button>
           </header>
           <section class="modal-body" id="modalDescription" v-on:click.self="setInput(false)">
+
             <slot name="body" class="modalBodySlot">
               <div class="group" v-if="descrizioneInput">
                 <input v-model="descrizione" type="text" required="required">
@@ -326,7 +442,7 @@
                 <span class="bar"></span>
                 <label>Descrizione</label>
               </div>
-              <p v-if="!descrizioneInput" @click="descrizioneInput = !descrizioneInput">
+              <p v-if="!descrizioneInput" @click="descrizioneInput = !descrizioneInput; modify = true">
                 Descrizione: {{ descrizione }}
               </p>
               <div class="group" v-if="luogoInput">
@@ -335,7 +451,7 @@
                 <span class="bar"></span>
                 <label>Luogo</label>
               </div>
-              <p v-if="!luogoInput" @click="luogoInput = !luogoInput">
+              <p v-if="!luogoInput" @click="luogoInput = !luogoInput; modify = true">
                 Luogo: {{ luogo }}
               </p>
               <div class="group" v-if="personeInput">
@@ -344,7 +460,7 @@
                 <span class="bar"></span>
                 <label>Persone</label>
               </div>
-              <p v-if="!personeInput" @click="personeInput = !personeInput">
+              <p v-if="!personeInput" @click="personeInput = !personeInput; modify = true">
                 Persone: {{ persone }}
               </p>
               <div v-if="tipoInput" class="typesInput">
@@ -354,17 +470,50 @@
                   </option>
                 </select>
               </div>
-              <p v-if="!tipoInput" @click="tipoInput = !perstipoInputoneInput" class="typesInput">
+              <p v-if="!tipoInput" @click="tipoInput = !tipoInput; modify = true" class="typesInput">
                 Etichetta: {{ typeConvert[tipo] }}
               </p>
+              <div class="group" v-if="oraInput">
+                <input v-model="oraInizio" type="time" required="required">
+                <input v-if="singleEvent != null && singleEvent.type.tipology =='normal'" v-model="oraFine" type="time">
+                <label class="labelOrario">Orario</label>
+              </div>
+              <p v-if="!oraInput " @click="oraInput = !oraInput; modify = true">
+                <p>
+                  Ora inizio: {{ oraInizio }} 
+                </p>
+                <p v-if="singleEvent != null && singleEvent.type.tipology =='normal' ">
+                  Ora Fine: {{ oraFine }} 
+                </p>
+              </p>
+              <div v-if="!creationEvent && singleEvent.type.tipology == 'special'" 
+                class="specialType">
+                {{ "ciao" }}
+                <div class="specialInput">
+                  <form @submit.prevent="submitSpecialType">
+                    <div class="group">
+                      <input type="number" min="0" required />
+                      <span class="bar"></span>
+                      <label>Capitolo</label>
+                    </div>
+                    <div class="group">
+                      <input type="number" min="0" required />
+                      <span class="bar"></span>
+                      <label>Pagina</label>
+                    </div>
+                  </form>
+                </div>
+                <div class="chronology">
+                  <div class="history">
+
+                  </div>
+                </div>
+              </div>
             </slot>
-            <div v-if="singleEvent==null" class="submitButton"><button type="submit">Hola</button></div>
+            <div v-if="modify" class="submitButton">
+              <button type="submit"><i class="fa-solid fa-floppy-disk fa-xl"></i></button>
+            </div>
           </section>
-          <!-- <footer class="modal-footer">
-            <slot name="footer">
-              This is the default footer!
-            </slot>
-          </footer> -->
         </form>
       </div>
     </div>

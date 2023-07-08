@@ -8,8 +8,8 @@ const EventsType = require('../models/EventsType');
 //todo fare a tutti il controllo se è son settati tutti i dati del body
 const eventsList = async (req, res) => {
   let data = req.body;
-  console.log(req.body)
   
+  console.log(data)
   if(!data.user_id)
     return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
     
@@ -20,48 +20,16 @@ const eventsList = async (req, res) => {
   const objId = new mongoose.Types.ObjectId(data.user_id);
   if(!user)
     return res.json({'status': 'ko', 'message': 'The user is not found' });
-  const events = await Events.find({user: objId});
-  res.json(events);
-}
-
-const eventSingle = async (req, res) => {
-    //todo prendere anche gli attachment
-  //deve avere anche i type e dato che è singolo prendo anche la durata dell'evento
-  //prendo anche se giustamente l'evento non è stato valorizzato con una durata
-  let data = req.body;
-  
-  if(!data.event_id)
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
-    
-  if(data.event_id == '')
-      return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
-
-  const objId = new mongoose.Types.ObjectId(data.event_id);
   const events = await Events.aggregate([
-    {$match: {_id: objId}},
-    {$lookup:
-      { 
-        from: 'events_type', 
-        localField:'event_type', 
-        foreignField:'_id',
-        as:'type'
+    {$match: {user: objId}},
+    {$lookup:{ 
+      from: 'events_type', 
+      localField:'event_type', 
+      foreignField:'_id',
+      as:'type'
     }},
-    {$lookup:
-      {
-        from: 'events_history', 
-        localField:'_id', 
-        foreignField:'event',
-        as:'history'
-      }
-    },
     {$unwind: '$type'},
-    {$unwind: {
-      path: "$history",
-      "preserveNullAndEmptyArrays": true
-    }},
   ]);
-  if(events.length <= 0)
-    return res.json({ 'status': 'ko', 'message': 'Event not found' });
   res.json(events);
 }
 
@@ -91,16 +59,17 @@ const eventCreate = async (req, res) => {
     people: data.people,
     description: data.description,
     event_type: typeObjId,
-    user: userObjId,
-    finished: false
+    user: userObjId
   })
-  await event.save();
-  res.json({'status': 'ok', 'data': event});
+
+  let eventCreated = await getEventAggregate(event._id)
+
+  res.json({'status': 'ok', 'data': eventCreated[0]});
 }
 
 const eventModify = async (req, res) => {
+  delete req.body.__v;
   let data = req.body;
-  console.log(data)
   if(!data.title|| !data.date || !data.location || !data.description 
         || !data.event_type_id || !data.event_id )
     return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
@@ -114,18 +83,22 @@ const eventModify = async (req, res) => {
   if(!type)
     return res.json({ 'status': 'ko', 'message': 'The event type is not found' });
 
-  let event = await Events.findById(data.event_id)
-  if(!event)
-    return res.json({ 'status': 'ko', 'message': 'Event not found' });
-  event.title = data.title;
-  event.data = data.date;
-  event.location = data.location;
-  event.people = data.people;
-  event.description = data.description;
-  event.event_type = typeObjId;
-  let eventModify = await event.save()
+  let update = {
+    title: data.title,
+    date: data.date,
+    location: data.location,
+    people: data.people,
+    description: data.description,
+    event_type: typeObjId
+  }
+  if(data.finished_time)
+    update["finished_time"] = data.finished_time
 
-  res.json({'status': 'ok', 'data': eventModify});
+  let event = await Events.findOneAndUpdate({_id:data.event_id}, update)
+
+  let eventModify = await getEventAggregate(event._id) 
+
+  res.json({'status': 'ok', 'data': eventModify[0]});
 }
 
 const eventDelete = async (req, res) => {
@@ -144,9 +117,35 @@ const eventDelete = async (req, res) => {
   res.json({'status': 'ok', 'event': eventDeleted._id});
 }
 
+async function getEventAggregate(id){
+  const event = await Events.aggregate([
+    {$match: {_id: id}},
+    {$lookup:
+      { 
+        from: 'events_type', 
+        localField:'event_type', 
+        foreignField:'_id',
+        as:'type'
+    }},
+    {$lookup:
+      {
+        from: 'events_history', 
+        localField:'_id', 
+        foreignField:'event',
+        as:'history'
+      }
+    },
+    {$unwind: '$type'},
+    {$unwind: {
+      path: "$history",
+      "preserveNullAndEmptyArrays": true
+    }},
+  ]);
+  return event
+}
+
 module.exports = {
     eventsList, 
-    eventSingle,
     eventCreate,
     eventModify, 
     eventDelete

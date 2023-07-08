@@ -4,6 +4,7 @@ $text-color: #CDF6FF;
 $border-color: #6573BC;
 $shadow-color: #00244B;
 $header-height: 100px;
+$icon-color: #EB9A28;
 $tr-height: 100px;
 
 .contenitore {
@@ -118,6 +119,7 @@ $tr-height: 100px;
       justify-content: center;
       align-items: center;
     }
+    
     .events:hover .addEvent{
       display: flex;
     }
@@ -130,8 +132,6 @@ $tr-height: 100px;
         font-size: 200%;
         width: 100%;
     }
-
-    
 }
 .modal-backdrop {
   position: fixed;
@@ -186,10 +186,28 @@ $tr-height: 100px;
   position: relative;
   padding: 20px 10px;
   .typesInput{
+    margin-block: 10px;
     width: fit-content;
   }
   .modalBodySlot *{
     margin-block: 40px;
+  }
+  .submitButton{
+    z-index: 99;
+    width: 25px;
+    height: 25px;
+    position: absolute;
+    right: 20px;
+    bottom: -15px;
+    justify-content: center;
+    align-items: center;
+    button{
+      cursor: pointer;
+      background-color: #00244B;
+      color: $icon-color;
+      padding: 10px;
+      border-radius: 50%;
+    }
   }
 }
 
@@ -235,23 +253,23 @@ $tr-height: 100px;
 
 $bg-color: #424242;
 $hl-color: #2196F3;
-$muted-color: mix(white, $bg-color, 70%);
 $trans-time: 300ms;
 
 .group {
+  width: fit-content;
   position: relative;
-  width: 80%;
 }
 
-// INPUTS // ============================== //
-textarea {
-  resize: none;
+
+.inputTitle{
+  color: $text-color;
+  border-bottom: 1px solid $text-color;
 }
 
 input,
 textarea {
   background: none;
-  color: $muted-color;
+  color: $shadow-color;
   font-size: 18px;
   padding-top: 15px;
   display: block;
@@ -259,7 +277,7 @@ textarea {
   border-radius: 0;
   margin-left: 0px;
   margin-bottom: 10px;
-  border-bottom: 1px solid $muted-color;
+  border-bottom: 1px solid $shadow-color;
   &:focus {
     outline: none;
   }
@@ -279,7 +297,7 @@ input[type="password"] {
 }
 
 label {
-  color: $muted-color;
+  color: $shadow-color;
   font-size: 16px;
   font-weight: normal;
   position: absolute;
@@ -288,11 +306,16 @@ label {
   top: 10px;
   transition: $trans-time ease all;
 }
+.labelOrario{
+  top: -2px;
+  font-size: 12px;
+  color: $hl-color;
+}
 
 .bar {
   position: relative;
   display: block;
-  width: 80%;
+  width: 100%;
   &:before {
     margin-bottom: 10px;
     content: '';
@@ -302,48 +325,6 @@ label {
     background: $hl-color;
     transition: $trans-time ease all;
     left: 0%;
-  }
-}
-
-// BUTTONS // ============================== //
-.btn {
-  background: #fff;
-  color: mix(black, $muted-color, 25%);
-  border: none;
-  padding: 10px 20px;
-  border-radius: 3px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  text-decoration: none;
-  outline: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
-  &:hover {
-    color: mix(black, $muted-color, 30%);
-    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.18), 0 5px 5px rgba(0, 0, 0, 0.12);
-  }
-  &.btn-link {
-    background: $hl-color;
-    color: mix(white, $hl-color, 80%);
-    &:hover {
-      background: darken($hl-color, 5%);
-      color: mix(white, $hl-color, 85%);
-    }
-  }
-  &.btn-submit {
-    background: $hl-color;
-    color: mix(white, $hl-color, 70%);
-    &:hover {
-      background: darken($hl-color, 5%);
-      color: mix(white, $hl-color, 85%);
-    }
-  }
-  &.btn-cancel {
-    background: #eee;
-    &:hover {
-      background: darken(#eee, 5%);
-      color: mix(black, $muted-color, 30%);
-    }
   }
 }
 

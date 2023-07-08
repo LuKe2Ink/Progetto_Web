@@ -35,8 +35,8 @@
     <h1>{{ count }}</h1>
     <div class="navHeader">
       <nav>
-        <div v-if="logged" class="login" :key="logged"><RouterLink to="/login" class="link"><i class="fa-solid fa-right-to-bracket"></i> Login</RouterLink></div>
-        <div v-if="!logged" class="login" :key="logged"><RouterLink to="/login" class="link" @click ="prova"><i class="fa-solid fa-right-to-bracket"></i> Logout</RouterLink></div>
+        <div v-if="logged" class="login" :key="logged"><a href="/login" class="link"><i class="fa-solid fa-right-to-bracket"></i> Login</a></div>
+        <div v-if="!logged" class="login" :key="logged"><a href="/login" class="link" @click ="prova"><i class="fa-solid fa-right-to-bracket"></i> Logout</a></div>
       </nav>
     </div>
   </header>
