@@ -48,8 +48,26 @@
         return data
     }
 
+    async function objectList(){
+        const dataBody = {
+            user_id: localStorage.getItem('user_id')
+        }
+        const response = await axios.post(config.apiAddress+':'+config.apiPort+'/object/list', 
+            dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+        );
+        const data = response.data;
+        if(data.status == 'ko'){
+            await swal({
+                title: "Error",
+                text: data.message,
+                icon: "error",
+                className: "sweetAlert"
+            })
+        }
+        return data.data
+    }
+
     function getDaysInMonth(month, year){
-      console.log(month, year)
       var date = new Date(year, month, 1);
 
       var result = [];
@@ -92,9 +110,8 @@
     }
     
     let events = await eventList();
-    let eventTypes = null;
-    if(events)
-      eventTypes = await typeList();
+    let eventTypes = await typeList();
+    let special_object = await objectList();
     let fakeEvent = {
       description: '',
       title: '',
@@ -107,44 +124,7 @@
     }
 
     export default defineComponent({
-        // setup() {
-          // let typeConvert = {};
-          // let jsonOptions = []
-          // eventTypes.forEach(element => {
-          //     jsonOptions.push({
-          //       text: element.name, value: element._id
-          //     })
-          //     typeConvert[element._id] = element.name
-          // });
-          // this.options = ref(jsonOptions)
-          // this.titolo = ref('')
-          // this.descrizione = ref('')
-          // this.luogo = ref('') 
-          // this.persone = ref('')
-          // this.tipo = ref('')
-          // this.oraInizio = ref('')
-          // this.oraFine = ref('')
-          // let month = moment().get('M')
-          // let year = moment().get('Y')
-          // //dinamico di default prende mese e anno corrente
-          // this.days = getDaysInMonth(month, year);
-          // // return {
-          // //     days,
-          // //     descrizione,
-          // //     titolo,
-          // //     luogo,
-          // //     persone,
-          // //     tipo,
-          // //     oraInizio,
-          // //     oraFine,
-          // //     options,
-          // //     typeConvert,
-          // //     month,
-          // //     year
-          // // }
-        // },
         created(){
-          console.log()
           this.typeConvert = {};
           let jsonOptions = [];
           eventTypes.forEach(element => {
@@ -161,6 +141,11 @@
           this.tipo = ref('')
           this.oraInizio = ref('')
           this.oraFine = ref('')
+          this.capitolo = ref('')
+          this.pagina = ref('')
+          this.episodio = ref('')
+          this.orario = ref('')
+          this.oggetto = ref('')
           this.month = moment().get('M')
           this.year = moment().get('Y')
           //dinamico di default prende mese e anno corrente
@@ -170,6 +155,7 @@
             return{
                 show: false,
                 singleEvent: null,
+                histories: null,
                 titleInput:false,
                 descrizioneInput: false,
                 titoloInput: false,
@@ -177,6 +163,7 @@
                 personeInput: false,
                 tipoInput: false,
                 oraInput: false,
+                objectInput: false,
                 creationEvent: false,
                 modify: false,
                 monthName: ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"],
@@ -192,16 +179,22 @@
                 tipo:null,
                 oraInizio:null,
                 oraFine:null,
+                capitolo: null,
+                pagina: null,
+                episodio: null,
+                oggetto: null,
+                orario: null,
                 options:null,
+                optionsObject: [],
                 typeConvert:null,
                 month:null,
-                year:null
+                year:null,
+                showHistory: false
             }
         },
         methods: {
             changeMonth(sequence){
               this.month += sequence;
-              console.log(this.month)
               if(this.month==-1){
                 this.month = 11;
                 this.year -= 1
@@ -217,15 +210,60 @@
               this.show = !this.show;
               this.creationEvent = false;
               this.singleEvent = null
+              this.histories = null
               this.setInput(false);
               if(fakeEvent.date)
                 delete fakeEvent.date
+              this.oggetto = ref('')
             },
-            eventSingle(event, week, day){
+            changeObject(event_id){
+              let jsonOptions = [];
+              const objectFiltered = special_object.filter((element)=>element.event_type == event_id)
+              objectFiltered.forEach(element => {
+                  jsonOptions.push({
+                    text: element.name, value: element._id
+                  })
+              });
+              this.optionsObject = ref(jsonOptions)
+              if(jsonOptions.length>0){
+                this.oggetto = ref('')
+              }
+            },
+            async eventSingle(event, week, day){
               this.selectedCell.week = week;
               this.selectedCell.day = day;
               this.show = true
               this.singleEvent = event
+              let body = {}
+              if(event.special_object){
+                body = {
+                  special_object: event.special_object._id
+                }
+              } else {
+                body = {
+                  event_id: event._id
+                }
+              }
+              console.log(body)
+              const response = await axios.post(config.apiAddress+':'+config.apiPort+'/history/getAll', 
+                body, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+              );
+              console.log(response.data)
+              if(response.data.data && response.data.data.length){
+                response.data.data.map((element)=>{
+                  if(element.time){
+                    let hours = element.time%360
+                    let minutes = (element.time-(hours*360))%60
+                    let seconds = (element.time-(hours*360)-(minutes*60))%60
+                    element.time = hours+":"+minutes+":"+seconds
+                  }
+                  return element;
+                })
+                this.histories = response.data.data
+              } else {
+                this.histories = []
+              }
+              this.changeObject(event.event_type)
               this.setInputValue(event)
             },
             createEvent(day, week, Indexday){
@@ -251,6 +289,9 @@
                 if(dataBody){
                   dataBody["date"]=fakeEvent.date;
                   dataBody.date["time"] = this.oraInizio
+                  if(this.oggetto != ''){
+                    dataBody["special_object"] = this.oggetto;
+                  }
                   const response = await axios.put(config.apiAddress+':'+config.apiPort+'/events/create', 
                     dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
                   );
@@ -263,7 +304,6 @@
                           className: "sweetAlert"
                       })
                   } else {
-                    console.log(data.data)
                     this.days[this.selectedCell.week][this.selectedCell.day].event.push(data.data)
                   }
                 }
@@ -304,19 +344,51 @@
                         {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
                       );
                     }
-                    console.log(data.data)
                     let predicate = (element) => element._id == data.data._id;
                     let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
                     this.days[this.selectedCell.week][this.selectedCell.day].event[index] = data.data
-                    console.log(this.days[this.selectedCell.week][this.selectedCell.day].event[index])
                   }
                 }
                 this.setInput(false);
               }
               this.modalSwitch()
             },
-            async submitSpecialType(){
-              
+            async submitSpecialType(type, type_id, event_id){
+              if(type == 'serie tv' || type == 'film')
+                await this.submitTypeTv(type_id, event_id)
+              else 
+                await this.submitTypePaper(type_id, event_id)
+            },
+            async submitTypeTv(type_id, event_id){
+              const hour = this.orario.split(":")[0] * 360;
+              const minutes = this.orario.split(":")[1] * 60;
+              const seconds = this.orario.split(":")[2];
+              const dataBody = {
+                event_type_id: type_id, 
+                event_id: event_id, 
+                episode: this.episodio == ''? null : this.episodio,
+                time: hour+minutes+seconds
+              }
+              const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', dataBody, 
+                {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+              );
+              if(response.data.data){
+                this.histories.unshift(response.data.data)
+              }
+            },
+            async submitTypePaper(type_id, event_id){
+              const dataBody = {
+                event_type_id: type_id, 
+                event_id: event_id, 
+                chapter: this.capitolo,
+                page: this.pagina
+              }
+              const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', dataBody, 
+                {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+              );
+              if(response.data.data){
+                this.histories.unshift(response.data.data)
+              }
             },
             checkInput(event){
               let dataBody = null;
@@ -352,6 +424,7 @@
                 this.tipoInput = bool
                 this.oraInput = bool
                 this.modify = bool
+                this.objectInput = bool
               }
             },
             setInputValue(jsonEvent){
@@ -371,7 +444,17 @@
               } else {
                 this.oraInizio = ref('')
               }
-              
+              if(jsonEvent.special_object)
+                this.oggetto = jsonEvent.special_object.name
+            },
+            async deleteEvent(){
+              const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/delete', 
+                {event_id:this.singleEvent._id},{headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+              );
+              let predicate = (element) => element._id == response.data.event;
+              let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
+              this.days[this.selectedCell.week][this.selectedCell.day].event.splice(index, 1)
+              this.modalSwitch()
             }
         },
     });
@@ -399,7 +482,7 @@
                     <td v-for="(day, indexDay) in week">
                       <div class="events">
                         <div v-if="day.day != ''" class="dayNumber"><p>{{ day.day }}</p></div>
-                        <div v-if="day.event.length > 0" class="eventList">
+                        <div :key="day.event" v-if="day.event.length > 0" class="eventList">
                             <div :key="event" v-bind:style="{ borderColor: event.type.color }"
                               @click="eventSingle(event, indexWeek, indexDay)" 
                                 class="eventSingle" v-for="event in day.event">
@@ -464,7 +547,7 @@
                 Persone: {{ persone }}
               </p>
               <div v-if="tipoInput" class="typesInput">
-                <select v-model="tipo" required>
+                <select v-model="tipo" @click="changeObject(tipo)" required>
                   <option v-for="option in options" :value="option.value">
                     {{ option.text }}
                   </option>
@@ -486,30 +569,98 @@
                   Ora Fine: {{ oraFine }} 
                 </p>
               </p>
+              <div v-if="objectInput && optionsObject.length>0 " class="typesInput">
+                <select :key="oggetto" v-model="oggetto" required>
+                  <option v-for="option in optionsObject" :value="option.value">
+                    {{ option.text }}
+                  </option>
+                </select>
+              </div>
+              <p v-if="(!creationEvent && tipo!='')&&!objectInput" class="typesInput" @click="objectInput = !objectInput; modify = true">
+                Oggetto collegato: {{ oggetto }}
+              </p>
               <div v-if="!creationEvent && singleEvent.type.tipology == 'special'" 
                 class="specialType">
-                {{ "ciao" }}
                 <div class="specialInput">
-                  <form @submit.prevent="submitSpecialType">
-                    <div class="group">
-                      <input type="number" min="0" required />
-                      <span class="bar"></span>
-                      <label>Capitolo</label>
+                  <form @submit.prevent="submitSpecialType(singleEvent.type.name, singleEvent.type._id, singleEvent._id)">
+                    <div v-if="singleEvent.type.name == 'libro' || singleEvent.type.name == 'fumetto'"  
+                      class="horizzontalInput">
+                      <div class="group">
+                        <input v-model="capitolo" type="number" min="0" required />
+                        <span class="bar"></span>
+                        <label>Capitolo</label>
+                      </div>
+                      <div class="group">
+                        <input v-model="pagina" type="number" min="0" required />
+                        <span class="bar"></span>
+                        <label>Pagina</label>
+                      </div>
+                      <div class="addHistoryButton">
+                        <button type="submit"><i class="fa-solid fa-plus"></i></button>
+                      </div>
                     </div>
-                    <div class="group">
-                      <input type="number" min="0" required />
-                      <span class="bar"></span>
-                      <label>Pagina</label>
+                    <div v-else class="horizzontalInput">
+                      <div class="group" v-if="singleEvent.type.name == 'serie tv'">
+                        <input v-model="episodio" type="number" min="1" required />
+                        <span class="bar"></span>
+                        <label>Episodio</label>
+                      </div>
+                      <div class="group">
+                        <input v-model="orario" type="time" step="1" required />
+                        <label class="labelOrario">Ora</label>
+                      </div>
+                      <div class="addHistoryButton">
+                        <button type="submit"><i class="fa-solid fa-plus"></i></button>
+                      </div>
                     </div>
                   </form>
                 </div>
                 <div class="chronology">
-                  <div class="history">
-
+                  <div v-if="showHistory" class="histories">
+                          {{ singleEvent.history }}
+                    <table classh="historyTable" :key="singleEvent.history" >
+                      <tbody>
+                          <tr>
+                              <th v-if="singleEvent.type.name == 'libro' || singleEvent.type.name == 'fumetto'"  >
+                                Capitolo
+                              </th>
+                              <th v-if="singleEvent.type.name == 'libro' || singleEvent.type.name == 'fumetto'"  >
+                                Pagina
+                              </th>
+                              <th v-if="singleEvent.type.name == 'serie tv'">
+                                Episodio
+                              </th>
+                              <th v-if="singleEvent.type.name == 'serie tv' || singleEvent.type.name == 'film'">
+                                Ora
+                              </th>
+                          </tr>
+                          <tr v-for="element in histories">
+                              <td v-if="singleEvent.type.name == 'libro' || singleEvent.type.name == 'fumetto'"  >
+                                {{ element.metadata.chapter }}
+                              </td>
+                              <td v-if="singleEvent.type.name == 'libro' || singleEvent.type.name == 'fumetto'"  >
+                                {{ element.metadata.page }}
+                              </td>
+                              <td v-if="singleEvent.type.name == 'serie tv'">
+                                {{ element.metadata.episode }}
+                              </td>
+                              <td v-if="singleEvent.type.name == 'serie tv' || singleEvent.type.name == 'film'">
+                                {{ element.metadata.duration }}
+                              </td>
+                          </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="showHistory" @click="showHistory = !showHistory">
+                    <i v-if="!showHistory" class="fa-solid fa-caret-down"></i>
+                    <i v-if="showHistory" class="fa-solid fa-caret-up"></i>
                   </div>
                 </div>
               </div>
             </slot>
+            <div v-if="!creationEvent" class="trashButton">
+              <button type="button" @click="deleteEvent"><i class="fa-solid fa-trash-can fa-xl"></i></button>
+            </div>
             <div v-if="modify" class="submitButton">
               <button type="submit"><i class="fa-solid fa-floppy-disk fa-xl"></i></button>
             </div>

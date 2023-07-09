@@ -10,6 +10,7 @@ function isAuthenticated(req, res, next) {
     req.username = decoded.username;
     next();
     } catch (error) {
+        console.log("entra")
         console.log(error)
         return res.json({'status': 'ko', 'redirect': '/user/login'});
     // console.error(error);

@@ -1,13 +1,13 @@
 const History = require('../models/EventHistory');
 const EventsType = require('../models/EventsType');
 const Events = require('../models/Events');
+const SpecialObject = require('../models/SpecialObject')
 const mongoose = require('mongoose')
 const moment = require('moment'); 
 const { json } = require('express');
 
 //todo fare a tutti il controllo se è son settati tutti i dati del body
 const historyAdd = async (req, res) => {
-    delete req.body.__v;
     let data = req.body
 
     if((!data.event_type_id && data.event_type_id!='')
@@ -22,54 +22,66 @@ const historyAdd = async (req, res) => {
         return res.json({'status': 'ko',  'message': 'The event is not found' });
 
     let jsonDuration = makeDurationJson(type, data)
+    if(!jsonDuration.duration && !jsonDuration.time &&
+        !jsonDuration.page && !jsonDuration.chapter && !jsonDuration.chapter)
+        return res.json({'status': 'ko',  'message': 'Campi non validi' });
 
     const historyIfExist = await History.find({
         event: eventObjId
     });
+    let history;
     if(historyIfExist.length > 0 && type.tipology == "normal"){
         historyIfExist[0].metadata = jsonDuration;
         historyIfExist[0].date = moment().format("DD/MM/YYYY HH:mm");
-        await historyIfExist[0].save()
+        history = await historyIfExist[0].save()
         // await historyIfExist.save();
     } else {
-        const history = await History.create({
+        history = await History.create({
             metadata: jsonDuration,
             date: moment().format("DD/MM/YYYY HH:mm"),
-            event: eventObjId
+            event: eventObjId,
+            special_object: data.object_id ? data.object_id : null
         })
     }
 
-    res.json({'status': 'ok'});
+    res.json({'status': 'ok', 'data': history});
 }
 
-// const historyModify = async (req, res) => {
-//     let data = req.body;
+const historyGet = async (req, res) => {
+    let data = req.body
+    
+    // console.log(data.event_id)
 
-//     if((!data.event_type_id && data.event_type_id!='')
-//         || (!data.event_id && data.event_id!='') || (!data.history_id && data.history_id!=''))
-//         return res.json({'status': 'ko', 'message': 'Prerequisited not valid'})
-//     const type = await EventsType.findById(data.event_type_id);
-//     if(!type)
-//         return res.json({'status': 'ko', 'message': 'The event type is not found' });
-//     const event = await EventsType.findById(data.event_id);
-//     const eventObjId = new mongoose.Types.ObjectId(data.event_id);
-//     if(!event)
-//         return res.json({ 'status': 'ko', 'message': 'The event is not found' });
-//     const history = await EventsType.findById(data.history_id);
-//     const historyObjId = new mongoose.Types.ObjectId(data.history_id);
-//     if(!history)
-//         return res.json({ 'status': 'ko', 'message': 'The event is not found' });
-      
-//     let jsonDuration = makeDurationJson(type, data)
-  
-//     history.metadata = jsonDuration;
-//     history.date = moment().format("DD/MM/YYYY HH:mm");
-//     history.event = eventObjId;
+    if((!data.event_id && data.event_id!='') && (!data.special_object && data.special_object!=''))
+        return res.json({'status': 'ko',  'message': 'Prerequisited not valid'})
+    
+    console.log(data)
+    let match = null;
+    if(data.event_id){
+        console.log("entra porco dio")
+        const event = await Events.findById(data.event_id);
+        const objId = new mongoose.Types.ObjectId(data.event_id);
+        if(!event)
+            return res.json({'status': 'ko',  'message': 'The event is not found' });
+        match = {event: objId}
+    }
+    if(data.special_object){
+        const object = await SpecialObject.findById(data.special_object);
+        const objId = new mongoose.Types.ObjectId(data.special_object);
+        if(!object)
+            return res.json({'status': 'ko',  'message': 'The special object is not found' }); 
+        match = {special_object: objId}
+    }
 
-//     await history.save();
-
-//     res.json({ 'status': 'ok'});
-// }
+    const histories = await History.aggregate([
+        {$match: match},
+        {$addFields: {
+            convertedDate: { $toDate: "$date" }
+        }},
+        {$sort: { "convertedDate": -1 }}
+    ])
+    res.json({'status': 'ok', 'data': histories});
+}
 
 function makeDurationJson(type, data){
     let jsonDuration = {};
@@ -83,27 +95,20 @@ function makeDurationJson(type, data){
             duration: data.duration
         }
     } else {
-        if(data.volume && data.volume>0)
-            jsonDuration = {
-                volume: data.volume
-            }
-        if(data.pages && data.pages>0)
-            jsonDuration = {
-                pages: data.pages
-            }
-        if(data.chapters && data.chapters>0)
-            jsonDuration = {
-                chapters: data.chapters
-            }
-        if(data.duration && data.duration>0)
-            jsonDuration = {
-                duration: data.seconds
-            }
+        if(data.episode && data.episode>=1)  
+            jsonDuration['episode']= data.episode
+        if(data.page && data.page>0)
+            jsonDuration['page']= data.page
+        if(data.chapter && data.chapter>0)  
+            jsonDuration['chapter']= data.chapter
+        if(data.time && data.time>0)
+           jsonDuration['time']= data.time
     }
-    console.log(jsonDuration)
+
     return jsonDuration;
 }
 
 module.exports = {
-    historyAdd
+    historyAdd,
+    historyGet
 }

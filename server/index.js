@@ -39,6 +39,7 @@ app.use('/types', isAuthenticated, require('./router/eventsTypeRouter'));
 app.use('/attachment', isAuthenticated, require('./router/attachmentRouter'));
 app.use('/history', isAuthenticated, require('./router/historyRouter'));
 app.use('/user', require('./router/userRouter')); 
+app.use('/object', require('./router/specialObjectRouter'))
 
 
 // console.log(app._router)

@@ -48,6 +48,11 @@ const eventSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "Users",
       required: true
+    },
+    special_object: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SpecialObject",
+      required: false
     }
   }, { collection: 'events' });
 

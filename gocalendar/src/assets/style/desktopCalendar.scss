@@ -72,7 +72,6 @@ $tr-height: 100px;
     .events{
       height: 100px;
       width: 100%;
-      height: heu;
     }
 
     .eventList{
@@ -82,7 +81,6 @@ $tr-height: 100px;
       width: calc(100% - 10px);
       margin-left: 5px;
       padding: 0px;
-      list-style-type: none;
       float:  left;
       clear: left;
     }
@@ -133,6 +131,11 @@ $tr-height: 100px;
         width: 100%;
     }
 }
+.histories{
+  width: 200px;
+  height: 100px;
+}
+
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -192,22 +195,43 @@ $tr-height: 100px;
   .modalBodySlot *{
     margin-block: 40px;
   }
-  .submitButton{
-    z-index: 99;
-    width: 25px;
-    height: 25px;
-    position: absolute;
-    right: 20px;
-    bottom: -15px;
-    justify-content: center;
-    align-items: center;
-    button{
-      cursor: pointer;
-      background-color: #00244B;
-      color: $icon-color;
-      padding: 10px;
-      border-radius: 50%;
-    }
+}
+
+.submitButton{
+  z-index: 99;
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  right: 20px;
+  bottom: -15px;
+  justify-content: center;
+  align-items: center;
+  button{
+    border: 0;
+    cursor: pointer;
+    background-color: #00244B;
+    color: $icon-color;
+    padding: 10px;
+    border-radius: 50%;
+  }
+}
+
+.trashButton{
+  z-index: 99;
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  right: 60px;
+  bottom: -15px;
+  justify-content: center;
+  align-items: center;
+  button{
+    border: 0;
+    cursor: pointer;
+    background-color: #00244B;
+    color: $icon-color;
+    padding: 10px;
+    border-radius: 50%;
   }
 }
 
@@ -249,8 +273,6 @@ $tr-height: 100px;
   border-radius: 5px;
 }
 
-
-
 $bg-color: #424242;
 $hl-color: #2196F3;
 $trans-time: 300ms;
@@ -258,12 +280,35 @@ $trans-time: 300ms;
 .group {
   width: fit-content;
   position: relative;
+  margin-right: 10px;
 }
 
+.addHistoryButton{
+  width: 20px;
+  height: 20px;
+  button{
+    border: 0;
+    cursor: pointer;
+    background-color: #00244B;
+    color: $icon-color;
+    padding: 5px;
+    border-radius: 50%;
+  }
+}
 
 .inputTitle{
   color: $text-color;
-  border-bottom: 1px solid $text-color;
+  border-bottom: 1px solid $text-color;  
+}
+.horizzontalInput{
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+
+input[type="number"]{
+  padding-bottom: 4px;
+  width: 100px;
 }
 
 input,
@@ -331,4 +376,9 @@ label {
 .btn-box {
   text-align: center;
   margin: 50px 0;
+}
+
+.historyTable{
+  width: 100%;
+  overflow: auto;
 }

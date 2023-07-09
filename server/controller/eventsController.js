@@ -9,7 +9,6 @@ const EventsType = require('../models/EventsType');
 const eventsList = async (req, res) => {
   let data = req.body;
   
-  console.log(data)
   if(!data.user_id)
     return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
     
@@ -28,7 +27,17 @@ const eventsList = async (req, res) => {
       foreignField:'_id',
       as:'type'
     }},
+    {$lookup:{ 
+      from: 'special_object', 
+      localField:'special_object', 
+      foreignField:'_id',
+      as:'special_object'
+    }},
     {$unwind: '$type'},
+    {$unwind: {
+      path: "$special_object",
+      "preserveNullAndEmptyArrays": true
+    }},
   ]);
   res.json(events);
 }
@@ -51,7 +60,6 @@ const eventCreate = async (req, res) => {
   const userObjId = new mongoose.Types.ObjectId(data.user_id);
   if(!user)
     return res.json({'status': 'ko',  'message': 'The user is not found' });  
-  
   const event = await Events.create({
     title: data.title,
     date: data.date,
@@ -59,7 +67,8 @@ const eventCreate = async (req, res) => {
     people: data.people,
     description: data.description,
     event_type: typeObjId,
-    user: userObjId
+    user: userObjId, 
+    special_object: data.special_object ? data.special_object : null
   })
 
   let eventCreated = await getEventAggregate(event._id)
@@ -135,9 +144,19 @@ async function getEventAggregate(id){
         as:'history'
       }
     },
+    {$lookup:{ 
+      from: 'special_object', 
+      localField:'special_object', 
+      foreignField:'_id',
+      as:'special_object'
+    }},
     {$unwind: '$type'},
     {$unwind: {
       path: "$history",
+      "preserveNullAndEmptyArrays": true
+    }},
+    {$unwind: {
+      path: "$special_object",
       "preserveNullAndEmptyArrays": true
     }},
   ]);

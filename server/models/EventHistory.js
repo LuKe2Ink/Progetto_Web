@@ -8,13 +8,17 @@ const eventsHistorySchema = new mongoose.Schema({
           type: Number,
           require: false
         },
-        volume:{
-          type: Number,
-          require: false
-        },
         page:{
           type: Number,
           require: false
+        },
+        episode:{
+          type: Number,
+          require: false
+        },
+        time: {
+          type: Number, 
+          required: false
         },
         duration: {
           type: Number, 
@@ -30,7 +34,12 @@ const eventsHistorySchema = new mongoose.Schema({
     event: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Events",
-      required: true
+      required: false
+    },
+    special_object: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SpecialObject",
+      required: false
     }
   }, { collection: 'events_history' });
 
