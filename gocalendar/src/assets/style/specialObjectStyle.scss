@@ -1,0 +1,16 @@
+$primary-color: #0085b6;
+$secondary-color: #3D7DBD;
+$text-color: #CDF6FF;
+$border-color: #6573BC;
+$shadow-color: #00244B;
+$header-height: 100px;
+$icon-color: #EB9A28;
+$tr-height: 100px;
+
+.contenitore {
+    max-width: 100%;
+    margin: auto;
+    margin-inline: 50px;
+    margin-top: $header-height;
+    // color: $text-color;
+}

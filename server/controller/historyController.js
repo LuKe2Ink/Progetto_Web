@@ -1,6 +1,7 @@
 const History = require('../models/EventHistory');
 const EventsType = require('../models/EventsType');
 const Events = require('../models/Events');
+const Users = require('../models/Users');
 const SpecialObject = require('../models/SpecialObject')
 const mongoose = require('mongoose')
 const moment = require('moment'); 
@@ -9,6 +10,7 @@ const { json } = require('express');
 //todo fare a tutti il controllo se è son settati tutti i dati del body
 const historyAdd = async (req, res) => {
     let data = req.body
+    console.log(data)
 
     if((!data.event_type_id && data.event_type_id!='')
         || (!data.event_id && data.event_id!=''))
@@ -32,13 +34,13 @@ const historyAdd = async (req, res) => {
     let history;
     if(historyIfExist.length > 0 && type.tipology == "normal"){
         historyIfExist[0].metadata = jsonDuration;
-        historyIfExist[0].date = moment().format("DD/MM/YYYY HH:mm");
+        historyIfExist[0].date = moment().format("MM/DD/YYYY HH:mm");
         history = await historyIfExist[0].save()
         // await historyIfExist.save();
     } else {
         history = await History.create({
             metadata: jsonDuration,
-            date: moment().format("DD/MM/YYYY HH:mm"),
+            date: moment().format("MM/DD/YYYY HH:mm"),
             event: eventObjId,
             special_object: data.object_id ? data.object_id : null
         })
@@ -58,7 +60,6 @@ const historyGet = async (req, res) => {
     console.log(data)
     let match = null;
     if(data.event_id){
-        console.log("entra porco dio")
         const event = await Events.findById(data.event_id);
         const objId = new mongoose.Types.ObjectId(data.event_id);
         if(!event)
@@ -80,6 +81,52 @@ const historyGet = async (req, res) => {
         }},
         {$sort: { "convertedDate": -1 }}
     ])
+    res.json({'status': 'ok', 'data': histories});
+}
+
+const historyForGraph = async (req, res) => {
+    let data = req.body
+    if(!data.user_id)
+        return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
+    
+    if(data.user_id == '')
+        return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
+
+    const user = await Users.findById(data.user_id);
+    const objId = new mongoose.Types.ObjectId(data.user_id);
+    if(!user)
+        return res.json({'status': 'ko', 'message': 'The user is not found' });
+    
+    const histories = await History.aggregate([
+        {$lookup:
+          { 
+            from: 'events', 
+            localField:'event', 
+            foreignField:'_id',
+            // let: { date: '$date' },
+            // pipeline: [
+            //   {
+            //     $match: {
+            //       $expr: {
+            //         $and: [
+            //           { $eq: ['$date', '$$date'] },
+            //           { $eq: ['$user', objId] },
+            //         ]
+            //       }
+            //     }
+            //   }
+            // ],
+            as:'event'
+        }},
+        {$lookup:
+          { 
+            from: 'events_type', 
+            localField:'event_type', 
+            foreignField:'_id',
+            as:'type'
+        }},
+    ]);
+    console.log(histories);
     res.json({'status': 'ok', 'data': histories});
 }
 
@@ -110,5 +157,6 @@ function makeDurationJson(type, data){
 
 module.exports = {
     historyAdd,
-    historyGet
+    historyGet,
+    historyForGraph
 }

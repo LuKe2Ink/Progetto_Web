@@ -5,22 +5,22 @@ const specialObjectSchema = new mongoose.Schema({
         type: String, 
         required: true 
     },
-    event_type: {
-        type: String, 
-        required: true 
-    },
     date:{
         type: String, 
         required: true 
+    },
+    img: {
+      type: String,
+      required: true
     },
     event_type: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "EventsType",
       required: true
     },
-    event: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Events",
+      ref: "Users",
       required: true
     }
   }, { collection: 'special_object' });

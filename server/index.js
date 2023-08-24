@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
 const cors = require('cors')
 const http = require('http');
 const mongoose = require('mongoose');
@@ -29,7 +30,10 @@ server.listen(3000, () => {
   console.log('Server listening on port '+3000);
 });
 
-app.use(express.json());
+// app.use(express.json());
+// app.use(express.urlencoded({extended: true, limit: "100mb"}));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 connectDB();
 
 //all main routes

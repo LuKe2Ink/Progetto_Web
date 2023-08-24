@@ -133,6 +133,10 @@
               })
               this.typeConvert[element._id] = element.name
           });
+          this.objectConverter = {};
+          special_object.forEach(element => {
+              this.objectConverter[element._id] = element.name
+          });
           this.options = ref(jsonOptions)
           this.titolo = ref('')
           this.descrizione = ref('')
@@ -187,6 +191,7 @@
                 options:null,
                 optionsObject: [],
                 typeConvert:null,
+                objectConverter: null,
                 month:null,
                 year:null,
                 showHistory: false
@@ -245,7 +250,7 @@
                 }
               }
               console.log(body)
-              const response = await axios.post(config.apiAddress+':'+config.apiPort+'/history/getAll', 
+              const response = await axios.post(config.apiAddress+':'+config.apiPort+'/history/get', 
                 body, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
               );
               console.log(response.data)
@@ -367,12 +372,19 @@
                 event_type_id: type_id, 
                 event_id: event_id, 
                 episode: this.episodio == ''? null : this.episodio,
-                time: hour+minutes+seconds
+                time: hour+minutes+seconds,
+                object_id: this.oggetto
               }
               const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', dataBody, 
                 {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
               );
               if(response.data.data){
+                await swal({
+                  title: "Storico dell'evento",
+                  text: "Lo storico dell'evento è stato aggiunto con successo",
+                  icon: "success",
+                  className: "sweetAlert"
+                })
                 this.histories.unshift(response.data.data)
               }
             },
@@ -381,12 +393,19 @@
                 event_type_id: type_id, 
                 event_id: event_id, 
                 chapter: this.capitolo,
-                page: this.pagina
+                page: this.pagina,
+                object_id: this.oggetto
               }
               const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', dataBody, 
                 {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
               );
               if(response.data.data){
+                await swal({
+                  title: "Storico dell'evento",
+                  text: "Lo storico dell'evento è stato aggiunto con successo",
+                  icon: "success",
+                  className: "sweetAlert"
+                })
                 this.histories.unshift(response.data.data)
               }
             },
@@ -445,7 +464,7 @@
                 this.oraInizio = ref('')
               }
               if(jsonEvent.special_object)
-                this.oggetto = jsonEvent.special_object.name
+                this.oggetto = jsonEvent.special_object._id
             },
             async deleteEvent(){
               const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/delete', 
@@ -576,8 +595,8 @@
                   </option>
                 </select>
               </div>
-              <p v-if="(!creationEvent && tipo!='')&&!objectInput" class="typesInput" @click="objectInput = !objectInput; modify = true">
-                Oggetto collegato: {{ oggetto }}
+              <p v-if="(!creationEvent && tipo!='' && oggetto)&&!objectInput" class="typesInput" @click="objectInput = !objectInput; modify = true">
+                Oggetto collegato: {{ objectConverter[oggetto] }}
               </p>
               <div v-if="!creationEvent && singleEvent.type.tipology == 'special'" 
                 class="specialType">

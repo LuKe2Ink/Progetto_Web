@@ -112,6 +112,10 @@ const userLogin = async (req, res) => {
     });
   }
 
+  console.log({ 
+    accessToken: accessToken,
+    user_id: user[0]._id
+  });
   res.json({ 
     accessToken: accessToken,
     user_id: user[0]._id

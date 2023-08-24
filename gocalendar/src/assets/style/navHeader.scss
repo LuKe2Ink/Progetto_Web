@@ -35,7 +35,14 @@ header{
         justify-content: end;
     }
 
-    .navHeader nav{
+    .navList{
+        width: 100%;
+        display: flex;
+        align-items: flex-start;
+        justify-content: start;
+    }
+
+    .navHeader nav, .navList nav{
         margin-right: 15px;
         height: 100%;
         align-items: center;

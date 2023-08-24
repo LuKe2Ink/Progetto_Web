@@ -41,6 +41,16 @@ const routes = [
       path: '/login',
       name: 'login',
       component: () => import('../pages/LoginPage.vue'),
+    },
+    {
+      path: '/object',
+      name: 'SpecialObject',
+      component: () => import('../components/SpecialObjectComponent.vue'),
+    },
+    {
+      path: '/event/type',
+      name: 'Event Type',
+      component: () => import('../components/EventTypeComponent.vue'),
     }
   ]
 
