@@ -10,11 +10,16 @@ const { json } = require('express');
 //todo fare a tutti il controllo se è son settati tutti i dati del body
 const historyAdd = async (req, res) => {
     let data = req.body
-    console.log(data)
 
     if((!data.event_type_id && data.event_type_id!='')
-        || (!data.event_id && data.event_id!=''))
+        || (!data.event_id && data.event_id!='') || (!data.user_id && data.user_id!=''))
         return res.json({'status': 'ko',  'message': 'Prerequisited not valid'})
+
+    const user = await Users.findById(data.user_id);
+    const objId = new mongoose.Types.ObjectId(data.user_id);
+    if(!user)
+        return res.json({'status': 'ko', 'message': 'The user is not found' });
+
     const type = await EventsType.findById(data.event_type_id);
     if(!type)
         return res.json({'status': 'ko',  'message': 'The event type is not found' });
@@ -42,7 +47,8 @@ const historyAdd = async (req, res) => {
             metadata: jsonDuration,
             date: moment().format("MM/DD/YYYY HH:mm"),
             event: eventObjId,
-            special_object: data.object_id ? data.object_id : null
+            special_object: data.object_id ? data.object_id : null,
+            user: data.user_id
         })
     }
 
@@ -98,30 +104,18 @@ const historyForGraph = async (req, res) => {
         return res.json({'status': 'ko', 'message': 'The user is not found' });
     
     const histories = await History.aggregate([
+        {$match: {special_object: null, user: objId}},
         {$lookup:
           { 
             from: 'events', 
             localField:'event', 
             foreignField:'_id',
-            // let: { date: '$date' },
-            // pipeline: [
-            //   {
-            //     $match: {
-            //       $expr: {
-            //         $and: [
-            //           { $eq: ['$date', '$$date'] },
-            //           { $eq: ['$user', objId] },
-            //         ]
-            //       }
-            //     }
-            //   }
-            // ],
             as:'event'
         }},
         {$lookup:
           { 
             from: 'events_type', 
-            localField:'event_type', 
+            localField:'event.event_type', 
             foreignField:'_id',
             as:'type'
         }},

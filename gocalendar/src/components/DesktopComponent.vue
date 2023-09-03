@@ -345,7 +345,7 @@
                       var duration = moment.duration(end.diff(startTime));
                       var minutes = duration.asMinutes();
                       const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', 
-                        {event_type_id: dataBody.event_type_id, event_id: dataBody.event_id, duration: minutes}, 
+                        {event_type_id: dataBody.event_type_id, event_id: dataBody.event_id, duration: minutes, user_id: localStorage.getItem('user_id')}, 
                         {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
                       );
                     }
@@ -536,7 +536,6 @@
             </button>
           </header>
           <section class="modal-body" id="modalDescription" v-on:click.self="setInput(false)">
-
             <slot name="body" class="modalBodySlot">
               <div class="group" v-if="descrizioneInput">
                 <input v-model="descrizione" type="text" required="required">

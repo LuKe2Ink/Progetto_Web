@@ -9,78 +9,79 @@ $tr-height: 100px;
 $hl-color: #2196F3;
 $trans-time: 300ms;
 
-button{
-    border: solid #EB9A28 1px;
-    cursor: pointer;
-    background-color: #00244B;
-    color: $icon-color;
-    padding: 10px;
-    border-radius: 50%;
-}
-.inputTitle{
-    margin-top: 3px;
-    color: $text-color;
-    border-bottom: 1px solid $text-color;  
-}
-  
-input,
-textarea {
-    background: none;
-    color: $shadow-color;
-    font-size: 18px;
-    padding-top: 15px;
-    display: block;
-    border: none;
-    border-radius: 0;
-    margin-left: 0px;
-    margin-bottom: 10px;
-    border-bottom: 1px solid $shadow-color;
-    &:focus {
-        outline: none;
+.textInputOnly, .buttonInputOnly{
+    button{
+        border: solid #EB9A28 1px;
+        cursor: pointer;
+        background-color: #00244B;
+        color: $icon-color;
+        padding: 10px;
+        border-radius: 50%;
     }
-    &:focus ~ label,
-    &:valid ~ label {
-        top: 3px;
-        font-size: 12px;
-        color: $hl-color;
+    .inputTitle{
+        margin-top: 3px;
+        color: $text-color;
+        border-bottom: 1px solid $text-color;  
     }
     
-    &:focus ~ .bar:before {
-        width: 90%;
-    }
-}
-
-input[type="password"] {
-    letter-spacing: 0.3em;
-}
-
-label {
-    color: white;
-    font-size: 16px;
-    font-weight: normal;
-    position: absolute;
-    pointer-events: none;
-    left: 5px;
-    top: 6px;
-    transition: $trans-time ease all;
-}
-    
-.bar {
-    position: relative;
-    display: block;
-    width: 100%;
-    &:before {
+    input,
+    textarea {
+        background: none;
+        color: $shadow-color;
+        font-size: 18px;
+        padding-top: 15px;
+        display: block;
+        border: none;
+        border-radius: 0;
+        margin-left: 0px;
         margin-bottom: 10px;
-        content: '';
-        height: 2px;
-        bottom: 0px;
+        border-bottom: 1px solid $shadow-color;
+        &:focus {
+            outline: none;
+        }
+        &:focus ~ label,
+        &:valid ~ label {
+            top: 3px;
+            font-size: 12px;
+            color: $hl-color;
+        }
+        
+        &:focus ~ .bar:before {
+            width: 90%;
+        }
+    }
+
+    input[type="password"] {
+        letter-spacing: 0.3em;
+    }
+
+    label {
+        color: white;
+        font-size: 16px;
+        font-weight: normal;
         position: absolute;
-        background: $hl-color;
+        pointer-events: none;
+        left: 5px;
+        top: 6px;
         transition: $trans-time ease all;
-        left: 0%;
+    }
+        
+    .bar {
+        position: relative;
+        display: block;
+        width: 100%;
+        &:before {
+            margin-bottom: 10px;
+            content: '';
+            height: 2px;
+            bottom: 0px;
+            position: absolute;
+            background: $hl-color;
+            transition: $trans-time ease all;
+            left: 0%;
+        }
     }
 }
-
 .contenitore {
     max-width: 100%;
     margin: auto;
@@ -101,11 +102,11 @@ label {
             align-items: flex-start;
             justify-content: start;
             .singleObject {
-                border: solid 2px $shadow-color;
+                border: solid 3px $shadow-color;
                 border-radius: 4px;
                 margin-left: calc(10%/4);
                 margin-bottom: 15px;
-                max-width: 30%;
+                width: 200px;
                 position: relative;
                 .objectName {
                     position: relative;
@@ -131,6 +132,17 @@ label {
                 }
                 .objectBody {
                     background-color: #00244B;
+                    
+                    .spaceBottom{
+                        margin-bottom: 10px;
+                    }
+
+                    p{
+                        margin-top: 0;
+                    }
+                    p:last-child{
+                        margin: 0;  
+                    }
                 }
                 .saveModify{
                     position: absolute;
@@ -156,5 +168,9 @@ label {
     padding-block: 20px;
     padding-inline: 15px;
     align-items: center;
-
+    border: solid #EB9A28 1px;
+    cursor: pointer;
+    background-color: #00244B;
+    color: $icon-color;
+    border-radius: 50%;
 }

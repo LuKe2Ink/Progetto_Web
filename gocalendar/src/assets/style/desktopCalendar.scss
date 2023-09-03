@@ -136,67 +136,6 @@ $tr-height: 100px;
   height: 100px;
 }
 
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: rgba(0, 0, 0, 0.3);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal {
-  width: 70%;
-  background: #FFFFFF;
-  box-shadow: 2px 2px 20px 1px;
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-header,
-.modal-footer {
-  padding: 15px;
-  display: flex;
-  h1{
-    margin-block: 0px;
-    p{
-      margin-block: 0px;
-    }
-  }
-}
-
-.modal-header {
-  justify-content: center;
-  align-items: center;
-  width: calc(100% - 30px);
-  position: relative;
-  border-bottom: 1px solid #eeeeee;
-  color: #4AAE9B;
-  justify-content: space-between;
-  font-size: 4vw;
-}
-
-.modal-footer {
-  border-top: 1px solid #eeeeee;
-  flex-direction: column;
-  justify-content: flex-end;
-}
-
-.modal-body {
-  position: relative;
-  padding: 20px 10px;
-  .typesInput{
-    margin-block: 10px;
-    width: fit-content;
-  }
-  .modalBodySlot *{
-    margin-block: 40px;
-  }
-}
-
 .submitButton{
   z-index: 99;
   width: 25px;
@@ -207,7 +146,7 @@ $tr-height: 100px;
   justify-content: center;
   align-items: center;
   button{
-    border: 0;
+    border: solid #EB9A28 1px;
     cursor: pointer;
     background-color: #00244B;
     color: $icon-color;

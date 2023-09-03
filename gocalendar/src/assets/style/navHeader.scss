@@ -11,6 +11,7 @@ body{
 .logo{
     margin: auto;
     margin-left: 10px;
+    margin-right: 20px;
     height: 80px;
 }
 
@@ -28,25 +29,33 @@ header{
         color: $icon-color;
     }
 
-    .navHeader{
-        width: 100%;
-        display: flex;
-        align-items: flex-end;
-        justify-content: end;
-    }
-
+    
     .navList{
-        width: 100%;
-        display: flex;
-        align-items: flex-start;
-        justify-content: start;
+        width: 60%;
+        nav {
+            .logged{
+                margin: auto;
+                margin-inline: auto;
+                // width: calc(100%/4);
+            }
+        }
     }
 
     .navHeader nav, .navList nav{
-        margin-right: 15px;
         height: 100%;
         align-items: center;
         display: flex;
+    }
+    .navHeader{
+        width: 20%;
+        display: flex;
+        flex-wrap: wrap-reverse;
+        align-content: flex-end;
+        justify-content: end;
+    }
+
+    .navList nav{
+        margin-inline: auto;
     }
 
     .link{

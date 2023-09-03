@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 800px;"><canvas id="acquisitions"></canvas></div>
+  <div style="width: 800px; margin-top: 300px;"><canvas id="acquisitions"></canvas></div>
 </template>
 
 <script>
@@ -32,22 +32,66 @@ async function historiesList(){
 
 let histories = await historiesList()
 console.log(histories)
-const labels = Utils.months({count: 7});
+let type = []
+for (let index = 0; index < histories.length; index++) {
+  const element = histories[index];
+  const ind = type.map(el => el._id).indexOf(element.type[0]._id);
+  if(ind<0)
+    type.push(element.type[0])
+}
+let monthTranslate = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"]
+let daysInMonth = moment().daysInMonth()
+let month = moment().month();
+let labels = Array.from({length: daysInMonth}, (_, i) => i + 1)
+
+let datasets = []
+for (let index = 0; index < type.length; index++) {
+  const element = type[index];
+  const result = histories.filter((el) => el.type[0]._id == element._id);
+  const dataSetData = []
+  labels.forEach(el=>{
+    const hist = histories.filter((e) => 
+      e.event[0].date.month == month && e.event[0].date.day == el
+        && e.type[0]._id == element._id
+    );
+    if(hist.length > 1){
+      hist.forEach((e, index)=>{
+        if(index!=0)
+          hist[0].metadata.duration += e.metadata.duration
+      });
+    }
+    if(hist.length >= 1)
+      dataSetData.push(hist[0].metadata.duration)
+    else
+      dataSetData.push(0)
+  })
+
+  datasets.push({
+    label: element.name,
+    data: dataSetData,
+    borderColor: "#ff0000",
+    backgroundColor: element.color,
+    yAxisID: element._id,
+  })
+}
+console.log(datasets)
+
+
 const data = {
   labels: labels,
   datasets: [
     {
       label: 'Dataset 1',
-      data: Utils.numbers(NUMBER_CFG),
-      borderColor: Utils.CHART_COLORS.red,
-      backgroundColor: Utils.transparentize(Utils.CHART_COLORS.red, 0.5),
+      data: [1,2,3],
+      borderColor: "#ff0000",
+      backgroundColor: "#ffffff",
       yAxisID: 'y',
     },
     {
       label: 'Dataset 2',
-      data: Utils.numbers(NUMBER_CFG),
-      borderColor: Utils.CHART_COLORS.blue,
-      backgroundColor: Utils.transparentize(Utils.CHART_COLORS.blue, 0.5),
+      data: [3,0,2],
+      borderColor: "#ffff00",
+      backgroundColor: "#ffff00",
       yAxisID: 'y1',
     }
   ]
@@ -55,45 +99,46 @@ const data = {
 
 
 export default defineComponent({
-
-
   mounted(){
     (async function() {
-      const data = [
-        { year: 2010, count: 10 },
-        { year: 2011, count: 20 },
-        { year: 2012, count: 15 },
-        { year: 2013, count: 25 },
-        { year: 2014, count: 22 },
-        { year: 2015, count: 30 },
-        { year: 2016, count: 28 },
-      ];
 
       console.log(document.getElementById('acquisitions'))
       new Chart(
         document.getElementById('acquisitions'),
         {
-          type: 'bar',
+          type: 'line',
+          data: data,
           options: {
-            animation: false,
+            responsive: true,
+            interaction: {
+              mode: 'index',
+              intersect: false,
+            },
+            stacked: false,
             plugins: {
-              legend: {
-                display: false
-              },
-              tooltip: {
-                enabled: false
+              title: {
+                display: true,
+                text: 'Chart.js Line Chart - Multi Axis'
               }
+            },
+            scales: {
+              y: {
+                type: 'linear',
+                display: false,
+                position: 'left',
+              },
+              y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+
+                // grid line settings
+                grid: {
+                  drawOnChartArea: false, // only want the grid lines for one axis to show up
+                },
+              },
             }
           },
-          data: {
-            labels: data.map(row => row.year),
-            datasets: [
-              {
-                label: 'Acquisitions by year',
-                data: data.map(row => row.count)
-              }
-            ]
-          }
         }
       );
     })();

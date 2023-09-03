@@ -40,6 +40,11 @@ const eventsHistorySchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "SpecialObject",
       required: false
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Users",
+      required: true
     }
   }, { collection: 'events_history' });
 

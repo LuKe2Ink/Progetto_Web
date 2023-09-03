@@ -30,16 +30,16 @@
 
 <template id="app">
   <header>
-  
+
     <img alt="GoCalendar logo" class="logo" src="./assets/logo.png" />
     <h1>{{ count }}</h1>
     <div class="navList">
       <nav>
-        <div v-if="logged" class="login" :key="logged"><a href="/home" class="link"> Home</a></div>
-        <div v-if="!logged" class="login" :key="logged"><a href="/calendar" class="link">Calendario</a></div>
-        <div v-if="!logged" class="login" :key="logged"><a href="/object" class="link">Oggetti</a></div>
-        <div v-if="!logged" class="login" :key="logged"><a href="/event/type" class="link">Etichette</a></div>
-        <div v-if="!logged" class="login" :key="logged"><a href="/graph" class="link">Grafico</a></div>
+        <div v-if="logged" class="logout" :key="logged"><a href="/home" class="link"> Home</a></div>
+        <div v-if="!logged" class="logged" :key="logged"><a href="/calendar" class="link">Calendario</a></div>
+        <div v-if="!logged" class="logged" :key="logged"><a href="/object" class="link">Oggetti</a></div>
+        <div v-if="!logged" class="logged" :key="logged"><a href="/event/type" class="link">Etichette</a></div>
+        <div v-if="!logged" class="logged" :key="logged"><a href="/graph" class="link">Grafico</a></div>
       </nav>
     </div>
     <div class="navHeader">

@@ -30,6 +30,8 @@ server.listen(3000, () => {
   console.log('Server listening on port '+3000);
 });
 
+process.env.PWD = process.cwd()
+app.use(express.static(process.env.PWD + '/public'));
 // app.use(express.json());
 // app.use(express.urlencoded({extended: true, limit: "100mb"}));
 app.use(bodyParser.json({ limit: '50mb' }));
