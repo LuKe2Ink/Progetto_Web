@@ -1,9 +1,11 @@
 const Attachment = require('../models/Attachment');
+const Events = require('../models/Events');
 const mongoose = require('mongoose')
 const moment = require('moment') 
 
 const attachmentAdd = async (req, res) => {
     let data = req.body
+    console.log(data);
     if(!data.event_id)
         return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
 
@@ -11,45 +13,63 @@ const attachmentAdd = async (req, res) => {
         return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
     
     const objId =new mongoose.mongo.ObjectId(data.event_id);
+    let attachment = [];
 
     let jsonAdd = {event: objId};
-    if(!data.link && data.link==''){
+    if(data.link && data.link!=''){
+        let existingLink = await Attachment.findOne({event:objId, link:{$exists: 1}})
         jsonAdd["link"] = data.link;
         jsonAdd["metadata"] = {
             date: moment().format("DD/MM/YYYY HH:mm")
-        } 
-    } else if(!data.file && data.file==''){
-        //creazione del file tramite gridfs
-        //sostituire il data.file con l'id successivamente
+        }
+        let att = null; 
+        if(existingLink){
+            await Attachment.findOneAndUpdate({_id: existingLink._id},jsonAdd);
+            att = await Attachment.findOne({event:objId, link:{$exists: 1}})
+        }
+        else
+            att = await Attachment.create(jsonAdd);
+        attachment.push(att)
+    }
+    if(data.file && data.file!=''){
+        let existingLink = await Attachment.findOne({event:objId, file:{$exists: 1}})
         const objId =new mongoose.mongo.ObjectId(data.file);
         jsonAdd["file"] = objId;
         jsonAdd["metadata"] = {
-            fileName: "nomefile.ciao" ,
+            fileName: data.fileName,
             date: moment().format("DD/MM/YYYY HH:mm"),
-            size: 100000
-        } 
-    } else {
+            size: data.size
+        }
+        let att = null; 
+        if(existingLink){
+            await Attachment.findOneAndUpdate({_id: existingLink._id},jsonAdd);
+            att = await Attachment.findOne({event:objId, file:{$exists: 1}})
+        }
+        else
+            att = await Attachment.create(jsonAdd);
+        attachment.push(att)
+    }
+    if(attachment.length == 0){
         return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
     }
 
-    const attachment = await Attachment.create({jsonAdd});
+    console.log(attachment)
 
-    res.json(attachment.metadata);
+    res.json(attachment);
 }
 
 const attachmentDelete = async (req, res) => {
   //todo delete attachmentDelete 
     let data = req.body
-    if(!data.attacment_id)
+    if(!data.attachment_id)
         return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
 
-    if(data.attacment_id=='')
+    if(data.attachment_id=='')
         return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
     
-    const objId =new mongoose.mongo.ObjectId(data.attacment_id);
-    const attachment = await Attachment.findByIdAndDelete(objId)
+    const attachment = await Attachment.findByIdAndDelete(data.attachment_id)
     
-    res.json({'status': 'ok', 'user': attachment._id})
+    res.json({'status': 'ok', 'data': attachment})
 }
 
 module.exports = {

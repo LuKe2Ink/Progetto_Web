@@ -336,7 +336,7 @@
                 </div>
             </div>
             <div  class="objectBody">
-                <img :ref="'imgFormInput'" src="/images/images.png" class="objectImage" @click="triggerInputImg(true)" />
+                <img @drop="triggerInputImg(true)" :ref="'imgFormInput'" src="/images/images.png" class="objectImage" @click="triggerInputImg(true)" />
             </div>
             <div class="typesInput">
                 <select v-model="tipoAdd" required>

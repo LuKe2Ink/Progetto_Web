@@ -29,6 +29,28 @@ header{
         color: $icon-color;
     }
 
+    .lateralMenu{
+        width: 200px;
+        top: 0px;
+        right: 0px;
+        position: fixed;
+        height: 100%;
+        background-color: white;
+        div{
+            cursor: pointer;
+            width: max-content;
+            margin-top: 30px;
+            margin-inline: auto;
+            .link{
+                border: 0;
+            }
+        }
+        .close{
+            margin-top: 10px;
+            margin-left: 15px;
+        }
+    }
+
     
     .navList{
         width: 60%;
@@ -41,11 +63,21 @@ header{
         }
     }
 
-    .navHeader nav, .navList nav{
+    .navHeader nav, .navList nav, .navHeaderReduce nav{
         height: 100%;
         align-items: center;
         display: flex;
     }
+    .navHeaderReduce{
+        margin-right: 20px;
+        width: 100%;
+        display: flex;
+        flex-direction: row-reverse;
+        i{
+            cursor: pointer;
+        }
+    }
+
     .navHeader{
         width: 20%;
         display: flex;

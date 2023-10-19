@@ -1,4 +1,4 @@
 {
-    "apiAddress":"http://localhost",
+    "apiAddress":"http://127.0.0.1",
     "apiPort": "3000"
 }

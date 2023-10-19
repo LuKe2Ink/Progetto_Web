@@ -29,7 +29,7 @@ const attachmentSchema = new mongoose.Schema({
           require:false
         }
         },
-        require
+        require: false
     }
   }, { collection: 'attachment' });
 

@@ -1,15 +1,21 @@
 <template>
-  <div style="width: 800px; margin-top: 300px;"><canvas id="acquisitions"></canvas></div>
+  <button style="margin-top: 200px;" @click="changeMonth(-1)">Indietro</button>
+  <button @click="changeMonth(+1)">Avanti</button>
+  <div id="divChart" style="width: 800px; height: max-content;"><canvas id="acquisitions"></canvas></div>
 </template>
 
 <script>
 import Chart from 'chart.js/auto'
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, toRaw } from 'vue';
   import axios from 'axios';
   import router from '../router/router';
   import swal from 'sweetalert';
   import config from '../../configApi.json';
   import moment from 'moment';
+  
+Array.prototype.max = function() {
+  return Math.max.apply(null, this);
+};
 
 async function historiesList(){
   const dataBody = {
@@ -31,7 +37,7 @@ async function historiesList(){
 }
 
 let histories = await historiesList()
-console.log(histories)
+
 let type = []
 for (let index = 0; index < histories.length; index++) {
   const element = histories[index];
@@ -40,74 +46,51 @@ for (let index = 0; index < histories.length; index++) {
     type.push(element.type[0])
 }
 let monthTranslate = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"]
-let daysInMonth = moment().daysInMonth()
-let month = moment().month();
-let labels = Array.from({length: daysInMonth}, (_, i) => i + 1)
 
-let datasets = []
-for (let index = 0; index < type.length; index++) {
-  const element = type[index];
-  const result = histories.filter((el) => el.type[0]._id == element._id);
-  const dataSetData = []
-  labels.forEach(el=>{
-    const hist = histories.filter((e) => 
-      e.event[0].date.month == month && e.event[0].date.day == el
-        && e.type[0]._id == element._id
-    );
-    if(hist.length > 1){
-      hist.forEach((e, index)=>{
-        if(index!=0)
-          hist[0].metadata.duration += e.metadata.duration
-      });
-    }
-    if(hist.length >= 1)
-      dataSetData.push(hist[0].metadata.duration)
-    else
-      dataSetData.push(0)
-  })
-
-  datasets.push({
-    label: element.name,
-    data: dataSetData,
-    borderColor: "#ff0000",
-    backgroundColor: element.color,
-    yAxisID: element._id,
-  })
-}
-console.log(datasets)
-
-
-const data = {
-  labels: labels,
-  datasets: [
-    {
-      label: 'Dataset 1',
-      data: [1,2,3],
-      borderColor: "#ff0000",
-      backgroundColor: "#ffffff",
-      yAxisID: 'y',
-    },
-    {
-      label: 'Dataset 2',
-      data: [3,0,2],
-      borderColor: "#ffff00",
-      backgroundColor: "#ffff00",
-      yAxisID: 'y1',
-    }
-  ]
-};
 
 
 export default defineComponent({
+  data(){
+    return{
+      histories: histories,
+      type: type,
+      year: moment().year(),
+      month: moment().month(),
+      daysInMonth: 0,
+      labels: [],
+      maxMinutes: 0,
+      datasets: [],
+      data: [],
+      chart: '',
+      ctx: ''
+    }
+  },
   mounted(){
-    (async function() {
-
-      console.log(document.getElementById('acquisitions'))
-      new Chart(
-        document.getElementById('acquisitions'),
+    this.ctx = document.getElementById("acquisitions").getContext("2d")
+    this.chartCreate();
+  },
+  methods: {
+    async changeMonth(value){
+      this.month += value
+      if(this.month < 0){
+        this.month = 11
+        this.year -= 1
+      } else if(this.month > 11) {
+        this.month = 0
+        this.year += 1
+      }
+      // document.getElementById('acquisitions').remove()
+      // document.getElementById('divChart').append()
+      this.clearData();
+      this.chartCreate();
+    },
+    chartCreate(){
+      this.createData();
+      this.chart = new Chart(
+        this.ctx,
         {
           type: 'line',
-          data: data,
+          data: this.data,
           options: {
             responsive: true,
             interaction: {
@@ -118,31 +101,84 @@ export default defineComponent({
             plugins: {
               title: {
                 display: true,
-                text: 'Chart.js Line Chart - Multi Axis'
+                text: monthTranslate[this.month]+" "+this.year
               }
             },
             scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Giorno del mese'
+                }
+              },
               y: {
-                type: 'linear',
-                display: false,
-                position: 'left',
-              },
-              y1: {
-                type: 'linear',
-                display: true,
-                position: 'right',
-
-                // grid line settings
-                grid: {
-                  drawOnChartArea: false, // only want the grid lines for one axis to show up
+                title: {
+                  display: true,
+                  text: 'Minuti'
                 },
-              },
+                min: 0,
+                max: this.maxMinutes,
+                ticks: {
+                  // forces step size to be 50 units
+                  stepSize: 5
+                }
+              }
             }
           },
         }
       );
-    })();
-  },});
+    },
+    createData(){
+      this.daysInMonth = moment(this.year+'-'+(this.month+1)).daysInMonth()
+      this.labels = Array.from({length: this.daysInMonth}, (_, i) => i + 1)
+      for (let index = 0; index < this.type.length; index++) {
+        const element = this.type[index];
+        // const result = this.histories.filter((el) => el.type[0]._id == element._id);
+        const dataSetData = []
+        this.labels.forEach(el=>{
+          const hist = this.histories.filter((e) => 
+            e.event[0].date.month == this.month && e.event[0].date.day == el 
+              && e.event[0].date.year == this.year && e.type[0]._id == element._id
+          );
+          if(hist.length > 1){
+            hist.forEach((e, index)=>{
+              if(index!=0)
+                hist[0].metadata.duration += e.metadata.duration
+            });
+          }
+          if(hist.length >= 1)
+            dataSetData.push(hist[0].metadata.duration)
+          else
+            dataSetData.push(0)
+        })
+        let currentMax = dataSetData.max()
+        if(currentMax>this.maxMinutes)
+          this.maxMinutes = currentMax
+
+        if(this.maxMinutes == 0)
+          this.maxMinutes = 150
+
+        this.datasets.push({
+          label: element.name,
+          data: dataSetData,
+          borderColor: element.color,
+          backgroundColor: element.color,
+        })
+      }
+
+      this.data = {
+        labels: this.labels,
+        datasets: this.datasets
+      };
+    },
+    clearData(){
+      this.labels = []
+      this.datasets = []
+      this.data = []
+      toRaw(this.chart).destroy()
+    }
+  }
+  });
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

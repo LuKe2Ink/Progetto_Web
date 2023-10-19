@@ -6,6 +6,12 @@ const http = require('http');
 const mongoose = require('mongoose');
 const { isAuthenticated } = require('./router/authToken/tokenVerify')
 const config = require("../config.json")
+
+const io = require('socket.io')(3001, {
+    cors: {
+        orgin: ["http://localhost:8080"]
+    }
+})
 // const moment = require('moment');
 app.use(cors());
 
@@ -23,6 +29,19 @@ const connectDB = () => {
 // app.listen('3000', () => {
 //   console.log('Node API server started on port ' + '3000');
 // });
+
+io.on("connection", socket=>{
+    console.log("hello stronzo")
+    socket.on("notification", (user_id)=>{
+        console.log(user_id)
+    })
+
+    let i = 0
+    setInterval(()=>{
+        socket.emit("notifications-get", "hello"+i)
+        i++;
+    }, 5000)
+})
 
 const server = http.createServer(app);
 const port = 3000; 

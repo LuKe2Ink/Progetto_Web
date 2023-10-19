@@ -1,10 +1,19 @@
 <script>
-    import { defineComponent, ref } from 'vue';
+    import { defineComponent, ref, toRaw } from 'vue';
     import axios from 'axios';
     import router from '../router/router';
     import swal from 'sweetalert';
     import config from '../../configApi.json';
     import moment from 'moment';
+
+    import io from 'socket.io-client';
+
+    const socket = io("http://localhost:3001")
+
+    // socket.emit("notification", localStorage.getItem('user_id'))
+    // socket.on("notifications-get", (bruh)=>{
+    //   console.log(bruh)
+    // })
     
     async function eventList(){
         const dataBody = {
@@ -150,6 +159,8 @@
           this.episodio = ref('')
           this.orario = ref('')
           this.oggetto = ref('')
+          this.link = ref('')
+          this.file = ref('')
           this.month = moment().get('M')
           this.year = moment().get('Y')
           //dinamico di default prende mese e anno corrente
@@ -167,6 +178,8 @@
                 personeInput: false,
                 tipoInput: false,
                 oraInput: false,
+                linkInput: false,
+                fileInput: false,
                 objectInput: false,
                 creationEvent: false,
                 modify: false,
@@ -188,6 +201,8 @@
                 episodio: null,
                 oggetto: null,
                 orario: null,
+                link: null,
+                file: null,
                 options:null,
                 optionsObject: [],
                 typeConvert:null,
@@ -216,7 +231,7 @@
               this.creationEvent = false;
               this.singleEvent = null
               this.histories = null
-              this.setInput(false);
+              this.setInput(false, 'close');
               if(fakeEvent.date)
                 delete fakeEvent.date
               this.oggetto = ref('')
@@ -269,6 +284,7 @@
                 this.histories = []
               }
               this.changeObject(event.event_type)
+              console.log(toRaw(event))
               this.setInputValue(event)
             },
             createEvent(day, week, Indexday){
@@ -310,10 +326,13 @@
                       })
                   } else {
                     this.days[this.selectedCell.week][this.selectedCell.day].event.push(data.data)
+                    
+                    this.addLinkOrFile(data.data._id)
                   }
                 }
               } else {
                 //modifica
+                this.addLinkOrFile(this.singleEvent._id)
                 let dataBody = this.checkInput(this.singleEvent);
                 if(dataBody){
                   dataBody["date"]=this.singleEvent.date
@@ -352,6 +371,7 @@
                     let predicate = (element) => element._id == data.data._id;
                     let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
                     this.days[this.selectedCell.week][this.selectedCell.day].event[index] = data.data
+                    console.log(this.days[this.selectedCell.week][this.selectedCell.day].event[index])
                   }
                 }
                 this.setInput(false);
@@ -373,7 +393,8 @@
                 event_id: event_id, 
                 episode: this.episodio == ''? null : this.episodio,
                 time: hour+minutes+seconds,
-                object_id: this.oggetto
+                object_id: this.oggetto,
+                user_id: localStorage.getItem('user_id')
               }
               const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', dataBody, 
                 {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
@@ -394,7 +415,8 @@
                 event_id: event_id, 
                 chapter: this.capitolo,
                 page: this.pagina,
-                object_id: this.oggetto
+                object_id: this.oggetto,
+                user_id: localStorage.getItem('user_id')
               }
               const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', dataBody, 
                 {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
@@ -434,7 +456,7 @@
               }
               return dataBody;
             },
-            setInput(bool){
+            setInput(bool, event=null){
               if(!this.creationEvent){
                 this.descrizioneInput = bool
                 this.titoloInput = bool
@@ -442,14 +464,33 @@
                 this.personeInput = bool
                 this.tipoInput = bool
                 this.oraInput = bool
-                this.modify = bool
                 this.objectInput = bool
+                if(event == 'close'){
+                    this.modify = bool
+                    this.linkInput = bool
+                    this.fileInput = bool
+                } else if(this.link == '' && this.file == ''){
+                    this.modify = bool
+                    this.linkInput = bool
+                    this.fileInput = bool
+                  }
               }
             },
             setInputValue(jsonEvent){
               this.descrizione = ref(jsonEvent.description)
               this.titolo = ref(jsonEvent.title)
-              this.luogo = ref(jsonEvent.location) 
+              this.luogo = ref(jsonEvent.location)
+              if(jsonEvent.attachment){
+                let predicate = (element) => element.link;
+                let indexLink = jsonEvent.attachment.findIndex(predicate)
+                predicate = (element) => element.file;
+                let indexFile = jsonEvent.attachment.findIndex(predicate)
+                this.link = ref(indexLink > -1  ? jsonEvent.attachment[indexLink].link : '')
+                this.file = ref(indexFile > -1 ? jsonEvent.attachment[indexFile].file : '')
+              } else {
+                this.link = ref('')
+                this.file = ref('')
+              }
               let people = jsonEvent.people.join(', ')
               this.persone = ref(people)
               this.tipo = ref(jsonEvent.event_type)
@@ -474,6 +515,84 @@
               let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
               this.days[this.selectedCell.week][this.selectedCell.day].event.splice(index, 1)
               this.modalSwitch()
+            },
+            async addLinkOrFile(event_id){
+              console.log(event_id)
+              const dataBody = {
+                event_id: event_id,
+                link: this.link,
+                file: this.file,
+                user_id: localStorage.getItem('user_id')
+              }
+              console.log(dataBody);
+              const response = await axios.put(config.apiAddress+':'+config.apiPort+'/attachment/add', dataBody, 
+                {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+              );
+              let data = response.data
+              if(data.status == 'ko'){
+                await swal({
+                    title: "Error",
+                    text: data.message,
+                    icon: "error",
+                    className: "sweetAlert"
+                })
+              } else {
+                let predicate = (element) => element._id == event_id;
+                let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
+                console.log(response.data)
+                if(this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment)
+                  this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment=response.data;
+                else
+                  this.days[this.selectedCell.week][this.selectedCell.day].event[index]['attachment']=response.data
+                
+                console.log(this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment)
+              }
+            },
+            openLink(link){
+              window.open(link, '_blank');
+            },
+            async deleteLink(type){
+              console.log("ciao ciao", type)
+              let indexAtt;
+              if(type == 'link'){
+                let predicate = (element) => element.link;
+                indexAtt = this.singleEvent.attachment.findIndex(predicate)
+              } else {
+                let predicate = (element) => element.file;
+                indexAtt = this.singleEvent.attachment.findIndex(predicate)
+              }
+              if(indexAtt < 0){
+                this.link = ref('')
+              } else {
+                const dataBody = {
+                  attachment_id: this.singleEvent.attachment[indexAtt]._id
+                }
+                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/attachment/delete', dataBody, 
+                  {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+                );
+                let data = response.data
+                if(data.status == 'ko'){
+                  await swal({
+                      title: "Error",
+                      text: data.message,
+                      icon: "error",
+                      className: "sweetAlert"
+                  })
+                } else {
+                  if(type == 'link'){
+                    let predicate = (element) => element._id = this.singleEvent._id;
+                    let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
+                    this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment.splice(indexAtt, 1);
+                    this.link = ref('')
+                  } else {
+                    let predicate = (element) => element._id = this.singleEvent._id;
+                    let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
+                    this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment.splice(indexAtt, 1);
+                    this.file = ref('')
+                  }
+                }
+              }
+              
             }
         },
     });
@@ -574,6 +693,19 @@
               <p v-if="!tipoInput" @click="tipoInput = !tipoInput; modify = true" class="typesInput">
                 Etichetta: {{ typeConvert[tipo] }}
               </p>
+              <div class="group" v-if="linkInput">
+                <input v-model="link" type="text" required="required">
+                <span class="highlight"></span>
+                <span class="bar"></span>
+                <label>Link</label>
+              </div>
+              <div v-if="!linkInput" class="linkButtonModify">
+                <span @click="linkInput = !linkInput; modify = true">
+                  Link 
+                </span>
+                <button type="button" v-if="link == ''" @click="linkInput = !linkInput; modify = true"><i class="fa-solid fa-plus"></i></button>
+                <button type="button" v-if="link != '' " @click="deleteLink('link')"><i class="fa-solid fa-trash-can"></i></button>
+              </div>
               <div class="group" v-if="oraInput">
                 <input v-model="oraInizio" type="time" required="required">
                 <input v-if="singleEvent != null && singleEvent.type.tipology =='normal'" v-model="oraFine" type="time">
@@ -676,11 +808,14 @@
                 </div>
               </div>
             </slot>
-            <div v-if="!creationEvent" class="trashButton">
+            <div v-if="!creationEvent" class="underButton trashButton">
               <button type="button" @click="deleteEvent"><i class="fa-solid fa-trash-can fa-xl"></i></button>
             </div>
-            <div v-if="modify" class="submitButton">
+            <div v-if="modify" class="underButton submitButton">
               <button type="submit"><i class="fa-solid fa-floppy-disk fa-xl"></i></button>
+            </div>
+            <div v-if="link" class="underButton linkButton">
+              <button type="button" @click="openLink(link)"><i class="fa-solid fa-link"></i></button>
             </div>
           </section>
         </form>

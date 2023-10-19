@@ -33,6 +33,12 @@ const eventsList = async (req, res) => {
       foreignField:'_id',
       as:'special_object'
     }},
+    {$lookup:{ 
+      from: 'attachment', 
+      localField:'_id', 
+      foreignField:'event',
+      as:'attachment'
+    }},
     {$unwind: '$type'},
     {$unwind: {
       path: "$special_object",
@@ -103,6 +109,8 @@ const eventModify = async (req, res) => {
   if(data.finished_time)
     update["finished_time"] = data.finished_time
 
+    console.log(update);
+
   let event = await Events.findOneAndUpdate({_id:data.event_id}, update)
 
   let eventModify = await getEventAggregate(event._id) 
@@ -154,6 +162,12 @@ async function getEventAggregate(id){
     {$unwind: {
       path: "$history",
       "preserveNullAndEmptyArrays": true
+    }},
+    {$lookup:{ 
+      from: 'attachment', 
+      localField:'_id', 
+      foreignField:'event',
+      as:'attachment'
     }},
     {$unwind: {
       path: "$special_object",
