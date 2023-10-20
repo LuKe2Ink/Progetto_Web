@@ -25,7 +25,7 @@ import { layouts } from 'chart.js';
         const data = response.data;
         if(data.status == 'ko'){
             await swal({
-                title: "Error",
+                title: "Error Event type",
                 text: data.message,
                 icon: "error",
                 className: "sweetAlert"

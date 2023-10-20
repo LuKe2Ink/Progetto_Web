@@ -6,6 +6,8 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt")
 const saltRounds = 10;
 
+const tokenManager = require('../router/authToken/tokenVerify');
+
 //vedere se utilizzare session token con refresh token
 const userRegister = async (req, res) => {
   //todo controllo password(?)
@@ -39,7 +41,15 @@ const userRegister = async (req, res) => {
     creation: moment().format('DD/MM/YYYY HH:mm')
   })
 
-  res.json({user_id: user.id});
+  const refreshToken = jwt.sign({ username: req.body.username }, "refreshSecret");
+  let token = await Token.create({
+    type: "refreshToken",
+    token: refreshToken,
+    date: moment().format('DD/MM/YYYY HH:mm'),
+    user: objId
+  })
+
+  res.json({user_id: user.id, refreshToken: refreshToken});
 }
 
 const userModify = async (req, res) => {
@@ -89,34 +99,44 @@ const userDelete = async (req, res) => {
 const userLogin = async (req, res) => {
   let data = req.body
 
-  const user = await checkPassword(data, res)
+  let user = await checkPassword(data, res)
   if(user.status)
     return user;
-
-  const objId = new mongoose.Types.ObjectId(user[0]._id);
+  
+  user = user[0]
+  
   let accessToken;
-  if(!user[0].token){
-    const refreshToken = jwt.sign({ username: req.body.username }, "refreshSecret");
-    let token = await Token.create({
-      type: "refreshToken",
-      token: refreshToken,
-      date: moment().format('DD/MM/YYYY HH:mm'),
-      user: objId
-    })
-    accessToken = jwt.sign({ username: req.body.username,  refresh: refreshToken}, "accessSecret", {
-      expiresIn: "1h",
-    });
-  } else {
-    accessToken = jwt.sign({ username: req.body.username,  refresh: user[0].token.token}, "accessSecret", {
-      expiresIn: "1h",
-    });
-  }
+  let token = await Token.findOne({user: user._id})
+  accessToken = tokenManager.createNewToken(req.body.username, token.token)
 
   res.json({ 
     accessToken: accessToken,
-    user_id: user[0]._id
+    user_id: user._id,
   });
 }
+
+const userVerifyOrRefresh = async (req, res) => {
+  let data = req.body
+
+  if(!data.token || data.token == ''){
+    return res.json({'status': 'ko',  'message': 'Prerequisited not valid'});
+  }
+
+  let accessToken = data.token;
+  console.log(accessToken)
+  if(!tokenManager.isExpired(data.token)){
+    console.log("entra")
+    let token = await Token.findOne({user: data.user_id})
+    accessToken = tokenManager.createNewToken(req.body.username, token.token)
+  }
+  console.log(accessToken)
+
+  res.json({ 
+    accessToken: accessToken,
+    user_id: data.user_id
+  });
+}
+
 
 async function checkPassword(data, res){
   if(!data || !data.username || !data.password)
@@ -154,5 +174,6 @@ module.exports = {
     userRegister, 
     userModify,
     userDelete,
-    userLogin
+    userLogin,
+    userVerifyOrRefresh
 }

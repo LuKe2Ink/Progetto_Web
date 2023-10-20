@@ -1,6 +1,7 @@
 <script setup>
   import DesktopComponent from '../components/DesktopComponent.vue';
   import MobileComponent from '../components/MobileComponet.vue';
+  
   function isMobile() {
     if( screen.width <= 760 ) {
         return true;

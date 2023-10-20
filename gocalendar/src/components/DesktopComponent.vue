@@ -5,16 +5,18 @@
     import swal from 'sweetalert';
     import config from '../../configApi.json';
     import moment from 'moment';
+    import tokenVerify from '../function/tokenSave';
+
+    let response = await tokenVerify.verifyAndSaveToken();
 
     import io from 'socket.io-client';
 
-    const socket = io("http://localhost:3001")
+    // const socket = io("http://localhost:3001")
 
     // socket.emit("notification", localStorage.getItem('user_id'))
     // socket.on("notifications-get", (bruh)=>{
     //   console.log(bruh)
     // })
-    
     async function eventList(){
         const dataBody = {
             user_id: localStorage.getItem('user_id')
@@ -23,9 +25,11 @@
             dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
         );
         const data = response.data;
+        console.log(data)
         if(data.status == 'ko'){
+          console.log("entra qua deficiente")
             await swal({
-                title: "Error",
+                title: "Error event",
                 text: data.message,
                 icon: "error",
                 className: "sweetAlert"
@@ -48,7 +52,7 @@
         const data = response.data;
         if(data.status == 'ko'){
             await swal({
-                title: "Error",
+                title: "Error type",
                 text: data.message,
                 icon: "error",
                 className: "sweetAlert"
@@ -67,7 +71,7 @@
         const data = response.data;
         if(data.status == 'ko'){
             await swal({
-                title: "Error",
+                title: "Error object",
                 text: data.message,
                 icon: "error",
                 className: "sweetAlert"
@@ -265,6 +269,7 @@
                 }
               }
               console.log(body)
+              await tokenVerify.verifyAndSaveToken();
               const response = await axios.post(config.apiAddress+':'+config.apiPort+'/history/get', 
                 body, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
               );
@@ -313,13 +318,14 @@
                   if(this.oggetto != ''){
                     dataBody["special_object"] = this.oggetto;
                   }
+                  await tokenVerify.verifyAndSaveToken();
                   const response = await axios.put(config.apiAddress+':'+config.apiPort+'/events/create', 
                     dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
                   );
                   const data = response.data;
                   if(data.status == 'ko'){
                       swal({
-                          title: "Error",
+                          title: "Error Single event",
                           text: data.message,
                           icon: "error",
                           className: "sweetAlert"
@@ -339,13 +345,14 @@
                   dataBody.date.time = this.oraInizio
                   if(this.oraFine != '')
                     dataBody.date["finished_time"] = this.oraFine
+                  await tokenVerify.verifyAndSaveToken();
                   const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/modify', 
                       dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
                   );
                   const data = response.data;
                   if(data.status == 'ko'){
                       await swal({
-                          title: "Error",
+                          title: "Error Link or File",
                           text: data.message,
                           icon: "error",
                           className: "sweetAlert"
@@ -363,6 +370,7 @@
                       let end = date.clone()
                       var duration = moment.duration(end.diff(startTime));
                       var minutes = duration.asMinutes();
+                      await tokenVerify.verifyAndSaveToken();
                       const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', 
                         {event_type_id: dataBody.event_type_id, event_id: dataBody.event_id, duration: minutes, user_id: localStorage.getItem('user_id')}, 
                         {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
@@ -396,6 +404,7 @@
                 object_id: this.oggetto,
                 user_id: localStorage.getItem('user_id')
               }
+              await tokenVerify.verifyAndSaveToken();
               const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', dataBody, 
                 {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
               );
@@ -418,6 +427,7 @@
                 object_id: this.oggetto,
                 user_id: localStorage.getItem('user_id')
               }
+              await tokenVerify.verifyAndSaveToken();
               const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', dataBody, 
                 {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
               );
@@ -508,6 +518,7 @@
                 this.oggetto = jsonEvent.special_object._id
             },
             async deleteEvent(){
+              await tokenVerify.verifyAndSaveToken();
               const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/delete', 
                 {event_id:this.singleEvent._id},{headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
               );
@@ -525,13 +536,14 @@
                 user_id: localStorage.getItem('user_id')
               }
               console.log(dataBody);
+              await tokenVerify.verifyAndSaveToken();
               const response = await axios.put(config.apiAddress+':'+config.apiPort+'/attachment/add', dataBody, 
                 {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
               );
               let data = response.data
               if(data.status == 'ko'){
                 await swal({
-                    title: "Error",
+                    title: "Error Link or File",
                     text: data.message,
                     icon: "error",
                     className: "sweetAlert"
@@ -567,13 +579,14 @@
                 const dataBody = {
                   attachment_id: this.singleEvent.attachment[indexAtt]._id
                 }
+                await tokenVerify.verifyAndSaveToken();
                 const response = await axios.post(config.apiAddress+':'+config.apiPort+'/attachment/delete', dataBody, 
                   {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
                 );
                 let data = response.data
                 if(data.status == 'ko'){
                   await swal({
-                      title: "Error",
+                      title: "Error delete Link or file",
                       text: data.message,
                       icon: "error",
                       className: "sweetAlert"

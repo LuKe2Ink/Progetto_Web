@@ -5,6 +5,9 @@
     import swal from 'sweetalert';
     import config from '../../configApi.json';
     import moment from 'moment';
+    import tokenVerify from '../function/tokenSave';
+
+    let response = await tokenVerify.verifyAndSaveToken();
     
     async function eventList(){
         const dataBody = {

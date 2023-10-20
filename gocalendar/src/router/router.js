@@ -4,10 +4,8 @@ const requireAuth = (to, from, next) => {
   const token = localStorage.getItem('token');
   console.log(token);
   if (token != null) {
-    // User is authorized, proceed with navigation
     next();
   } else {
-    // User is not authorized, redirect to login page or show an error message
     next('/login');
   }
 };
