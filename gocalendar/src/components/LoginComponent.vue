@@ -4,7 +4,11 @@
   import router from '../router/router';
   import swal from 'sweetalert';
   import config from '../../configApi.json';
+  import utils from '../function/utils';
+  import io from 'socket.io-client';
 
+  
+  const socket = io("http://localhost:3001");
 
   export default defineComponent({
     setup() {
@@ -28,9 +32,10 @@
             className: "sweetAlert"
           })
         } else {
-          console.log(response.data.user_id)
           localStorage.setItem('token', response.data.accessToken);
           localStorage.setItem('user_id', response.data.user_id);
+          socket.emit("notification", localStorage.getItem('user_id'))
+          utils.createNotificationSocket()
           setTimeout(() => {
             router.push('/calendar')
           }, 300);

@@ -7,7 +7,7 @@
     import moment from 'moment';
     import tokenVerify from '../function/tokenSave';
 
-    let response = await tokenVerify.verifyAndSaveToken();
+    await tokenVerify.verifyAndSaveToken();
     
     async function eventList(){
         const dataBody = {
@@ -262,7 +262,7 @@
                   event_id: event._id
                 }
               }
-              console.log(body)
+              await tokenVerify.verifyAndSaveToken();
               const response = await axios.post(config.apiAddress+':'+config.apiPort+'/history/get', 
                 body, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
               );
@@ -301,6 +301,7 @@
               input=!input;
             },
             async submitForm(){
+              await tokenVerify.verifyAndSaveToken();
               //creazione
               if(this.singleEvent==null){
                 let dataBody = this.checkInput(fakeEvent);
@@ -389,6 +390,7 @@
                 object_id: this.oggetto,
                 user_id: localStorage.getItem('user_id')
               }
+              await tokenVerify.verifyAndSaveToken();
               const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', dataBody, 
                 {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
               );
@@ -411,6 +413,7 @@
                 object_id: this.oggetto,
                 user_id: localStorage.getItem('user_id')
               }
+              await tokenVerify.verifyAndSaveToken();
               const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', dataBody, 
                 {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
               );
@@ -482,6 +485,7 @@
                 this.oggetto = jsonEvent.special_object._id
             },
             async deleteEvent(){
+              await tokenVerify.verifyAndSaveToken();
               const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/delete', 
                 {event_id:this.singleEvent._id},{headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
               );

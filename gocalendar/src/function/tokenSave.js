@@ -3,7 +3,6 @@ const config = require('../../configApi.json');
 const swal = require('sweetalert');
 
 const verifyAndSaveToken = async () => {
-    console.log("lo fa effettivamente")
     const response = await axios.post(config.apiAddress+':'+config.apiPort+'/user/token', {
         token: localStorage.getItem('token'),
         user_id: localStorage.getItem('user_id')

@@ -4,8 +4,9 @@ const bodyParser = require('body-parser');
 const cors = require('cors')
 const http = require('http');
 const mongoose = require('mongoose');
-const { isAuthenticated } = require('./router/authToken/tokenVerify')
-const config = require("../config.json")
+const { isAuthenticated } = require('./router/authToken/tokenVerify');
+const config = require("../config.json");
+const Events = require('./models/Events');
 
 const io = require('socket.io')(3001, {
     cors: {
@@ -29,17 +30,51 @@ const connectDB = () => {
 // app.listen('3000', () => {
 //   console.log('Node API server started on port ' + '3000');
 // });
-
+let users_id = []
 io.on("connection", socket=>{
-    console.log("hello stronzo")
     socket.on("notification", (user_id)=>{
-        console.log(user_id)
+        if(!users_id.includes(user_id))
+            users_id.push(user_id)
+    })
+    socket.on("disconnection", (user_id)=>{
+        if(users_id.includes(user_id)){
+            let index = users_id.indexOf(user_id);
+            users_id.splice(index, 1)
+        }
     })
 
-    let i = 0
-    setInterval(()=>{
-        socket.emit("notifications-get", "hello"+i)
-        i++;
+    setInterval(async ()=>{
+        if(users_id.length>0){
+            users_id.forEach(async (element)=>{
+                const objId = new mongoose.Types.ObjectId(element);
+                let event = await Events.aggregate([
+                    {$match: {user: objId}},
+                    {$lookup:
+                    { 
+                        from: 'events_type', 
+                        localField:'event_type',
+                        foreignField:'_id',
+                        as:'type'
+                    }},
+                    {$lookup:
+                    {
+                        from: 'events_history', 
+                        localField:'_id', 
+                        foreignField:'event',
+                        as:'history'
+                    }
+                    },
+                    {$unwind: '$type'},
+                    {$match: { "type.tipology": "normal" } },
+                    {$unwind: {
+                    path: "$history",
+                    "preserveNullAndEmptyArrays": true
+                    }},
+                    {$match: { "history": {$exists: false} } },
+                ]);
+                socket.emit("notifications-"+element,event)
+            })
+        }
     }, 5000)
 })
 

@@ -1,10 +1,14 @@
 <script>
-  import { defineComponent, ref, toRaw  } from 'vue';
-  import axios from 'axios';
-  import router from '../router/router';
-  import swal from 'sweetalert';
-  import config from '../../configApi.json';
-import { layouts } from 'chart.js';
+    import { defineComponent, ref, toRaw  } from 'vue';
+    import axios from 'axios';
+    import router from '../router/router';
+    import swal from 'sweetalert';
+    import config from '../../configApi.json';
+    import { layouts } from 'chart.js';
+
+    import tokenVerify from '../function/tokenSave';
+
+    await tokenVerify.verifyAndSaveToken();
 
     function uuidv4() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
@@ -69,6 +73,7 @@ import { layouts } from 'chart.js';
                   tipology: this.prev.type.tipology,
                   graph: this.graph
                 }
+                await tokenVerify.verifyAndSaveToken();
                 const response = await axios.post(config.apiAddress+':'+config.apiPort+'/types/modify', dataBody, 
                   {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
                 );
@@ -108,6 +113,7 @@ import { layouts } from 'chart.js';
                     type_id: id,
                     chain_events: resultSwalEvents,
                 }
+                await tokenVerify.verifyAndSaveToken();
                 const response = await axios.post(config.apiAddress+':'+config.apiPort+'/types/delete', dataBody, 
                     {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
                 );
@@ -182,7 +188,7 @@ import { layouts } from 'chart.js';
                     graph: this.graphInput,
                     user_id: localStorage.getItem('user_id'),
                 }
-                console.log(dataBody)
+                await tokenVerify.verifyAndSaveToken();
                 const response = await axios.put(config.apiAddress+':'+config.apiPort+'/types/create', dataBody, 
                     {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
                 );

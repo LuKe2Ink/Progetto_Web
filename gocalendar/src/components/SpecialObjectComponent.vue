@@ -1,9 +1,13 @@
 <script>
-  import { defineComponent, ref } from 'vue';
-  import axios from 'axios';
-  import router from '../router/router';
-  import swal from 'sweetalert';
-  import config from '../../configApi.json';
+    import { defineComponent, ref } from 'vue';
+    import axios from 'axios';
+    import router from '../router/router';
+    import swal from 'sweetalert';
+    import config from '../../configApi.json';
+    import tokenVerify from '../function/tokenSave';
+
+    await tokenVerify.verifyAndSaveToken();
+
     function uuidv4() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
         .replace(/[xy]/g, function (c) {
@@ -12,7 +16,7 @@
             return v.toString(16);
         });
     }
-    
+
     async function typeList(){
         const dataBody = {
             user_id: localStorage.getItem('user_id'),
@@ -34,7 +38,7 @@
     }
 
     async function objectList(){
-         const dataBody = {
+            const dataBody = {
             user_id: localStorage.getItem('user_id')
         }
         const response = await axios.post(config.apiAddress+':'+config.apiPort+'/object/list', 
@@ -137,6 +141,7 @@
                     name: this.name,
                     event_type_id: this.objectsList[index].event_type
                 }
+                await tokenVerify.verifyAndSaveToken();
                 const response = await axios.post(config.apiAddress+':'+config.apiPort+'/object/modify', dataBody, 
                     {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
                 );
@@ -175,6 +180,7 @@
                     object_id: id,
                     chain_events: resultSwal
                 }
+                await tokenVerify.verifyAndSaveToken();
                 const response = await axios.post(config.apiAddress+':'+config.apiPort+'/object/delete', dataBody, 
                     {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
                 );
@@ -261,8 +267,8 @@
                     name: this.nomeAdd,
                     event_type_id: this.tipoAdd,
                     user_id: localStorage.getItem('user_id'),
-                }
-                console.log(dataBody)
+                }  
+                await tokenVerify.verifyAndSaveToken();
                 const response = await axios.put(config.apiAddress+':'+config.apiPort+'/object/add', dataBody, 
                     {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
                 );

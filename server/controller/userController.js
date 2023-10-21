@@ -123,13 +123,10 @@ const userVerifyOrRefresh = async (req, res) => {
   }
 
   let accessToken = data.token;
-  console.log(accessToken)
   if(!tokenManager.isExpired(data.token)){
-    console.log("entra")
     let token = await Token.findOne({user: data.user_id})
     accessToken = tokenManager.createNewToken(req.body.username, token.token)
   }
-  console.log(accessToken)
 
   res.json({ 
     accessToken: accessToken,

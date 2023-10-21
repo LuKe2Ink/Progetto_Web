@@ -7,16 +7,8 @@
     import moment from 'moment';
     import tokenVerify from '../function/tokenSave';
 
-    let response = await tokenVerify.verifyAndSaveToken();
+    await tokenVerify.verifyAndSaveToken();
 
-    import io from 'socket.io-client';
-
-    // const socket = io("http://localhost:3001")
-
-    // socket.emit("notification", localStorage.getItem('user_id'))
-    // socket.on("notifications-get", (bruh)=>{
-    //   console.log(bruh)
-    // })
     async function eventList(){
         const dataBody = {
             user_id: localStorage.getItem('user_id')
@@ -309,6 +301,7 @@
               input=!input;
             },
             async submitForm(){
+              await tokenVerify.verifyAndSaveToken();
               //creazione
               if(this.singleEvent==null){
                 let dataBody = this.checkInput(fakeEvent);
@@ -318,7 +311,6 @@
                   if(this.oggetto != ''){
                     dataBody["special_object"] = this.oggetto;
                   }
-                  await tokenVerify.verifyAndSaveToken();
                   const response = await axios.put(config.apiAddress+':'+config.apiPort+'/events/create', 
                     dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
                   );
@@ -345,7 +337,6 @@
                   dataBody.date.time = this.oraInizio
                   if(this.oraFine != '')
                     dataBody.date["finished_time"] = this.oraFine
-                  await tokenVerify.verifyAndSaveToken();
                   const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/modify', 
                       dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
                   );
@@ -528,36 +519,35 @@
               this.modalSwitch()
             },
             async addLinkOrFile(event_id){
-              console.log(event_id)
-              const dataBody = {
-                event_id: event_id,
-                link: this.link,
-                file: this.file,
-                user_id: localStorage.getItem('user_id')
-              }
-              console.log(dataBody);
-              await tokenVerify.verifyAndSaveToken();
-              const response = await axios.put(config.apiAddress+':'+config.apiPort+'/attachment/add', dataBody, 
-                {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-              );
-              let data = response.data
-              if(data.status == 'ko'){
-                await swal({
-                    title: "Error Link or File",
-                    text: data.message,
-                    icon: "error",
-                    className: "sweetAlert"
-                })
-              } else {
-                let predicate = (element) => element._id == event_id;
-                let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
-                console.log(response.data)
-                if(this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment)
-                  this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment=response.data;
-                else
-                  this.days[this.selectedCell.week][this.selectedCell.day].event[index]['attachment']=response.data
-                
-                console.log(this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment)
+              if(this.link!='' && this.link!=''){
+                const dataBody = {
+                  event_id: event_id,
+                  link: this.link,
+                  file: this.file,
+                  user_id: localStorage.getItem('user_id')
+                }
+                const response = await axios.put(config.apiAddress+':'+config.apiPort+'/attachment/add', dataBody, 
+                  {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+                );
+                let data = response.data
+                if(data.status == 'ko'){
+                  await swal({
+                      title: "Error Link or File",
+                      text: data.message,
+                      icon: "error",
+                      className: "sweetAlert"
+                  })
+                } else {
+                  let predicate = (element) => element._id == event_id;
+                  let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
+                  console.log(response.data)
+                  if(this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment)
+                    this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment=response.data;
+                  else
+                    this.days[this.selectedCell.week][this.selectedCell.day].event[index]['attachment']=response.data
+                  
+                  console.log(this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment)
+                }
               }
             },
             openLink(link){

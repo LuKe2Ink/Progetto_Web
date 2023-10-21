@@ -2,6 +2,17 @@
   import { RouterLink, RouterView, useRouter} from 'vue-router'
   import { onMounted, ref } from 'vue';
 
+  import io from 'socket.io-client';
+  import moment from 'moment';
+  import utils from './function/utils';
+
+  const socket = io("http://localhost:3001")
+
+  if(localStorage.getItem('user_id')!='null'){
+    socket.emit("notification", localStorage.getItem('user_id'))
+    utils.createNotificationSocket()
+  }
+
   const router = useRouter()
 
   let logged = ref(false)
@@ -22,6 +33,7 @@
   })
 
   function logout(){
+    socket.emit("disconnection", localStorage.getItem('user_id'))
     localStorage.setItem('token',null);
     localStorage.setItem('user_id',null);
     isLogged()
@@ -75,6 +87,12 @@
   </div>
 </template>
 
+<!-- <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"></link> -->
 <style lang="scss">
   @import './assets/style/navHeader.scss'; 
 </style>
+
+<style module>
+  @import url("https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css");
+</style>
+
