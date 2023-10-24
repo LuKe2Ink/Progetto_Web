@@ -22,6 +22,21 @@ const userSchema = new mongoose.Schema({
         require: false,
         default: true
     },
+    role:{
+        type: String,
+        require: false,
+        default: 'user'
+    },
+    notification:{
+        type: Boolean,
+        require: false,
+        default: true
+    },
+    graph_setting:{
+        type: String,
+        require: false,
+        default: 'minutes'
+    },
     
   }, { collection: 'users' });
 

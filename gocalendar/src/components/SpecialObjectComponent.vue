@@ -2,7 +2,7 @@
     import { defineComponent, ref } from 'vue';
     import axios from 'axios';
     import router from '../router/router';
-    import swal from 'sweetalert';
+    import swal from 'sweetalert2';
     import config from '../../configApi.json';
     import tokenVerify from '../function/tokenSave';
 
@@ -18,12 +18,12 @@
     }
 
     async function typeList(){
-        const dataBody = {
+        const databody = {
             user_id: localStorage.getItem('user_id'),
             special: true
         }
         const response = await axios.post(config.apiAddress+':'+config.apiPort+'/types/list/filtered', 
-            dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+            databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
         );
         const data = response.data;
         if(data.status == 'ko'){
@@ -38,11 +38,11 @@
     }
 
     async function objectList(){
-            const dataBody = {
+            const databody = {
             user_id: localStorage.getItem('user_id')
         }
         const response = await axios.post(config.apiAddress+':'+config.apiPort+'/object/list', 
-            dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+            databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
         );
         const data = response.data;
         if(data.status == 'ko'){
@@ -135,14 +135,14 @@
             async modifySave(id){
                 let predicate = (element) => element._id == this.prevSave;
                 let index = this.objectsList.findIndex(predicate)
-                const dataBody = {
+                const databody = {
                     object_id: id,
                     img: this.img ? this.img : this.prevImg,
                     name: this.name,
                     event_type_id: this.objectsList[index].event_type
                 }
                 await tokenVerify.verifyAndSaveToken();
-                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/object/modify', dataBody, 
+                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/object/modify', databody, 
                     {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
                 );
                 let data = response.data
@@ -176,12 +176,12 @@
                         }
                     }
                 })
-                const dataBody = {
+                const databody = {
                     object_id: id,
                     chain_events: resultSwal
                 }
                 await tokenVerify.verifyAndSaveToken();
-                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/object/delete', dataBody, 
+                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/object/delete', databody, 
                     {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
                 );
                 if(response.data.status == 'ko'){
@@ -262,14 +262,14 @@
                         className: "sweetAlert"
                     })
                 }
-                const dataBody = {
+                const databody = {
                     img: this.$refs.imgFormInput.src,
                     name: this.nomeAdd,
                     event_type_id: this.tipoAdd,
                     user_id: localStorage.getItem('user_id'),
                 }  
                 await tokenVerify.verifyAndSaveToken();
-                const response = await axios.put(config.apiAddress+':'+config.apiPort+'/object/add', dataBody, 
+                const response = await axios.put(config.apiAddress+':'+config.apiPort+'/object/add', databody, 
                     {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
                 );
                 let data = response.data

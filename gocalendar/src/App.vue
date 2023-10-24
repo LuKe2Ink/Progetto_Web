@@ -20,7 +20,7 @@
   
   function isLogged(){
     const user_id= localStorage.getItem('user_id')
-    logged.value = (user_id == 'null');
+    logged.value = (user_id == 'null' || !user_id);
   }
 
   router.beforeEach((to, from, next) => {

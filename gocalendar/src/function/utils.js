@@ -1,6 +1,10 @@
 const Toastify = require('toastify-js');
 const io = require('socket.io-client');
-const moment = require('moment')
+const moment = require('moment');
+const axios = require('axios')
+const config = require('../../configApi.json');
+const swal = require('sweetalert2')
+const router = require('../router/router');
 
 function createTostify(event, date){
     let message = "L'evento "+event.title+" del "+ date.format('D/M/Y')+" si è concluso"
@@ -43,7 +47,52 @@ function createNotificationSocket(){
     })
 }
 
+async function callApi(databody, route, type){
+  let response;
+  switch(type){
+    case "get":
+      response = await axios.get(config.apiAddress+':'+config.apiPort+route,
+       {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}, 
+       // Never throw
+       validateStatus: () => true});
+      break;
+
+    case "put":
+      response = await axios.put(config.apiAddress+':'+config.apiPort+route, 
+      databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}, 
+      // Never throw
+      validateStatus: () => true});
+    break;
+    
+    case "post":
+      response = await axios.post(config.apiAddress+':'+config.apiPort+route, 
+      databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}, 
+        // Never throw
+        validateStatus: () => true});
+    break;
+  }
+
+  console.log(response)
+
+  if(response.status > 400){
+    await swal.fire({
+      title: "Error event",
+      text: response.message,
+      icon: "error",
+      className: "sweetAlert"
+    })
+
+    // localStorage.clear();
+    // window.location.href = config.clientAddress+config.clientPort+"/login"
+
+    return 'ko';
+  }
+
+  return response.data??'ok';
+}
+
 module.exports = {
     createTostify,
-    createNotificationSocket
+    createNotificationSocket,
+    callApi
 }

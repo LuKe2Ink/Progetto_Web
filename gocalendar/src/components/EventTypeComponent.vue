@@ -2,7 +2,7 @@
     import { defineComponent, ref, toRaw  } from 'vue';
     import axios from 'axios';
     import router from '../router/router';
-    import swal from 'sweetalert';
+    import swal from 'sweetalert2';
     import config from '../../configApi.json';
     import { layouts } from 'chart.js';
 
@@ -20,11 +20,11 @@
     }
     
     async function typeList(){
-        const dataBody = {
+        const databody = {
             user_id: localStorage.getItem('user_id')
         }
         const response = await axios.post(config.apiAddress+':'+config.apiPort+'/types/list', 
-            dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+            databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
         );
         const data = response.data;
         if(data.status == 'ko'){
@@ -66,7 +66,7 @@
             async modifySave(id){
                 let predicate = (element) => element._id == this.prev.save;
                 let index = this.eventTypes.findIndex(predicate)
-                const dataBody = {
+                const databody = {
                   type_id: id,
                   name: this.name,
                   color: this.color,
@@ -74,7 +74,7 @@
                   graph: this.graph
                 }
                 await tokenVerify.verifyAndSaveToken();
-                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/types/modify', dataBody, 
+                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/types/modify', databody, 
                   {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
                 );
                 let data = response.data
@@ -109,12 +109,12 @@
                         }
                     }
                 })
-                const dataBody = {
+                const databody = {
                     type_id: id,
                     chain_events: resultSwalEvents,
                 }
                 await tokenVerify.verifyAndSaveToken();
-                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/types/delete', dataBody, 
+                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/types/delete', databody, 
                     {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
                 );
                 let data = response.data
@@ -182,14 +182,14 @@
                 this.$refs["typeListForm"].append(newObject)
             },
             async addSave(){
-                const dataBody = {
+                const databody = {
                     name: this.nameInput,
                     color: this.colorInput,
                     graph: this.graphInput,
                     user_id: localStorage.getItem('user_id'),
                 }
                 await tokenVerify.verifyAndSaveToken();
-                const response = await axios.put(config.apiAddress+':'+config.apiPort+'/types/create', dataBody, 
+                const response = await axios.put(config.apiAddress+':'+config.apiPort+'/types/create', databody, 
                     {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
                 );
                 let data = response.data

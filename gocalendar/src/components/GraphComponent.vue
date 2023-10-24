@@ -9,7 +9,7 @@
   import { defineComponent, ref, toRaw } from 'vue';
   import axios from 'axios';
   import router from '../router/router';
-  import swal from 'sweetalert';
+  import swal from 'sweetalert2';
   import config from '../../configApi.json';
   import moment from 'moment';
   import tokenVerify from '../function/tokenSave';
@@ -21,11 +21,11 @@
   };
 
   async function historiesList(){
-    const dataBody = {
+    const databody = {
         user_id: localStorage.getItem('user_id')
     }
     const response = await axios.post(config.apiAddress+':'+config.apiPort+'/history/get/all', 
-      dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+      databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
     );
     const data = response.data;
     if(data.status == 'ko'){

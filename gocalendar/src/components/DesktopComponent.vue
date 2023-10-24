@@ -2,7 +2,7 @@
     import { defineComponent, ref, toRaw } from 'vue';
     import axios from 'axios';
     import router from '../router/router';
-    import swal from 'sweetalert';
+    import swal from 'sweetalert2';
     import config from '../../configApi.json';
     import moment from 'moment';
     import tokenVerify from '../function/tokenSave';
@@ -10,16 +10,15 @@
     await tokenVerify.verifyAndSaveToken();
 
     async function eventList(){
-        const dataBody = {
+        const databody = {
             user_id: localStorage.getItem('user_id')
         }
         const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/list', 
-            dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+            databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
         );
         const data = response.data;
         console.log(data)
         if(data.status == 'ko'){
-          console.log("entra qua deficiente")
             await swal({
                 title: "Error event",
                 text: data.message,
@@ -35,11 +34,11 @@
     }
     
     async function typeList(){
-        const dataBody = {
+        const databody = {
             user_id: localStorage.getItem('user_id')
         }
         const response = await axios.post(config.apiAddress+':'+config.apiPort+'/types/list', 
-            dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+            databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
         );
         const data = response.data;
         if(data.status == 'ko'){
@@ -54,11 +53,11 @@
     }
 
     async function objectList(){
-        const dataBody = {
+        const databody = {
             user_id: localStorage.getItem('user_id')
         }
         const response = await axios.post(config.apiAddress+':'+config.apiPort+'/object/list', 
-            dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+            databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
         );
         const data = response.data;
         if(data.status == 'ko'){
@@ -304,15 +303,15 @@
               await tokenVerify.verifyAndSaveToken();
               //creazione
               if(this.singleEvent==null){
-                let dataBody = this.checkInput(fakeEvent);
-                if(dataBody){
-                  dataBody["date"]=fakeEvent.date;
-                  dataBody.date["time"] = this.oraInizio
+                let databody = this.checkInput(fakeEvent);
+                if(databody){
+                  databody["date"]=fakeEvent.date;
+                  databody.date["time"] = this.oraInizio
                   if(this.oggetto != ''){
-                    dataBody["special_object"] = this.oggetto;
+                    databody["special_object"] = this.oggetto;
                   }
                   const response = await axios.put(config.apiAddress+':'+config.apiPort+'/events/create', 
-                    dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+                    databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
                   );
                   const data = response.data;
                   if(data.status == 'ko'){
@@ -331,14 +330,14 @@
               } else {
                 //modifica
                 this.addLinkOrFile(this.singleEvent._id)
-                let dataBody = this.checkInput(this.singleEvent);
-                if(dataBody){
-                  dataBody["date"]=this.singleEvent.date
-                  dataBody.date.time = this.oraInizio
+                let databody = this.checkInput(this.singleEvent);
+                if(databody){
+                  databody["date"]=this.singleEvent.date
+                  databody.date.time = this.oraInizio
                   if(this.oraFine != '')
-                    dataBody.date["finished_time"] = this.oraFine
+                    databody.date["finished_time"] = this.oraFine
                   const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/modify', 
-                      dataBody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
+                      databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
                   );
                   const data = response.data;
                   if(data.status == 'ko'){
@@ -363,7 +362,7 @@
                       var minutes = duration.asMinutes();
                       await tokenVerify.verifyAndSaveToken();
                       const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', 
-                        {event_type_id: dataBody.event_type_id, event_id: dataBody.event_id, duration: minutes, user_id: localStorage.getItem('user_id')}, 
+                        {event_type_id: databody.event_type_id, event_id: databody.event_id, duration: minutes, user_id: localStorage.getItem('user_id')}, 
                         {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
                       );
                     }
@@ -387,7 +386,7 @@
               const hour = this.orario.split(":")[0] * 360;
               const minutes = this.orario.split(":")[1] * 60;
               const seconds = this.orario.split(":")[2];
-              const dataBody = {
+              const databody = {
                 event_type_id: type_id, 
                 event_id: event_id, 
                 episode: this.episodio == ''? null : this.episodio,
@@ -396,7 +395,7 @@
                 user_id: localStorage.getItem('user_id')
               }
               await tokenVerify.verifyAndSaveToken();
-              const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', dataBody, 
+              const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', databody, 
                 {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
               );
               if(response.data.data){
@@ -410,7 +409,7 @@
               }
             },
             async submitTypePaper(type_id, event_id){
-              const dataBody = {
+              const databody = {
                 event_type_id: type_id, 
                 event_id: event_id, 
                 chapter: this.capitolo,
@@ -419,7 +418,7 @@
                 user_id: localStorage.getItem('user_id')
               }
               await tokenVerify.verifyAndSaveToken();
-              const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', dataBody, 
+              const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', databody, 
                 {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
               );
               if(response.data.data){
@@ -433,7 +432,7 @@
               }
             },
             checkInput(event){
-              let dataBody = null;
+              let databody = null;
               let personeForm = this.persone.replace(' ', '')
               let personeEvento = ''
               if(event.people)
@@ -445,7 +444,7 @@
                 || this.tipo != event.event_type
                 || (event.date && this.oraInizio != event.date.time)
                 || (event.date && this.oraFine != event.date.finished_time)){
-                  dataBody = {
+                  databody = {
                   user_id: localStorage.getItem('user_id'),
                   title: this.titolo,
                   description: this.descrizione,
@@ -455,7 +454,7 @@
                   event_id: event._id ? event._id : ''
                 }
               }
-              return dataBody;
+              return databody;
             },
             setInput(bool, event=null){
               if(!this.creationEvent){
@@ -520,13 +519,13 @@
             },
             async addLinkOrFile(event_id){
               if(this.link!='' && this.link!=''){
-                const dataBody = {
+                const databody = {
                   event_id: event_id,
                   link: this.link,
                   file: this.file,
                   user_id: localStorage.getItem('user_id')
                 }
-                const response = await axios.put(config.apiAddress+':'+config.apiPort+'/attachment/add', dataBody, 
+                const response = await axios.put(config.apiAddress+':'+config.apiPort+'/attachment/add', databody, 
                   {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
                 );
                 let data = response.data
@@ -566,11 +565,11 @@
               if(indexAtt < 0){
                 this.link = ref('')
               } else {
-                const dataBody = {
+                const databody = {
                   attachment_id: this.singleEvent.attachment[indexAtt]._id
                 }
                 await tokenVerify.verifyAndSaveToken();
-                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/attachment/delete', dataBody, 
+                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/attachment/delete', databody, 
                   {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
                 );
                 let data = response.data

@@ -15,10 +15,10 @@ const userRegister = async (req, res) => {
   let data = req.body
 
   if(!data || !data.username || !data.password || !data.mail)
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});
 
   if(data.username=='' || data.password=='' || data.mail=='')
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});
     
   let salt = await bcrypt.genSalt(saltRounds);
   let cryptedPass = await bcrypt.hash(data.password, salt);
@@ -27,12 +27,12 @@ const userRegister = async (req, res) => {
     username: data.username
   })
   if(findUsername.length > 0)
-    return res.json({ 'status': 'ko', 'message': 'Username already existing'});
+    return res.status(422).send({'message': 'Username already existing'});
   let findMail = await User.find({
     mail: data.mail
   })
   if(findMail.length > 0)
-    return res.json({'status': 'ko',  'message': 'Mail already existing'});
+    return res.status(422).send({'message': 'Mail already existing'});
 
   const user = await User.create({
     username: data.username,
@@ -49,51 +49,105 @@ const userRegister = async (req, res) => {
     user: objId
   })
 
-  res.json({user_id: user.id, refreshToken: refreshToken});
+  res.status(200).send({user_id: user.id, refreshToken: refreshToken});
+}
+
+const usersList= async (req, res) => {
+  //modify da fare
+  let data = req.body
+  let user = await checkPassword(data, res);
+  if(user.status)
+    return;
+  console.log(user[0].role, user.role == 'admin')
+  if(user[0].role == 'admin'){
+    const users = await User.find();
+    return res.status(200).send(users);
+  } else {
+    return res.status(401).send({'status': 'ko',  'message': 'Accesso non autorizzato'});
+  }
 }
 
 const userModify = async (req, res) => {
+  //modify da fare
   let data = req.body
   if(!data || !data.user_id)
-    return res.json({'status': 'ko',  'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});
 
   if(data.user_id=='')
-    return res.json({'status': 'ko',  'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});
 
   const objId = new mongoose.Types.ObjectId(data.user_id);
-  const user = User.findById(objId)
-  
+  let oldUser = await User.findById(objId)
+  if(!oldUser)
+    return res.status(404).send({'message': 'Prerequisited not valid'});
+
+  let setting = {}
   if(data.username && data.username != ''){
+    console.log(data.username)
     let findUsername = await User.find({
       username: data.username
     })
-
     if(findUsername.length > 0)
-      return res.status(412).json({ 'message': 'Username already existing'});
-    
-    user.username = data.username
+      return res.status(422).send({'message': 'Username already existing'});
+    setting["username"] = data.username
   }
-
-  if(data.password && data.password != ''){
-    let salt = await bcrypt.genSalt(saltRounds);
-    let cryptedPass = await bcrypt.hash(data.password, salt);
-    user.password = cryptedPass;
+  if(data.mail && data.mail != ''){
+    let findMail = await User.find({
+      mail: data.mail
+    })
+    if(findMail.length > 0)
+      return res.status(422).send({'message': 'Mail already existing'});
+    setting["mail"] = data.mail
   }
-  await user.save()
-  
+  console.log(data.notification, (typeof data.notification)=='boolean', typeof null, typeof undefined)
+  if((typeof data.notification)=='boolean'){
+    setting["notification"] = data.notification
+  }
+  if(data.graph_setting && data.graph_setting != ''){
+    setting["graph_setting"] = data.graph_setting
+  }
+  // console.log(setting)
 
-  res.json({'status': 'ok'})
+  await User.findByIdAndUpdate(objId, setting)
+  const user = await User.findById(objId);
+
+  res.status(200).send({user})
+}
+
+const userChangePassword = async (req, res) => {
+  //lo faccio perché per eliminare richiede user e password
+  let data = req.body
+  if(!data.newPassword || data.newPassword == '')
+    return res.status(412).send({'message': 'Prerequisited not valid'});
+
+  const objId = new mongoose.Types.ObjectId(data.user_id);
+  let findUser = await User.findById(objId)
+  if(!findUser)
+    return res.status(404).send({'message': 'Prerequisited not valid'});
+
+  const oldUser = await checkPassword(data, res)
+  if(oldUser.status)
+    return oldUser;
+  let salt = await bcrypt.genSalt(saltRounds);
+  let cryptedPass = await bcrypt.hash(data.newPassword, salt);
+  console.log(cryptedPass)
+  await User.findByIdAndUpdate(objId, {password: cryptedPass})
+  res.status(204).send({})
 }
 
 const userDelete = async (req, res) => {
   //lo faccio perché per eliminare richiede user e password
   let data = req.body
-  const user = await checkPassword(data, res) 
-  if(user.status)
-    return user;
-  const objId = new mongoose.Types.ObjectId(user[0]._id);
-  const userDeleted = await User.findByIdAndDelete(objId)
-  res.json({'status': 'ok', 'redirect': '/user/register', 'user': userDeleted._id})
+  const objId = new mongoose.Types.ObjectId(data.user_id);
+  let findUser = await User.findById(objId)
+  if(!findUser)
+    return res.status(404).send({'message': 'Prerequisited not valid'});
+  const oldUser = await checkPassword(data, res) 
+  if(oldUser.status)
+    return oldUser;
+  const user = await User.findByIdAndDelete(objId)
+  //eliminazione di anche tutti i dati
+  res.status(204).send({})
 }
 
 const userLogin = async (req, res) => {
@@ -109,7 +163,7 @@ const userLogin = async (req, res) => {
   let token = await Token.findOne({user: user._id})
   accessToken = tokenManager.createNewToken(req.body.username, token.token)
 
-  res.json({ 
+  res.status(200).send({ 
     accessToken: accessToken,
     user_id: user._id,
   });
@@ -119,7 +173,7 @@ const userVerifyOrRefresh = async (req, res) => {
   let data = req.body
 
   if(!data.token || data.token == ''){
-    return res.json({'status': 'ko',  'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});
   }
 
   let accessToken = data.token;
@@ -128,19 +182,34 @@ const userVerifyOrRefresh = async (req, res) => {
     accessToken = tokenManager.createNewToken(req.body.username, token.token)
   }
 
-  res.json({ 
+  res.status(200).send({ 
     accessToken: accessToken,
     user_id: data.user_id
   });
 }
 
+const userSettings = async (req, res) => {
+  let data = req.body
+
+  if(!data.user_id || data.user_id == ''){
+    return res.status(412).send({'message': 'Prerequisited not valid'});
+  }
+  const objId = new mongoose.Types.ObjectId(data.user_id);
+
+  let user = await User.findOne({_id:objId})
+  if(!user)
+    return res.status(404).send({'message': 'Prerequisited not valid'});
+
+  res.status(200).send(user);
+}
+
 
 async function checkPassword(data, res){
   if(!data || !data.username || !data.password)
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});
 
   if(data.username=='' || data.password=='')
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});
 
   const user = await User.aggregate([
     {$match: {username: data.username}},
@@ -158,11 +227,13 @@ async function checkPassword(data, res){
     }},
   ]);
   if(user.length <= 0)
-    return res.json({'status': 'ko', 'message': 'User not found' });
+    return res.status(404).send({'message': 'User not found'});
+
+  console.log(data.password, user[0].password)
   
   let compare = await bcrypt.compare(data.password, user[0].password)
   if(!compare){
-    return res.json({'status': 'ko', 'message': 'Password or username not corret' });
+    return res.status(412).send({'message':'Password or username not corret' });
   }
   return user;
 }
@@ -172,5 +243,8 @@ module.exports = {
     userModify,
     userDelete,
     userLogin,
-    userVerifyOrRefresh
+    userVerifyOrRefresh,
+    userSettings,
+    userChangePassword,
+    usersList
 }

@@ -1,0 +1,17 @@
+200 tutto ok
+
+201 Created
+
+412 Precondition Failed
+
+404 not found
+
+417 Expectation Failed
+
+401 Unauthorized
+
+403 Forbidden
+
+422 Unprocessable Entity
+
+204 No Content

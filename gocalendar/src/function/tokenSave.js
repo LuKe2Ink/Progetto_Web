@@ -1,6 +1,6 @@
 const axios = require('axios');
 const config = require('../../configApi.json');
-const swal = require('sweetalert');
+const swal = require('sweetalert2');
 
 const verifyAndSaveToken = async () => {
     const response = await axios.post(config.apiAddress+':'+config.apiPort+'/user/token', {

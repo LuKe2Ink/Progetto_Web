@@ -2,7 +2,7 @@
   import { defineComponent, ref } from 'vue';
   import axios from 'axios';
   import router from '../router/router';
-  import swal from 'sweetalert';
+  import swal from 'sweetalert2';
   import config from '../../configApi.json';
   import utils from '../function/utils';
   import io from 'socket.io-client';
@@ -70,5 +70,5 @@
 </template>
 
 <style lang="scss">
-    @import '../assets/style/userRouteStyle.scss'; 
+    @import '../assets/style/logRouteStyle.scss'; 
 </style>
