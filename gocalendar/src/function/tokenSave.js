@@ -9,7 +9,7 @@ const verifyAndSaveToken = async () => {
     });
     const data = response.data;
     if(response.status == 'ko'){
-        await swal({
+        await swal.fire({
         title: "Error token",
         text: data.message,
         icon: "error",

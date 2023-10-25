@@ -7,10 +7,10 @@ const moment = require('moment')
 const eventsTypeListFiltered = async (req, res) => {
   let data = req.body
   if(!data || !data.user_id)
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});;
 
   if(data.user_id=='')
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});;
   
   let tipology = "normal";
     
@@ -22,33 +22,33 @@ const eventsTypeListFiltered = async (req, res) => {
   const objId = new mongoose.Types.ObjectId(data.user_id);
   const userTypes = await EventsType.find({user: objId, tipology: tipology})
   let eventsType = typesDefault.concat(userTypes)
-  res.json(eventsType);
+  res.status(200).send(eventsType);
 }
 
 const eventsTypeList = async (req, res) => {
   let data = req.body
   if(!data || !data.user_id)
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});;
 
   if(data.user_id=='')
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});;
 
   const typesDefault = await EventsType.find({defaults: true});
   // console.log(typesDefault)
   const objId = new mongoose.Types.ObjectId(data.user_id);
   const userTypes = await EventsType.find({user: objId})
   let eventsType = typesDefault.concat(userTypes)
-  res.json(eventsType);
+  res.status(200).send(eventsType);
 }
 
 const eventsTypeCreate = async (req, res) => {
   let data = req.body
   if(!data || !data.user_id || !data.name || !data.color 
     || (data.graph==null || data.graph==undefined))
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});;
 
   if(data.user_id==''|| data.name=='' || data.color=='')
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});;
 
   const type = await EventsType.create({
     name: data.name,
@@ -59,7 +59,7 @@ const eventsTypeCreate = async (req, res) => {
     user: new mongoose.mongo.ObjectId(data.user_id)
   })
   
-  res.json(type);
+  res.status(200).send(type);
 }
 
 const eventsTypeModify = async (req, res) => {
@@ -67,15 +67,15 @@ const eventsTypeModify = async (req, res) => {
   if(!data || !data.name || !data.color 
       || !data.tipology || (data.graph == null || data.graph == undefined) 
       || !data.type_id)
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});;
 
   if(data.name=='' || data.color=='' || data.tipology=='' || data.type_id=='')
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});;
 
   let objId = new mongoose.mongo.ObjectId(data.type_id)
   const type = await EventsType.findById(objId)
   if(!type)
-    return res.json({ 'status': 'ko', 'message': 'Event type not found'});
+    return res.status(404).send({'message': 'Event type not found'});
   
   type.name = data.name
   type.color = data.color
@@ -84,16 +84,16 @@ const eventsTypeModify = async (req, res) => {
 
   let modifiedType = await type.save();
   
-  res.json({'status': 'ok', 'data': modifiedType});
+  res.status(200).send(modifiedType);
 }
 
 const eventsTypeDelete = async (req, res) => {
   let data = req.body
   if(!data.type_id)
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});;
 
   if(data.type_id=='')
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});;
 
   let objId = new mongoose.mongo.ObjectId(data.type_id)
   const type = await EventsType.findByIdAndDelete(objId)
@@ -118,7 +118,8 @@ const eventsTypeDelete = async (req, res) => {
         }
     }
   }
-  res.json({'status': 'ok', 'type': type._id});
+  const typeId = type._id
+  res.status(200).send(typeId);
 }
 
 module.exports = {

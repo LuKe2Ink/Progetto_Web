@@ -10,15 +10,15 @@ const eventsList = async (req, res) => {
   let data = req.body;
   
   if(!data.user_id)
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
+    return res.status(412).send({'message': 'Prerequisited not valid'});
     
   if(data.user_id == '')
-      return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
+      return res.status(412).send({'message': 'Prerequisited not valid'});
 
   const user = await Users.findById(data.user_id);
   const objId = new mongoose.Types.ObjectId(data.user_id);
   if(!user)
-    return res.json({'status': 'ko', 'message': 'The user is not found' });
+    return res.status(404).send({'message': 'The user is not found' });
   const events = await Events.aggregate([
     {$match: {user: objId}},
     {$lookup:{ 
@@ -45,27 +45,28 @@ const eventsList = async (req, res) => {
       "preserveNullAndEmptyArrays": true
     }},
   ]);
-  res.json(events);
+
+  res.status(200).send(events);
 }
 
 const eventCreate = async (req, res) => {
   let data = req.body;
   if(!data.title|| !data.date || !data.location || !data.description 
       || !data.event_type_id || !data.user_id)
-      return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
+      return res.status(412).send({'message': 'Prerequisited not valid'});
 
   if(data.title == '' || data.date == '' || data.location == ''
       || data.description == '' || data.event_type_id == '' || data.user_id == '')
-      return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
+      return res.status(412).send({'message': 'Prerequisited not valid'});
 
   const type = await EventsType.findById(data.event_type_id);
   const typeObjId = new mongoose.Types.ObjectId(data.event_type_id);
   if(!type)
-    return res.json({ 'status': 'ko', 'message': 'The event type is not found' });  
+    return res.status(404).send({'message':'The event type is not found' });  
   const user = await Users.findById(data.user_id);
   const userObjId = new mongoose.Types.ObjectId(data.user_id);
   if(!user)
-    return res.json({'status': 'ko',  'message': 'The user is not found' });  
+    return res.status(404).send({'message': 'The user is not found' });  
   const event = await Events.create({
     title: data.title,
     date: data.date,
@@ -79,7 +80,7 @@ const eventCreate = async (req, res) => {
 
   let eventCreated = await getEventAggregate(event._id)
 
-  res.json({'status': 'ok', 'data': eventCreated[0]});
+  res.status(200).send(eventCreated[0]);
 }
 
 const eventModify = async (req, res) => {
@@ -87,16 +88,16 @@ const eventModify = async (req, res) => {
   let data = req.body;
   if(!data.title|| !data.date || !data.location || !data.description 
         || !data.event_type_id || !data.event_id )
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
+    return res.status(412).send({'message': 'Prerequisited not valid'});
 
   if(data.title == '' || data.location == ''
     || data.description == '' || data.event_type_id == '' || data.event_id == '')
-    return res.json({'status': 'ko', 'message': 'Prerequisited not valid'})
+    return res.status(412).send({'message': 'Prerequisited not valid'});
 
   const type = await EventsType.findById(data.event_type_id);
   const typeObjId = new mongoose.Types.ObjectId(data.event_type_id);
   if(!type)
-    return res.json({ 'status': 'ko', 'message': 'The event type is not found' });
+    return res.status(404).send({'message': 'The event type is not found' });
 
   let update = {
     title: data.title,
@@ -115,23 +116,23 @@ const eventModify = async (req, res) => {
 
   let eventModify = await getEventAggregate(event._id) 
 
-  res.json({'status': 'ok', 'data': eventModify[0]});
+  res.status(200).send(eventModify[0]);
 }
 
 const eventDelete = async (req, res) => {
   let data = req.body;
   if(data.event_id == '')
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
+    return res.status(412).send({'message': 'Prerequisited not valid'});
   if(!data.event_id)
-    return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
+    return res.status(412).send({'message': 'Prerequisited not valid'});
   //todo delete eventDelete
   let event = await Events.findById(data.event_id)
   if(!event)
-    return res.json({ 'status': 'ko', 'message': 'Event not found' });
+    return res.status(404).send({'message': 'Event not found' });
 
   let eventDeleted = await Events.findByIdAndDelete(data.event_id)
   
-  res.json({'status': 'ok', 'event': eventDeleted._id});
+  res.status(200).send(eventDeleted._id);
 }
 
 async function getEventAggregate(id){

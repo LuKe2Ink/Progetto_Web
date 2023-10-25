@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const { isAuthenticated } = require('./router/authToken/tokenVerify');
 const config = require("../config.json");
 const Events = require('./models/Events');
+const Users = require('./models/Users');
 
 const io = require('socket.io')(3001, {
     cors: {
@@ -47,32 +48,35 @@ io.on("connection", socket=>{
         if(users_id.length>0){
             users_id.forEach(async (element)=>{
                 const objId = new mongoose.Types.ObjectId(element);
-                let event = await Events.aggregate([
-                    {$match: {user: objId}},
-                    {$lookup:
-                    { 
-                        from: 'events_type', 
-                        localField:'event_type',
-                        foreignField:'_id',
-                        as:'type'
-                    }},
-                    {$lookup:
-                    {
-                        from: 'events_history', 
-                        localField:'_id', 
-                        foreignField:'event',
-                        as:'history'
-                    }
-                    },
-                    {$unwind: '$type'},
-                    {$match: { "type.tipology": "normal" } },
-                    {$unwind: {
-                    path: "$history",
-                    "preserveNullAndEmptyArrays": true
-                    }},
-                    {$match: { "history": {$exists: false} } },
-                ]);
-                socket.emit("notifications-"+element,event)
+                let user = await Users.findById(objId)
+                if(user.notification){
+                    let event = await Events.aggregate([
+                        {$match: {user: objId}},
+                        {$lookup:
+                        { 
+                            from: 'events_type', 
+                            localField:'event_type',
+                            foreignField:'_id',
+                            as:'type'
+                        }},
+                        {$lookup:
+                        {
+                            from: 'events_history', 
+                            localField:'_id', 
+                            foreignField:'event',
+                            as:'history'
+                        }
+                        },
+                        {$unwind: '$type'},
+                        {$match: { "type.tipology": "normal" } },
+                        {$unwind: {
+                        path: "$history",
+                        "preserveNullAndEmptyArrays": true
+                        }},
+                        {$match: { "history": {$exists: false} } },
+                    ]);
+                    socket.emit("notifications-"+element,event)
+                }
             })
         }
     }, 5000)

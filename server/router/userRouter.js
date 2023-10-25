@@ -10,4 +10,5 @@ router.post('/token', userController.userVerifyOrRefresh);
 router.post('/settings', userController.userSettings);
 router.post('/modify/password', userController.userChangePassword);
 router.post('/list', userController.usersList);
+router.post('/active', userController.disableEnableUser);
 module.exports = router;

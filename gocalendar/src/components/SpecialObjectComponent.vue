@@ -5,6 +5,7 @@
     import swal from 'sweetalert2';
     import config from '../../configApi.json';
     import tokenVerify from '../function/tokenSave';
+    import utils from '../function/utils';
 
     await tokenVerify.verifyAndSaveToken();
 
@@ -22,38 +23,28 @@
             user_id: localStorage.getItem('user_id'),
             special: true
         }
-        const response = await axios.post(config.apiAddress+':'+config.apiPort+'/types/list/filtered', 
-            databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-        );
-        const data = response.data;
-        if(data.status == 'ko'){
-            await swal({
-                title: "Error",
-                text: data.message,
-                icon: "error",
-                className: "sweetAlert"
-            })
+        const response = await utils.callApi(databody, '/types/list/filtered', "post")
+        if(response.status == 'ko'){
+            localStorage.setItem('user_id', null)
+            localStorage.setItem('token', null)
+            await router.push("/login")
+            return null
         }
-        return data
+        return response
     }
 
     async function objectList(){
             const databody = {
             user_id: localStorage.getItem('user_id')
         }
-        const response = await axios.post(config.apiAddress+':'+config.apiPort+'/object/list', 
-            databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-        );
-        const data = response.data;
-        if(data.status == 'ko'){
-            await swal({
-                title: "Error",
-                text: data.message,
-                icon: "error",
-                className: "sweetAlert"
-            })
+        const response = await utils.callApi(databody, '/object/list', "post")
+        if(response.status == 'ko'){
+            localStorage.setItem('user_id', null)
+            localStorage.setItem('token', null)
+            await router.push("/login")
+            return null
         }
-        return data.data;
+        return response;
     }
 
     const objectsList = await objectList();
@@ -121,7 +112,7 @@
                         }
                     }
                     else {
-                        swal({
+                        swal.fire({
                             title: "Error",
                             text: "Immagine non validata, l'altezza e la larghezza devono essre uguali",
                             icon: "error",
@@ -142,18 +133,12 @@
                     event_type_id: this.objectsList[index].event_type
                 }
                 await tokenVerify.verifyAndSaveToken();
-                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/object/modify', databody, 
-                    {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
-                );
-                let data = response.data
-                
-                if(data.status == 'ko'){
-                    await swal({
-                        title: "Error",
-                        text: data.message,
-                        icon: "error",
-                        className: "sweetAlert"
-                    })
+                const response = await utils.callApi(databody, '/object/modify', "post")
+                if(response.status == 'ko'){
+                    localStorage.setItem('user_id', null)
+                    localStorage.setItem('token', null)
+                    await router.push("/login")
+                    return null
                 } else {
                     this.objectsList[index].img = this.img ? this.img : this.prevImg
                     this.$refs[this.prevSave][0].hidden = true;
@@ -164,7 +149,7 @@
                 }
             },
             async deletObject(id){
-                const resultSwal = await swal({
+                const resultSwal = await swal.fire({
                     title: "Attenzione",
                     text: "Si vuole anche eliminare tutti gli eventi collegati all'oggetto?",
                     icon: "warning",
@@ -181,21 +166,17 @@
                     chain_events: resultSwal
                 }
                 await tokenVerify.verifyAndSaveToken();
-                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/object/delete', databody, 
-                    {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
-                );
-                if(response.data.status == 'ko'){
-                    await swal({
-                        title: "Error",
-                        text: data.message,
-                        icon: "error",
-                        className: "sweetAlert"
-                    })
+                const response = await utils.callApi(databody, '/object/delete', "post")
+                if(response.status == 'ko'){
+                    localStorage.setItem('user_id', null)
+                    localStorage.setItem('token', null)
+                    await router.push("/login")
+                    return null
                 } else {
-                    let predicate = (element) => element._id == response.data.object;
+                    let predicate = (element) => element._id == response;
                     let index = this.objectsList.findIndex(predicate)
                     this.objectsList.splice(index, 1)
-                    await swal({
+                    await swal.fire({
                         title: "Successo",
                         text: "L'oggetto è stato eliminato con successo",
                         icon: "success"
@@ -255,7 +236,7 @@
             },
             async addSave(){
                 if(this.$refs.imgFormInput.src == this.srcOriginal ){
-                    await swal({
+                    await swal.fire({
                         title: "Errore",
                         text: "Inserire un'immagine",
                         icon: "error",
@@ -269,18 +250,12 @@
                     user_id: localStorage.getItem('user_id'),
                 }  
                 await tokenVerify.verifyAndSaveToken();
-                const response = await axios.put(config.apiAddress+':'+config.apiPort+'/object/add', databody, 
-                    {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
-                );
-                let data = response.data
-                
-                if(data.status == 'ko'){
-                    await swal({
-                        title: "Error",
-                        text: data.message,
-                        icon: "error",
-                        className: "sweetAlert"
-                    })
+                const response = await utils.callApi(databody, '/object/add', "put")
+                if(response.status == 'ko'){
+                    localStorage.setItem('user_id', null)
+                    localStorage.setItem('token', null)
+                    await router.push("/login")
+                    return null
                 } else {
                     this.resetForm()
                 }

@@ -2,8 +2,6 @@
   import { defineComponent, ref } from 'vue';
   import axios from 'axios';
   import router from '../router/router';
-  import swal from 'sweetalert2';
-  import config from '../../configApi.json';
   import utils from '../function/utils';
   import io from 'socket.io-client';
 
@@ -22,18 +20,15 @@
         };
 
         // Send the login request to the server
-        const response = await axios.post(config.apiAddress+':'+config.apiPort+'/user/login', formData);
-        const data = response.data;
-        if(data.status == 'ko'){
-          await swal({
-            title: "Error",
-            text: data.message,
-            icon: "error",
-            className: "sweetAlert"
-          })
-        } else {
-          localStorage.setItem('token', response.data.accessToken);
-          localStorage.setItem('user_id', response.data.user_id);
+        const response = await utils.callApi(formData, '/user/login', "post")
+        if(response.status == 'ko'){
+            localStorage.setItem('user_id', null)
+            localStorage.setItem('token', null)
+            await router.push("/login")
+            return null
+        }else {
+          localStorage.setItem('token', response.accessToken);
+          localStorage.setItem('user_id', response.user_id);
           socket.emit("notification", localStorage.getItem('user_id'))
           utils.createNotificationSocket()
           setTimeout(() => {

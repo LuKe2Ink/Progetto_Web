@@ -6,6 +6,7 @@
     import config from '../../configApi.json';
     import moment from 'moment';
     import tokenVerify from '../function/tokenSave';
+    import utils from '../function/utils';
 
     await tokenVerify.verifyAndSaveToken();
 
@@ -13,62 +14,42 @@
         const databody = {
             user_id: localStorage.getItem('user_id')
         }
-        const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/list', 
-            databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-        );
-        const data = response.data;
-        console.log(data)
-        if(data.status == 'ko'){
-            await swal({
-                title: "Error event",
-                text: data.message,
-                icon: "error",
-                className: "sweetAlert"
-            })
+        const response = await utils.callApi(databody, '/events/list', "post")
+        if(response.status == 'ko'){
             localStorage.setItem('user_id', null)
             localStorage.setItem('token', null)
             await router.push("/login")
             return null
         }
-        return data;
+        return response;
     }
     
     async function typeList(){
         const databody = {
             user_id: localStorage.getItem('user_id')
         }
-        const response = await axios.post(config.apiAddress+':'+config.apiPort+'/types/list', 
-            databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-        );
-        const data = response.data;
-        if(data.status == 'ko'){
-            await swal({
-                title: "Error type",
-                text: data.message,
-                icon: "error",
-                className: "sweetAlert"
-            })
+        const response = await utils.callApi(databody, '/types/list', "post")
+        if(response.status == 'ko'){
+            localStorage.setItem('user_id', null)
+            localStorage.setItem('token', null)
+            await router.push("/login")
+            return null
         }
-        return data
+        return response;
     }
 
     async function objectList(){
         const databody = {
             user_id: localStorage.getItem('user_id')
         }
-        const response = await axios.post(config.apiAddress+':'+config.apiPort+'/object/list', 
-            databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-        );
-        const data = response.data;
-        if(data.status == 'ko'){
-            await swal({
-                title: "Error object",
-                text: data.message,
-                icon: "error",
-                className: "sweetAlert"
-            })
+        const response = await utils.callApi(databody, '/object/list', "post")
+        if(response.status == 'ko'){
+            localStorage.setItem('user_id', null)
+            localStorage.setItem('token', null)
+            await router.push("/login")
+            return null
         }
-        return data.data
+        return response;
     }
 
     function getDaysInMonth(month, year){
@@ -116,6 +97,7 @@
     let events = await eventList();
     let eventTypes = await typeList();
     let special_object = await objectList();
+    console.log(special_object)
     let fakeEvent = {
       description: '',
       title: '',
@@ -261,12 +243,16 @@
               }
               console.log(body)
               await tokenVerify.verifyAndSaveToken();
-              const response = await axios.post(config.apiAddress+':'+config.apiPort+'/history/get', 
-                body, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-              );
-              console.log(response.data)
-              if(response.data.data && response.data.data.length){
-                response.data.data.map((element)=>{
+              const response = await utils.callApi(body, '/history/get', "post")
+              if(response.status == 'ko'){
+                  localStorage.setItem('user_id', null)
+                  localStorage.setItem('token', null)
+                  await router.push("/login")
+                  return null
+              }
+              console.log(response)
+              if(response && response.length){
+                response.map((element)=>{
                   if(element.time){
                     let hours = element.time%360
                     let minutes = (element.time-(hours*360))%60
@@ -275,7 +261,7 @@
                   }
                   return element;
                 })
-                this.histories = response.data.data
+                this.histories = response
               } else {
                 this.histories = []
               }
@@ -310,21 +296,15 @@
                   if(this.oggetto != ''){
                     databody["special_object"] = this.oggetto;
                   }
-                  const response = await axios.put(config.apiAddress+':'+config.apiPort+'/events/create', 
-                    databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-                  );
-                  const data = response.data;
-                  if(data.status == 'ko'){
-                      swal({
-                          title: "Error Single event",
-                          text: data.message,
-                          icon: "error",
-                          className: "sweetAlert"
-                      })
+                  const response = await utils.callApi(databody, '/events/create', "put")
+                  if(response.status == 'ko'){
+                      localStorage.setItem('user_id', null)
+                      localStorage.setItem('token', null)
+                      await router.push("/login")
+                      return null
                   } else {
-                    this.days[this.selectedCell.week][this.selectedCell.day].event.push(data.data)
-                    
-                    this.addLinkOrFile(data.data._id)
+                    this.days[this.selectedCell.week][this.selectedCell.day].event.push(response) 
+                    this.addLinkOrFile(response._id)
                   }
                 }
               } else {
@@ -336,19 +316,14 @@
                   databody.date.time = this.oraInizio
                   if(this.oraFine != '')
                     databody.date["finished_time"] = this.oraFine
-                  const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/modify', 
-                      databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-                  );
-                  const data = response.data;
-                  if(data.status == 'ko'){
-                      await swal({
-                          title: "Error Link or File",
-                          text: data.message,
-                          icon: "error",
-                          className: "sweetAlert"
-                      })
+                  const response = await utils.callApi(databody, '/events/modify', "post")
+                  if(response.status == 'ko'){
+                      localStorage.setItem('user_id', null)
+                      localStorage.setItem('token', null)
+                      await router.push("/login")
+                      return null
                   } else {
-                    if(this.oraFine != '' && data.data.event_type.tipology != 'special '){
+                    if(this.oraFine != '' && response.event_type.tipology != 'special '){
                       let date = moment()
                       date.set('hours', this.oraInizio.split(":")[0])
                       date.set('minutes', this.oraInizio.split(":")[1])
@@ -361,14 +336,19 @@
                       var duration = moment.duration(end.diff(startTime));
                       var minutes = duration.asMinutes();
                       await tokenVerify.verifyAndSaveToken();
-                      const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', 
-                        {event_type_id: databody.event_type_id, event_id: databody.event_id, duration: minutes, user_id: localStorage.getItem('user_id')}, 
-                        {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-                      );
+                      const response = await utils.callApi(
+                        {event_type_id: databody.event_type_id, event_id: databody.event_id, duration: minutes, user_id: localStorage.getItem('user_id')},
+                          '/history/add', "put")
+                      if(response.status == 'ko'){
+                          localStorage.setItem('user_id', null)
+                          localStorage.setItem('token', null)
+                          await router.push("/login")
+                          return null
+                      }
                     }
-                    let predicate = (element) => element._id == data.data._id;
+                    let predicate = (element) => element._id == response._id;
                     let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
-                    this.days[this.selectedCell.week][this.selectedCell.day].event[index] = data.data
+                    this.days[this.selectedCell.week][this.selectedCell.day].event[index] = response
                     console.log(this.days[this.selectedCell.week][this.selectedCell.day].event[index])
                   }
                 }
@@ -395,17 +375,20 @@
                 user_id: localStorage.getItem('user_id')
               }
               await tokenVerify.verifyAndSaveToken();
-              const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', databody, 
-                {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-              );
-              if(response.data.data){
-                await swal({
+              const response = await utils.callApi(databody, '/history/add', "put")
+              if(response.status == 'ko'){
+                  localStorage.setItem('user_id', null)
+                  localStorage.setItem('token', null)
+                  await router.push("/login")
+                  return null
+              } else {
+                await swal.fire({
                   title: "Storico dell'evento",
                   text: "Lo storico dell'evento è stato aggiunto con successo",
                   icon: "success",
                   className: "sweetAlert"
                 })
-                this.histories.unshift(response.data.data)
+                this.histories.unshift(response)
               }
             },
             async submitTypePaper(type_id, event_id){
@@ -418,17 +401,20 @@
                 user_id: localStorage.getItem('user_id')
               }
               await tokenVerify.verifyAndSaveToken();
-              const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', databody, 
-                {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-              );
-              if(response.data.data){
-                await swal({
+              const response = await utils.callApi(databody, '/history/add', "put")
+              if(response.status == 'ko'){
+                  localStorage.setItem('user_id', null)
+                  localStorage.setItem('token', null)
+                  await router.push("/login")
+                  return null
+              } else {
+                await swal.fire({
                   title: "Storico dell'evento",
                   text: "Lo storico dell'evento è stato aggiunto con successo",
                   icon: "success",
                   className: "sweetAlert"
                 })
-                this.histories.unshift(response.data.data)
+                this.histories.unshift(response)
               }
             },
             checkInput(event){
@@ -509,10 +495,14 @@
             },
             async deleteEvent(){
               await tokenVerify.verifyAndSaveToken();
-              const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/delete', 
-                {event_id:this.singleEvent._id},{headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-              );
-              let predicate = (element) => element._id == response.data.event;
+              const response = await utils.callApi({event_id:this.singleEvent._id}, '/events/delete', "post")
+              if(response.status == 'ko'){
+                  localStorage.setItem('user_id', null)
+                  localStorage.setItem('token', null)
+                  await router.push("/login")
+                  return null
+              }
+              let predicate = (element) => element._id == response;
               let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
               this.days[this.selectedCell.week][this.selectedCell.day].event.splice(index, 1)
               this.modalSwitch()
@@ -525,25 +515,19 @@
                   file: this.file,
                   user_id: localStorage.getItem('user_id')
                 }
-                const response = await axios.put(config.apiAddress+':'+config.apiPort+'/attachment/add', databody, 
-                  {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-                );
-                let data = response.data
-                if(data.status == 'ko'){
-                  await swal({
-                      title: "Error Link or File",
-                      text: data.message,
-                      icon: "error",
-                      className: "sweetAlert"
-                  })
+                const response = await utils.callApi(databody, '/attachment/add', "put")
+                if(response.status == 'ko'){
+                    localStorage.setItem('user_id', null)
+                    localStorage.setItem('token', null)
+                    await router.push("/login")
+                    return null
                 } else {
                   let predicate = (element) => element._id == event_id;
                   let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
-                  console.log(response.data)
                   if(this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment)
-                    this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment=response.data;
+                    this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment=response;
                   else
-                    this.days[this.selectedCell.week][this.selectedCell.day].event[index]['attachment']=response.data
+                    this.days[this.selectedCell.week][this.selectedCell.day].event[index]['attachment']=response
                   
                   console.log(this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment)
                 }
@@ -569,17 +553,12 @@
                   attachment_id: this.singleEvent.attachment[indexAtt]._id
                 }
                 await tokenVerify.verifyAndSaveToken();
-                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/attachment/delete', databody, 
-                  {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-                );
-                let data = response.data
-                if(data.status == 'ko'){
-                  await swal({
-                      title: "Error delete Link or file",
-                      text: data.message,
-                      icon: "error",
-                      className: "sweetAlert"
-                  })
+                const response = await utils.callApi(databody, '/attachment/add', "post")
+                if(response.status == 'ko'){
+                    localStorage.setItem('user_id', null)
+                    localStorage.setItem('token', null)
+                    await router.push("/login")
+                    return null
                 } else {
                   if(type == 'link'){
                     let predicate = (element) => element._id = this.singleEvent._id;

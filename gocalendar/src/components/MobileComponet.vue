@@ -18,7 +18,7 @@
         );
         const data = response.data;
         if(data.status == 'ko'){
-            await swal({
+            await swal.fire({
                 title: "Error",
                 text: data.message,
                 icon: "error",
@@ -41,7 +41,7 @@
         );
         const data = response.data;
         if(data.status == 'ko'){
-            await swal({
+            await swal.fire({
                 title: "Error",
                 text: data.message,
                 icon: "error",
@@ -60,7 +60,7 @@
         );
         const data = response.data;
         if(data.status == 'ko'){
-            await swal({
+            await swal.fire({
                 title: "Error",
                 text: data.message,
                 icon: "error",
@@ -316,7 +316,7 @@
                   );
                   const data = response.data;
                   if(data.status == 'ko'){
-                      swal({
+                      swal.fire({
                           title: "Error",
                           text: data.message,
                           icon: "error",
@@ -339,7 +339,7 @@
                   );
                   const data = response.data;
                   if(data.status == 'ko'){
-                      await swal({
+                      await swal.fire({
                           title: "Error",
                           text: data.message,
                           icon: "error",
@@ -395,7 +395,7 @@
                 {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
               );
               if(response.data.data){
-                await swal({
+                await swal.fire({
                   title: "Storico dell'evento",
                   text: "Lo storico dell'evento è stato aggiunto con successo",
                   icon: "success",
@@ -418,7 +418,7 @@
                 {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
               );
               if(response.data.data){
-                await swal({
+                await swal.fire({
                   title: "Storico dell'evento",
                   text: "Lo storico dell'evento è stato aggiunto con successo",
                   icon: "success",
@@ -503,7 +503,7 @@
             async handleOrientationChange() {
                 const orientation = window.screen.orientation.type
                 if (orientation === "landscape-primary") {
-                    await swal({
+                    await swal.fire({
                           title: "Attenzione",
                           text: "La visualizzazione di questa pagina in orizzontale non è supportata, ritornare alla visualizzazione in verticale",
                           icon: "warning",

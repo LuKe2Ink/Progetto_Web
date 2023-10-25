@@ -58,7 +58,6 @@ const usersList= async (req, res) => {
   let user = await checkPassword(data, res);
   if(user.status)
     return;
-  console.log(user[0].role, user.role == 'admin')
   if(user[0].role == 'admin'){
     const users = await User.find();
     return res.status(200).send(users);
@@ -83,7 +82,6 @@ const userModify = async (req, res) => {
 
   let setting = {}
   if(data.username && data.username != ''){
-    console.log(data.username)
     let findUsername = await User.find({
       username: data.username
     })
@@ -99,14 +97,12 @@ const userModify = async (req, res) => {
       return res.status(422).send({'message': 'Mail already existing'});
     setting["mail"] = data.mail
   }
-  console.log(data.notification, (typeof data.notification)=='boolean', typeof null, typeof undefined)
   if((typeof data.notification)=='boolean'){
     setting["notification"] = data.notification
   }
   if(data.graph_setting && data.graph_setting != ''){
     setting["graph_setting"] = data.graph_setting
   }
-  // console.log(setting)
 
   await User.findByIdAndUpdate(objId, setting)
   const user = await User.findById(objId);
@@ -130,7 +126,6 @@ const userChangePassword = async (req, res) => {
     return oldUser;
   let salt = await bcrypt.genSalt(saltRounds);
   let cryptedPass = await bcrypt.hash(data.newPassword, salt);
-  console.log(cryptedPass)
   await User.findByIdAndUpdate(objId, {password: cryptedPass})
   res.status(204).send({})
 }
@@ -203,6 +198,23 @@ const userSettings = async (req, res) => {
   res.status(200).send(user);
 }
 
+const disableEnableUser = async (req, res) => {
+  let data = req.body
+
+  if(!data.user_id || data.user_id == ''){
+    return res.status(412).send({'message': 'Prerequisited not valid'});
+  }
+  const objId = new mongoose.Types.ObjectId(data.user_id);
+
+  let user = await User.findOne({_id:objId})
+  if(!user)
+    return res.status(404).send({'message': 'Prerequisited not valid'});
+
+  await User.findByIdAndUpdate(objId, {active: !user.active})
+
+  res.status(204).send();
+}
+
 
 async function checkPassword(data, res){
   if(!data || !data.username || !data.password)
@@ -212,7 +224,7 @@ async function checkPassword(data, res){
     return res.status(412).send({'message': 'Prerequisited not valid'});
 
   const user = await User.aggregate([
-    {$match: {username: data.username}},
+    {$match: {username: data.username, active: true}},
     {$lookup:
       {
         from: 'tokens', 
@@ -228,8 +240,6 @@ async function checkPassword(data, res){
   ]);
   if(user.length <= 0)
     return res.status(404).send({'message': 'User not found'});
-
-  console.log(data.password, user[0].password)
   
   let compare = await bcrypt.compare(data.password, user[0].password)
   if(!compare){
@@ -246,5 +256,6 @@ module.exports = {
     userVerifyOrRefresh,
     userSettings,
     userChangePassword,
-    usersList
+    usersList,
+    disableEnableUser
 }

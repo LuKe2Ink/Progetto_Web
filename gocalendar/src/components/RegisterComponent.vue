@@ -4,6 +4,7 @@
   import router from '../router/router';
   import swal from 'sweetalert2';
   import config from '../../configApi.json';
+  import utils from '../function/utils';
 
   export default defineComponent({
     setup() {
@@ -20,17 +21,13 @@
         };
 
         // Send the login request to the server
-        console.log(formData, config.apiAddress+':'+config.apiPort+'/user/register')
-        const response = await axios.put(config.apiAddress+':'+config.apiPort+'/user/register', formData);
-        const data = response.data;
-        if(data.status == 'ko'){
-          swal({
-            title: "Error",
-            text: data.message,
-            icon: "error",
-            className: "sweetAlert"
-          })
-        } else 
+        const response = await utils.callApi(formData, '/user/register', "put")
+        if(response.status == 'ko'){
+            localStorage.setItem('user_id', null)
+            localStorage.setItem('token', null)
+            await router.push("/register")
+            return null
+        }else 
           router.push('/login')
       }
 

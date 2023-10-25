@@ -7,43 +7,37 @@
 <script>
   import Chart from 'chart.js/auto'
   import { defineComponent, ref, toRaw } from 'vue';
-  import axios from 'axios';
   import router from '../router/router';
-  import swal from 'sweetalert2';
-  import config from '../../configApi.json';
   import moment from 'moment';
   import tokenVerify from '../function/tokenSave';
+  import utils from '../function/utils';
 
   await tokenVerify.verifyAndSaveToken();
     
   Array.prototype.max = function() {
     return Math.max.apply(null, this);
   };
+  const databody = {
+      user_id: localStorage.getItem('user_id')
+  }
 
   async function historiesList(){
-    const databody = {
-        user_id: localStorage.getItem('user_id')
+    const response = await utils.callApi(databody, "/history/get/all", "post")
+    if(response.status == 'ko'){
+      setTimeout(() => {
+        router.push('/login')
+      }, 300);
     }
-    const response = await axios.post(config.apiAddress+':'+config.apiPort+'/history/get/all', 
-      databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-    );
-    const data = response.data;
-    if(data.status == 'ko'){
-        await swal({
-            title: "Error",
-            text: data.message,
-            icon: "error",
-            className: "sweetAlert"
-        })
-    }
-    return data.data
+    return response
   }
 
   let histories = await historiesList()
+  let user = await utils.callApi(databody, '/user/settings', 'post')
 
   let type = []
   for (let index = 0; index < histories.length; index++) {
     const element = histories[index];
+    console.log(element)
     const ind = type.map(el => el._id).indexOf(element.type[0]._id);
     if(ind<0)
       type.push(element.type[0])
@@ -161,6 +155,7 @@
           if(this.maxMinutes == 0)
             this.maxMinutes = 150
 
+          console.log(element.color)
           this.datasets.push({
             label: element.name,
             data: dataSetData,

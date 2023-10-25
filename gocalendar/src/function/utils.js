@@ -6,8 +6,8 @@ const config = require('../../configApi.json');
 const swal = require('sweetalert2')
 const router = require('../router/router');
 
-function createTostify(event, date){
-    let message = "L'evento "+event.title+" del "+ date.format('D/M/Y')+" si è concluso"
+function createToastify(event, date){
+    let message = "L'evento "+event.title+" del "+ date._i+" si è concluso"
 
     return Toastify({
         text: message,
@@ -30,16 +30,21 @@ function createNotificationSocket(){
         events.forEach(element => {
           setTimeout(function(){
             var date = element.date
-            let expirDateEvent = moment().set({
-              'year': date.year, 
-              'month': date.month, 
-              'day': date.day,
+            var stringDate = date.day+"/"+date.month+"/"+date.year
+            let expirDateEvent = moment(stringDate, 'D/M/YYYY')
+            expirDateEvent.set({
               'hour': date.time?date.time.split(':')[0]:"00",
               'minute': date.time?date.time.split(':')[1]:"00",
               'second': '00'
             });
-            if(expirDateEvent.add('1 day')<=moment.now()){
-              let toast = createTostify(element, expirDateEvent.add('-1 day'))
+            expirDateEvent.set({ 
+              'day': date.day,
+              'month': date.month,
+              'year': date.year
+            })
+            let checkExpireDate = expirDateEvent
+            if(checkExpireDate.add(1, 'D')<=moment.now()){
+              let toast = createToastify(element, expirDateEvent)
               toast.showToast();
             }
           }, 1000)
@@ -52,9 +57,9 @@ async function callApi(databody, route, type){
   switch(type){
     case "get":
       response = await axios.get(config.apiAddress+':'+config.apiPort+route,
-       {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}, 
+      {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}, 
        // Never throw
-       validateStatus: () => true});
+      validateStatus: () => true});
       break;
 
     case "put":
@@ -87,12 +92,15 @@ async function callApi(databody, route, type){
 
     return 'ko';
   }
-
-  return response.data??'ok';
+  console.log(response.data=='', typeof response.data)
+  if(response.data=='' && (typeof response.data) == 'object')
+    return response.data
+  
+  return response.data==''?'ok':response.data;
 }
 
 module.exports = {
-    createTostify,
+    createToastify,
     createNotificationSocket,
     callApi
 }

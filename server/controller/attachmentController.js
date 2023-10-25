@@ -7,10 +7,10 @@ const attachmentAdd = async (req, res) => {
     let data = req.body
     console.log(data);
     if(!data.event_id)
-        return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+        return res.status(412).send({'message': 'Prerequisited not valid'});;
 
     if(data.event_id=='')
-        return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+        return res.status(412).send({'message': 'Prerequisited not valid'});;
     
     const objId =new mongoose.mongo.ObjectId(data.event_id);
     let attachment = [];
@@ -50,26 +50,26 @@ const attachmentAdd = async (req, res) => {
         attachment.push(att)
     }
     if(attachment.length == 0){
-        return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+        return res.status(412).send({'message': 'Prerequisited not valid'});;
     }
 
     console.log(attachment)
 
-    res.json(attachment);
+    status(200).send({'data': attachment});
 }
 
 const attachmentDelete = async (req, res) => {
   //todo delete attachmentDelete 
     let data = req.body
     if(!data.attachment_id)
-        return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+        return res.status(412).send({'message': 'Prerequisited not valid'});;
 
     if(data.attachment_id=='')
-        return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'});
+        return res.status(412).send({'message': 'Prerequisited not valid'});;
     
     const attachment = await Attachment.findByIdAndDelete(data.attachment_id)
     
-    res.json({'status': 'ok', 'data': attachment})
+    res.status(200).send(attachment)
 }
 
 module.exports = {

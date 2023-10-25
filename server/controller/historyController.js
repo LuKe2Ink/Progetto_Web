@@ -13,25 +13,25 @@ const historyAdd = async (req, res) => {
 
     if((!data.event_type_id && data.event_type_id!='')
         || (!data.event_id && data.event_id!='') || (!data.user_id && data.user_id!=''))
-        return res.json({'status': 'ko',  'message': 'Prerequisited not valid'})
+        return res.status(412).send({'message': 'Prerequisited not valid'});
 
     const user = await Users.findById(data.user_id);
     const objId = new mongoose.Types.ObjectId(data.user_id);
     if(!user)
-        return res.json({'status': 'ko', 'message': 'The user is not found' });
+        return res.status(404).send({'message': 'The user is not found' });
 
     const type = await EventsType.findById(data.event_type_id);
     if(!type)
-        return res.json({'status': 'ko',  'message': 'The event type is not found' });
+        return res.status(404).send({'message': 'The event type is not found' });
     const event = await Events.findById(data.event_id);
     const eventObjId = new mongoose.Types.ObjectId(data.event_id);
     if(!event)
-        return res.json({'status': 'ko',  'message': 'The event is not found' });
+        return res.status(404).send({'message': 'The event is not found' });
 
     let jsonDuration = makeDurationJson(type, data)
     if(!jsonDuration.duration && !jsonDuration.time &&
         !jsonDuration.page && !jsonDuration.chapter && !jsonDuration.chapter)
-        return res.json({'status': 'ko',  'message': 'Campi non validi' });
+        return res.status(412).send({ 'message': 'Campi non validi' });
 
     const historyIfExist = await History.find({
         event: eventObjId
@@ -52,7 +52,7 @@ const historyAdd = async (req, res) => {
         })
     }
 
-    res.json({'status': 'ok', 'data': history});
+    res.status(200).send(history);
 }
 
 const historyGet = async (req, res) => {
@@ -61,7 +61,7 @@ const historyGet = async (req, res) => {
     // console.log(data.event_id)
 
     if((!data.event_id && data.event_id!='') && (!data.special_object && data.special_object!=''))
-        return res.json({'status': 'ko',  'message': 'Prerequisited not valid'})
+        return res.status(412).send({'message': 'Prerequisited not valid'});
     
     console.log(data)
     let match = null;
@@ -69,14 +69,14 @@ const historyGet = async (req, res) => {
         const event = await Events.findById(data.event_id);
         const objId = new mongoose.Types.ObjectId(data.event_id);
         if(!event)
-            return res.json({'status': 'ko',  'message': 'The event is not found' });
+            return res.status(404).send({'message': 'The event is not found' });
         match = {event: objId}
     }
     if(data.special_object){
         const object = await SpecialObject.findById(data.special_object);
         const objId = new mongoose.Types.ObjectId(data.special_object);
         if(!object)
-            return res.json({'status': 'ko',  'message': 'The special object is not found' }); 
+            return res.status(404).send({'message': 'The special object is not found' }); 
         match = {special_object: objId}
     }
 
@@ -87,48 +87,49 @@ const historyGet = async (req, res) => {
         }},
         {$sort: { "convertedDate": -1 }}
     ])
-    res.json({'status': 'ok', 'data': histories});
+    res.status(200).send(histories);
 }
 
 const historyForGraph = async (req, res) => {
     let data = req.body
     if(!data.user_id)
-        return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
+        return res.status(412).send({'message': 'Prerequisited not valid'});
     
     if(data.user_id == '')
-        return res.json({ 'status': 'ko', 'message': 'Prerequisited not valid'})
+        return res.status(412).send({'message': 'Prerequisited not valid'});
 
     const user = await Users.findById(data.user_id);
     const objId = new mongoose.Types.ObjectId(data.user_id);
     if(!user)
-        return res.json({'status': 'ko', 'message': 'The user is not found' });
+        return res.status(404).send({'message': 'The user is not found' });
     
     const histories = await History.aggregate([
         {$match: {special_object: null, user: objId}},
         {$lookup:
-          { 
-            from: 'events', 
-            localField:'event', 
-            foreignField:'_id',
-            as:'event'
-        }},
+            { 
+                from: 'events', 
+                localField:'event', 
+                foreignField:'_id',
+                as:'event'
+            }},
         {$lookup:
-          { 
-            from: 'events_type', 
-            localField:'event.event_type', 
-            foreignField:'_id',
-            as:'type'
-        }},
+            { 
+                from: 'events_type', 
+                localField:'event.event_type', 
+                foreignField:'_id',
+                as:'type'
+            }
+        },
     ]);
     console.log(histories);
-    res.json({'status': 'ok', 'data': histories});
+    res.status(200).send(histories);
 }
 
 function makeDurationJson(type, data){
     let jsonDuration = {};
     if(type.tipology == "normal"){
         if(!data.duration) 
-            return res.json({ 'status': 'ok', 
+            return res.status(412).send({
                 'message': 'Prerequisited not valid',
                 'problem' : 'duration'
             });
@@ -143,7 +144,7 @@ function makeDurationJson(type, data){
         if(data.chapter && data.chapter>0)  
             jsonDuration['chapter']= data.chapter
         if(data.time && data.time>0)
-           jsonDuration['time']= data.time
+            jsonDuration['time']= data.time
     }
 
     return jsonDuration;

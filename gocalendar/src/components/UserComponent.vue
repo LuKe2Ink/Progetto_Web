@@ -15,6 +15,8 @@
     export default defineComponent({
         created() {
             this.setInput()
+            if(user.role=='admin')
+                this.admin = true
         },
         methods:{
             setInput(){
@@ -61,9 +63,12 @@
                     if(response.user_id){
                         databody["user_id"]=localStorage.getItem("user_id")
                         let usersList = await utils.callApi(databody, '/user/list', 'post')
-                        console.log(typeof usersList)
                         if((typeof usersList)=='object'){
                             if(usersList.length > 0){  
+                                let predicate = (element) => element._id != localStorage.getItem("user_id");
+                                usersList=usersList.filter(predicate)
+                                console.log(usersList)
+                                this.usersList = usersList
                                 this.calendarSettings = false
                                 this.userSettings = false
                                 this.adminList = true
@@ -74,20 +79,39 @@
             },
             async changePassword(){
                 //rotta esclusiva per cambio password
-                if(!this.flagChangePassword){
-                    this.flagChangePassword = true
-                } else {
+                // if(!this.flagChangePassword){
+                //     this.flagChangePassword = true
+                // } else {
+                let result = await swal.fire({
+                    title: 'Cambio Password',
+                    html: `<input type="password" id="oldPass" class="swal2-input" placeholder="Vecchia Password">
+                    <input type="password" id="newPass" class="swal2-input" placeholder="Nuova Password">
+                    <input type="password" id="againNewPass" class="swal2-input" placeholder="Conferma Nuova Password">`,
+                    confirmButtonText: 'Cambia Password',
+                    focusConfirm: false,
+                    preConfirm: () => {
+                        const oldPass = swal.getPopup().querySelector('#oldPass').value
+                        const newPass = swal.getPopup().querySelector('#newPass').value
+                        const againNewPass = swal.getPopup().querySelector('#againNewPass').value
+                        if (!oldPass || !newPass || (newPass != againNewPass)) {
+                            swal.showValidationMessage('Dati non validi')
+                        }
+                        return { oldPass: oldPass, newPass: newPass }
+                    }
+                })
+                if(result.isConfirmed == true){
                     let databody={
                         username: user.username,
                         user_id: localStorage.getItem("user_id"),
-                        password: this.oldPass,
-                        newPassword: this.newPass
+                        password: result.value.oldPass,
+                        newPassword: result.value.newPass
                     };
                     await utils.callApi(databody, '/user/modify/password', 'post')
                     this.oldPass = ref('')
                     this.newPass = ref('')
                     this.flagChangePassword = false
                 }
+                // }
             },
             async modifyUser(){
                 let databody={};
@@ -107,6 +131,27 @@
                 user = response.user
                 this.setInput()
                 this.modify = false;
+            },
+            async switchActiveUser(index){
+                let question = this.usersList[index].active?"disattivare":"riattivare"
+
+                let swalResponse = await swal.fire({
+                    title: 'Sei sicuro di voler '+question+' questo utente?',
+                    showDenyButton: true,
+                    showCancelButton: false,
+                    confirmButtonText: 'Si',
+                    denyButtonText: 'No'
+                })
+
+                if(swalResponse.isConfirmed){
+                    const databody = {
+                        user_id: this.usersList[index]._id
+                    }
+                    let response = await utils.callApi(databody, "/user/active", 'post') 
+                    console.log(response)
+                    if(response=='ok') 
+                        this.usersList[index].active = !this.usersList[index].active
+                }
             }
         },
         data(){
@@ -121,7 +166,9 @@
                 userSettings: true,
                 calendarSettings: false,
                 adminList: false,
-                modify: false
+                modify: false,
+                usersList: [],
+                admin: false
             }
         },
     })
@@ -137,7 +184,7 @@
             <div ref="calendarTab" class="calendar" v-bind:class="{ active: calendarSettings }" @click="switchMenuSettings(true, $event)">
                 <span>Calendar</span>
             </div>
-            <div ref="adminTab" class="admin" v-bind:class="{ active: adminList }" @click="switchAdminList()">
+            <div v-if="admin" ref="adminTab" class="admin" v-bind:class="{ active: adminList }" @click="switchAdminList()">
                 <span>Admin</span>
             </div>
         </div>
@@ -193,27 +240,18 @@
                 <!-- </form> -->
             </div>
             <div class="adminList" v-if="adminList">
-                <form>
-                    <div class="row">
-                        <label for="notification">Hello:</label>
-                        <input :disabled="!modify" type="checkbox" id="notification" v-model="notification" required>
+                <div v-for="(user, index) in usersList" class="usersList">
+                    <div class="user" 
+                        v-bind:class="{borderActive:user.active, borderDisabled: !user.active}"
+                        @click="switchActiveUser(index)" :key="user.active">
+                        <div>
+                           <span> Username: {{user.username}}</span>
+                        </div>
+                        <div>
+                           <span> Mail: {{user.mail}}</span>
+                        </div>
                     </div>
-                    <div class="row">
-                        <label for="graph_setting">Grafico:</label>
-                        <select :disabled="!modify" v-model="graph_setting"
-                                id="graph_setting">
-                            <option value="hours">
-                                Ore
-                            </option>
-                            <option value="minutes">
-                                Minuti
-                            </option>
-                            <option value="seconds">
-                                Secondi
-                            </option>
-                        </select>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>

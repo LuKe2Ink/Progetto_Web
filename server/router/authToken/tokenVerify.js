@@ -4,15 +4,14 @@ function isAuthenticated(req, res, next) {
     try {
         let token = req.get("Authorization");
         if (!token){
-            return res.json({'status': 'ko', 'redirect': '/user/login'});
+            return res.status(401).send({'data': '/user/login'});
         }
         token = token.split(" ")[1];
         const decoded = jwt.verify(token, "accessSecret");
         req.username = decoded.username;
         next();
     } catch (error) {
-        console.log(error)
-        return res.json({'status': 'ko', 'redirect': '/user/login'});
+        return res.status(401).send({'data': '/user/login'});
     }
 }
 

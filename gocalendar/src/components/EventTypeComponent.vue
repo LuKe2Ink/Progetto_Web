@@ -5,7 +5,7 @@
     import swal from 'sweetalert2';
     import config from '../../configApi.json';
     import { layouts } from 'chart.js';
-
+    import utils from '../function/utils';
     import tokenVerify from '../function/tokenSave';
 
     await tokenVerify.verifyAndSaveToken();
@@ -23,19 +23,14 @@
         const databody = {
             user_id: localStorage.getItem('user_id')
         }
-        const response = await axios.post(config.apiAddress+':'+config.apiPort+'/types/list', 
-            databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-        );
-        const data = response.data;
-        if(data.status == 'ko'){
-            await swal({
-                title: "Error Event type",
-                text: data.message,
-                icon: "error",
-                className: "sweetAlert"
-            })
+        const response = await utils.callApi(databody, '/types/list', "post")
+        if(response.status == 'ko'){
+            localStorage.setItem('user_id', null)
+            localStorage.setItem('token', null)
+            await router.push("/login")
+            return null
         }
-        return data
+        return response
     }
 
     let eventTypes = await typeList();
@@ -67,28 +62,21 @@
                 let predicate = (element) => element._id == this.prev.save;
                 let index = this.eventTypes.findIndex(predicate)
                 const databody = {
-                  type_id: id,
-                  name: this.name,
-                  color: this.color,
-                  tipology: this.prev.type.tipology,
-                  graph: this.graph
+                    type_id: id,
+                    name: this.name,
+                    color: this.color,
+                    tipology: this.prev.type.tipology,
+                    graph: this.graph
                 }
                 await tokenVerify.verifyAndSaveToken();
-                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/types/modify', databody, 
-                  {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
-                );
-                let data = response.data
-                console.log(data)
-                
-                if(data.status == 'ko'){
-                    await swal({
-                        title: "Error",
-                        text: data.message,
-                        icon: "error",
-                        className: "sweetAlert"
-                    })
+                const response = await utils.callApi(databody, '/types/modify', "post")
+                if(response.status == 'ko'){
+                    localStorage.setItem('user_id', null)
+                    localStorage.setItem('token', null)
+                    await router.push("/login")
+                    return null
                 } else {
-                    this.eventTypes[index] = data.data
+                    this.eventTypes[index] = response
                     this.eventTypes[index].guidLabel = uuidv4()
                     this.eventTypes[index].guidColor = uuidv4()
                     this.eventTypes[index].guidGraph = uuidv4()
@@ -97,7 +85,7 @@
                 }
             },
             async deletObject(id){
-                const resultSwalEvents = await swal({
+                const resultSwalEvents = await swal.fire({
                     title: "Attenzione",
                     text: "Si vuole anche eliminare tutti gli eventi collegati all'etichetta?",
                     icon: "warning",
@@ -114,22 +102,17 @@
                     chain_events: resultSwalEvents,
                 }
                 await tokenVerify.verifyAndSaveToken();
-                const response = await axios.post(config.apiAddress+':'+config.apiPort+'/types/delete', databody, 
-                    {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
-                );
-                let data = response.data
-                if(data.status == 'ko'){
-                    await swal({
-                        title: "Error",
-                        text: data.message,
-                        icon: "error",
-                        className: "sweetAlert"
-                    })
+                const response = await utils.callApi(databody, '/types/delete', "post")
+                if(response.status == 'ko'){
+                    localStorage.setItem('user_id', null)
+                    localStorage.setItem('token', null)
+                    await router.push("/login")
+                    return null
                 } else {
-                    let predicate = (element) => element._id == data.type._id;
+                    let predicate = (element) => element._id == response._id;
                     let index = this.eventTypes.findIndex(predicate)
                     this.eventTypes.splice(index, 1)
-                    await swal({
+                    await swal.fire({
                         title: "Successo",
                         text: "L'oggetto è stato eliminato con successo",
                         icon: "success"
@@ -189,20 +172,14 @@
                     user_id: localStorage.getItem('user_id'),
                 }
                 await tokenVerify.verifyAndSaveToken();
-                const response = await axios.put(config.apiAddress+':'+config.apiPort+'/types/create', databody, 
-                    {headers: {Authorization: 'Bearer '+localStorage.getItem('token')} }
-                );
-                let data = response.data
-                
-                if(data.status && data.status == 'ko'){
-                    await swal({
-                        title: "Error",
-                        text: data.message,
-                        icon: "error",
-                        className: "sweetAlert"
-                    })
+                const response = await utils.callApi(databody, '/types/create', "put")
+                if(response.status == 'ko'){
+                    localStorage.setItem('user_id', null)
+                    localStorage.setItem('token', null)
+                    await router.push("/login")
+                    return null
                 } else {
-                    this.eventTypes.push(data)
+                    this.eventTypes.push(response)
                     let last = this.eventTypes.length-1
                     this.eventTypes[last]["guidLabel"] = uuidv4()
                     this.eventTypes[last]["guidColor"] = uuidv4()

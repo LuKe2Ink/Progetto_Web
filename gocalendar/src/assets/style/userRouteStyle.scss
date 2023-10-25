@@ -61,6 +61,32 @@ $header-height: 150px;
         min-width: 400px;
     }
 
+    .usersList{
+        height: 300px;
+        display: block;
+        .user{
+            max-width: fit-content;
+            margin-inline: auto;
+            text-align: start;
+            display: block;
+            padding: 10px;
+            span{
+                font-size: 25px;
+            }
+        }
+    }
+
+    .borderActive, .borderDisabled{
+        border-radius: 10px;
+    }
+
+    .borderActive{
+        border: 1px solid $shadow-color;
+    }
+    .borderDisabled{
+        border: 1px solid red;
+    }
+
     .calendarSetting{
         .row{
             padding-inline: 60px;
@@ -137,6 +163,14 @@ $header-height: 150px;
     .link:visited{
         color: #EB9A28;
     }
+}
+.risposta { margin: 0 2em; }
+.order-1 { order: 1; }
+.order-2 { order: 2; }
+.order-3 { order: 3; }
+
+.right-gap {
+    margin-right: auto;
 }
 
 @media (max-width : 600px) {
