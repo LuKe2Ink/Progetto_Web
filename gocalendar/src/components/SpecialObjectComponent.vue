@@ -75,6 +75,7 @@
                 prevSave: '',
                 prevName: '',
                 prevImg: '',
+                objectImg: '',
                 imgIdClicked: '',
                 options: '',
                 nomeAdd: ref(''),
@@ -84,7 +85,21 @@
             }
         },
         methods: {
+            dragover(e) {
+                e.preventDefault();
+                this.isDragging = true;
+            },
+            dragleave() {
+                this.isDragging = false;
+            },
+            drop(e) {
+                e.preventDefault();
+                console.log("hello there")
+                this.onFileChange(e);
+                this.isDragging = false;
+            },
             onFileChange(e) {
+                console.log("entra")
                 var files = e.target.files || e.dataTransfer.files;
                 if (!files.length)
                     return;
@@ -97,28 +112,18 @@
                 reader.onload = (e) => {
                     var image = new Image();
                     image.src = e.target.result;
-                    console.log(image.width, image.height)
-                    if(image.width == image.height){
-                        if(this.$refs.imgFormInput["inputFormImg"]){
-                            this.$refs.imgFormInput.src = e.target.result;
-                        } else {
-                            this.img = e.target.result;
-                            if(this.imgIdClicked != ''){
-                                let predicate = (element) => element._id == this.imgIdClicked;
-                                let index = this.objectsList.findIndex(predicate)
+                    if(this.$refs.imgFormInput["inputFormImg"]){
+                        this.$refs.imgFormInput.src = e.target.result;
+                    } else {
+                        this.img = e.target.result;
+                        if(this.imgIdClicked != ''){
+                            let predicate = (element) => element._id == this.imgIdClicked;
+                            let index = this.objectsList.findIndex(predicate)
+                            console.log(this.imgIdClicked, this.prevSave)
+                            if(this.prevImg == '')
                                 this.prevImg = this.objectsList[index].img
-                                this.objectsList[index].img = this.img
-                            }
+                            this.objectsList[index].img = this.img
                         }
-                    }
-                    else {
-                        swal.fire({
-                            title: "Error",
-                            text: "Immagine non validata, l'altezza e la larghezza devono essre uguali",
-                            icon: "error",
-                            className: "sweetAlert"
-                        })
-                        this.img = ''
                     }
                 };
                 reader.readAsDataURL(file);
@@ -140,9 +145,28 @@
                     await router.push("/login")
                     return null
                 } else {
-                    this.objectsList[index].img = this.img ? this.img : this.prevImg
+                    this.$refs[this.objectsList[index].guidInput].hidden = true;
+                    this.$refs[this.objectsList[index].guidLabel].hidden = false;
+                    if(!this.img && this.img!=''){
+                        this.objectsList[index].img = this.img
+                        this.prevImg = this.img
+                    }
+                    if(!this.prevImg && this.prevImg != ''){
+                        this.objectsList[index].img = this.prevImg
+                    }
+
                     this.$refs[this.prevSave][0].hidden = true;
+                    if(this.prevName != ''){
+                        this.$refs[this.prevName.show][0].hidden = false;
+                        this.objectsList[index].name = this.name
+                        this.$refs[this.prevName.hide][0].hidden = true;
+                    }
+                    this.prevSave = '';
+                    this.prevImg = '';
+                    this.prevName = '';
+
                     if(this.$refs[this.prevName] && this.$refs[this.prevName] !=''){
+                        this.$refs[this.prevSave][0].hidden = true;
                         this.$refs[this.prevName.show][0].hidden = false;
                         this.$refs[this.prevName.hide][0].hidden = true;
                     }
@@ -161,27 +185,32 @@
                         }
                     }
                 })
-                const databody = {
-                    object_id: id,
-                    chain_events: resultSwal
-                }
-                await tokenVerify.verifyAndSaveToken();
-                const response = await utils.callApi(databody, '/object/delete', "post")
-                if(response.status == 'ko'){
-                    localStorage.setItem('user_id', null)
-                    localStorage.setItem('token', null)
-                    await router.push("/login")
-                    return null
-                } else {
-                    let predicate = (element) => element._id == response;
-                    let index = this.objectsList.findIndex(predicate)
-                    this.objectsList.splice(index, 1)
-                    await swal.fire({
-                        title: "Successo",
-                        text: "L'oggetto è stato eliminato con successo",
-                        icon: "success"
-                    }) 
-                    
+                if(resultSwal.isConfirmed){
+                    const databody = {
+                        object_id: id,
+                        chain_events: resultSwal
+                    }
+                    await tokenVerify.verifyAndSaveToken();
+                    const response = await utils.callApi(databody, '/object/delete', "post")
+                    if(response.status == 'ko'){
+                        localStorage.setItem('user_id', null)
+                        localStorage.setItem('token', null)
+                        await router.push("/login")
+                        return null
+                    } else {
+                        let predicate = (element) => element._id == response;
+                        let index = this.objectsList.findIndex(predicate)
+                        this.objectsList.splice(index, 1)
+                        this.prevImg = ''
+                        this.prevName = ''
+                        this.prevSave = ''
+                        await swal.fire({
+                            title: "Successo",
+                            text: "L'oggetto è stato eliminato con successo",
+                            icon: "success"
+                        }) 
+                        
+                    }
                 }
 
             },
@@ -202,8 +231,7 @@
                 this.$refs[hide][0].hidden = true;
                 this.name=name
             },
-            triggerInputImg(input, id, name){
-                console.log(input)
+            triggerInputImg(input, id, name, click = true){
                 if(input){
                     this.$refs.imgFormInput["inputFormImg"]=true
                 } else {
@@ -216,7 +244,9 @@
                         this.$refs.imgInput.value = ''
                         let predicate = (element) => element._id == this.prevSave;
                         let index = this.objectsList.findIndex(predicate)
-                        this.objectsList[index].img = this.prevImg
+                        if(this.prevImg!='')
+                            this.objectsList[index].img = this.prevImg
+                        this.prevImg = ''
                     }
 
                     this.prevSave = id
@@ -224,13 +254,22 @@
                     this.imgIdClicked = id
                 }
 
-                this.$refs.imgInput.click()
+                if(click)
+                    this.$refs.imgInput.click()
             },
             addCard(){
+                if(this.prevImg != ''){
+                    this.$refs[this.prevSave][0].hidden = true;
+                    this.img = '';
+                    this.imgIdClicked = ''
+                    this.$refs.imgInput.value = ''
+                    let predicate = (element) => element._id == this.prevSave;
+                    let index = this.objectsList.findIndex(predicate)
+                    this.objectsList[index].img = this.prevImg
+                }
                 this.resetForm()
                 this.srcOriginal = this.$refs.imgFormInput.src
                 let newObject = this.$refs["formNewObject"]
-                console.log(newObject)
                 newObject.hidden = false
                 this.$refs["objectListForm"].append(newObject)
             },
@@ -242,26 +281,32 @@
                         icon: "error",
                         className: "sweetAlert"
                     })
-                }
-                const databody = {
-                    img: this.$refs.imgFormInput.src,
-                    name: this.nomeAdd,
-                    event_type_id: this.tipoAdd,
-                    user_id: localStorage.getItem('user_id'),
-                }  
-                await tokenVerify.verifyAndSaveToken();
-                const response = await utils.callApi(databody, '/object/add', "put")
-                if(response.status == 'ko'){
-                    localStorage.setItem('user_id', null)
-                    localStorage.setItem('token', null)
-                    await router.push("/login")
-                    return null
                 } else {
-                    this.resetForm()
+                    const databody = {
+                        img: this.$refs.imgFormInput.src,
+                        name: this.nomeAdd,
+                        event_type_id: this.tipoAdd,
+                        user_id: localStorage.getItem('user_id'),
+                    }  
+                    await tokenVerify.verifyAndSaveToken();
+                    const response = await utils.callApi(databody, '/object/add', "put")
+                    if(response.status == 'ko'){
+                        localStorage.setItem('user_id', null)
+                        localStorage.setItem('token', null)
+                        await router.push("/login")
+                        return null
+                    } else {
+                        response.guidInput = uuidv4()
+                        response.guidLabel = uuidv4()
+                        objectsList.push(response)
+                        this.img = ''
+                        this.resetForm()
+                    }
                 }
             },
             resetForm(){
                 this.$refs.imgInput.src = "../assets/images.png";
+                this.$refs.imgFormInput.src = "/images/images.png"
                 this.nomeAdd = ref('');
                 this.tipoAdd = ref('');
                 this.$refs.formNewObject.hidden = true;
@@ -275,7 +320,7 @@
 <template>
     <div class="contenitore">
         <div class="specialObjects">
-            <div class="objectList" :ref="'objectListForm'">
+            <div class="objectList" :ref="'objectListForm'" :key="objectsList">
                 <div v-for="object in objectsList" class="singleObject">
                     <div class="objectName">
                         <div hidden="true" :ref="object.guidInput">
@@ -288,8 +333,12 @@
                             {{ object.name }}
                         </span>
                     </div>
-                    <div class="objectBody">
-                        <img v-bind:src="object.img" class="objectImage" @click="triggerInputImg(false, object._id, object.name)" />
+                    <div class="objectBody" 
+                        @dragover="dragover"
+                        @dragleave="dragleave"
+                        @drop="(e)=>{triggerInputImg(false, object._id, object.name, false); drop(e)}">
+                        <img accept="image/*,image/jpeg" v-bind:src="object.img" class="objectImage" 
+                            @click="triggerInputImg(false, object._id, object.name)" />
                     </div>
                     <button class="deleteObject" @click="deletObject(object._id)">
                         <i class="fa-solid fa-trash-can fa-xl"></i>
@@ -316,8 +365,13 @@
                     <label>Titolo</label>
                 </div>
             </div>
-            <div  class="objectBody">
-                <img @drop="triggerInputImg(true)" :ref="'imgFormInput'" src="/images/images.png" class="objectImage" @click="triggerInputImg(true)" />
+            <div class="objectBody"
+                @dragover="dragover"
+                @dragleave="dragleave"
+                @drop="(e)=>{triggerInputImg(true, null, null, false); drop(e)}">
+                <img accept="image/*,image/jpeg" @drop="triggerInputImg(true)" 
+                    :ref="'imgFormInput'" src="/images/images.png" class="objectImage" 
+                    @click="triggerInputImg(true)" />
             </div>
             <div class="typesInput">
                 <select v-model="tipoAdd" required>

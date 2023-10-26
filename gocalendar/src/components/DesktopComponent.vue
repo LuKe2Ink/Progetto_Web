@@ -138,6 +138,7 @@
           this.oggetto = ref('')
           this.link = ref('')
           this.file = ref('')
+          this.fileData = ''
           this.month = moment().get('M')
           this.year = moment().get('Y')
           //dinamico di default prende mese e anno corrente
@@ -179,6 +180,7 @@
                 oggetto: null,
                 orario: null,
                 link: null,
+                fileData:null,
                 file: null,
                 options:null,
                 optionsObject: [],
@@ -186,10 +188,39 @@
                 objectConverter: null,
                 month:null,
                 year:null,
-                showHistory: false
+                showHistory: false,
             }
         },
         methods: {
+            onFileChange(e) {
+                var files = e.target.files || e.dataTransfer.files;
+                if (!files.length)
+                    return;
+                this.setFile(files[0]);
+            },
+            async setFile(file) {
+              let sizeMB = file.size/(1024*1024)
+                if(sizeMB>15){
+                  await swal.fire({
+                    title:"La grandezza del file supera i 15 MB",
+                    icon:'error'
+                  })
+                  this.$refs.fileInput.value = ''
+                } else {
+                  var reader = new FileReader();
+                  reader.onload = (e) => {
+                      // var file = new File();
+                      file.src = e.target.result;
+                      console.log(this.fileData)
+                      this.fileData = {
+                        fileName: file.name,
+                        size: file.size
+                      }
+                      this.file = file.src; 
+                  };
+                  reader.readAsDataURL(file);
+                }
+            },
             changeMonth(sequence){
               this.month += sequence;
               if(this.month==-1){
@@ -467,15 +498,16 @@
               this.titolo = ref(jsonEvent.title)
               this.luogo = ref(jsonEvent.location)
               if(jsonEvent.attachment){
+                console.log(jsonEvent.attachment)
                 let predicate = (element) => element.link;
                 let indexLink = jsonEvent.attachment.findIndex(predicate)
                 predicate = (element) => element.file;
                 let indexFile = jsonEvent.attachment.findIndex(predicate)
                 this.link = ref(indexLink > -1  ? jsonEvent.attachment[indexLink].link : '')
-                this.file = ref(indexFile > -1 ? jsonEvent.attachment[indexFile].file : '')
+                this.fileData = indexFile > -1 ? jsonEvent.attachment[indexFile].metadata : ''
               } else {
                 this.link = ref('')
-                this.file = ref('')
+                this.fileData = ''
               }
               let people = jsonEvent.people.join(', ')
               this.persone = ref(people)
@@ -508,12 +540,17 @@
               this.modalSwitch()
             },
             async addLinkOrFile(event_id){
-              if(this.link!='' && this.link!=''){
+              if(this.link!='' || this.file!=''){
                 const databody = {
                   event_id: event_id,
                   link: this.link,
                   file: this.file,
                   user_id: localStorage.getItem('user_id')
+                }
+                console.log(this.file)
+                if(this.fileData != ''){
+                  databody["fileName"] = this.fileData.fileName
+                  databody["size"] = this.fileData.size
                 }
                 const response = await utils.callApi(databody, '/attachment/add', "put")
                 if(response.status == 'ko'){
@@ -536,24 +573,26 @@
             openLink(link){
               window.open(link, '_blank');
             },
-            async deleteLink(type){
+            async deleteLinkFile(type){
               console.log("ciao ciao", type)
               let indexAtt;
               if(type == 'link'){
                 let predicate = (element) => element.link;
                 indexAtt = this.singleEvent.attachment.findIndex(predicate)
+                if(indexAtt < 0)
+                  this.link = ref('')
               } else {
                 let predicate = (element) => element.file;
                 indexAtt = this.singleEvent.attachment.findIndex(predicate)
+                if(indexAtt < 0)
+                  this.file = ref('')
               }
-              if(indexAtt < 0){
-                this.link = ref('')
-              } else {
+              if(indexAtt >= 0){
                 const databody = {
                   attachment_id: this.singleEvent.attachment[indexAtt]._id
                 }
                 await tokenVerify.verifyAndSaveToken();
-                const response = await utils.callApi(databody, '/attachment/add', "post")
+                const response = await utils.callApi(databody, '/attachment/delete', "post")
                 if(response.status == 'ko'){
                     localStorage.setItem('user_id', null)
                     localStorage.setItem('token', null)
@@ -570,6 +609,7 @@
                     let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
                     this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment.splice(indexAtt, 1);
                     this.file = ref('')
+                    this.fileData = ''
                   }
                 }
               }
@@ -674,19 +714,6 @@
               <p v-if="!tipoInput" @click="tipoInput = !tipoInput; modify = true" class="typesInput">
                 Etichetta: {{ typeConvert[tipo] }}
               </p>
-              <div class="group" v-if="linkInput">
-                <input v-model="link" type="text" required="required">
-                <span class="highlight"></span>
-                <span class="bar"></span>
-                <label>Link</label>
-              </div>
-              <div v-if="!linkInput" class="linkButtonModify">
-                <span @click="linkInput = !linkInput; modify = true">
-                  Link 
-                </span>
-                <button type="button" v-if="link == ''" @click="linkInput = !linkInput; modify = true"><i class="fa-solid fa-plus"></i></button>
-                <button type="button" v-if="link != '' " @click="deleteLink('link')"><i class="fa-solid fa-trash-can"></i></button>
-              </div>
               <div class="group" v-if="oraInput">
                 <input v-model="oraInizio" type="time" required="required">
                 <input v-if="singleEvent != null && singleEvent.type.tipology =='normal'" v-model="oraFine" type="time">
@@ -700,6 +727,32 @@
                   Ora Fine: {{ oraFine }} 
                 </p>
               </p>
+              <div class="group" v-if="linkInput">
+                <input v-model="link" type="text" required="required">
+                <span class="highlight"></span>
+                <span class="bar"></span>
+                <label>Link</label>
+              </div>
+              <div v-if="!linkInput" class="linkButtonModify">
+                <span @click="linkInput = !linkInput; modify = true">
+                  Link 
+                </span>
+                <button type="button" v-if="link == ''" @click="linkInput = !linkInput; modify = true"><i class="fa-solid fa-plus"></i></button>
+                <button type="button" v-if="link != '' " @click="deleteLinkFile('link')"><i class="fa-solid fa-trash-can"></i></button>
+              </div>
+              <div class="group" v-if="fileInput">
+                <input ref="fileInput" v-on:change="onFileChange" type="file" required="required">
+                <span class="highlight"></span>
+                <span class="bar"></span>
+                <label>File</label>
+              </div>
+              <div v-if="!fileInput" class="fileButtonModify">
+                <span @click="fileInput = !fileInput; modify = true">
+                  File <span v-if="fileData != ''">name: {{ fileData.fileName }} size: {{ fileData.size }}</span>  
+                </span>
+                <button type="button" v-if="fileData == ''" @click="fileInput = !fileInput; modify = true"><i class="fa-solid fa-plus"></i></button>
+                <button type="button" v-if="fileData != '' " @click="deleteLinkFile('file')"><i class="fa-solid fa-trash-can"></i></button>
+              </div>
               <div v-if="objectInput && optionsObject.length>0 " class="typesInput">
                 <select :key="oggetto" v-model="oggetto" required>
                   <option v-for="option in optionsObject" :value="option.value">

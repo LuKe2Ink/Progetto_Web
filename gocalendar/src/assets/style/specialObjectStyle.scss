@@ -82,30 +82,28 @@ label {
 }
 
 .contenitore {
-    max-width: 100%;
-    margin: auto;
-    margin-inline: 50px;
-    margin-top: $header-height;
+    width: 90%;
+    margin-top: $header-height; 
+    margin-inline: auto;
     // color: $text-color;
-    display: inline-flex;
+    display: block;
     .specialObjects{
+        margin-inline: auto;
         display: flex;
         justify-content: start;
         .objectList {
-            max-width: 100%;
-            margin: auto;
-            margin-inline: 20px;
+            width: 100%;
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
             align-items: flex-start;
-            justify-content: start;
+            justify-content: space-evenly;
             .singleObject {
                 border: solid 2px $shadow-color;
                 border-radius: 4px;
-                margin-left: calc(10%/4);
+                // margin-left: calc(10%/4);
                 margin-bottom: 15px;
-                max-width: 30%;
+                width: 30%;
                 position: relative;
                 .objectName {
                     position: relative;
@@ -125,12 +123,22 @@ label {
                         top: 10%;
                     }
                 }
-                .objectImage {
-                    margin: auto;
-                    width: 100%;
-                }
                 .objectBody {
                     background-color: #00244B;
+                    height: 30vh;
+                    width: 100%;
+                    display: flex;
+                    justify-content: center;
+                }
+                @media (max-width: 620px) {
+                    .objectBody{
+                        height: 10vh;
+                    }
+                }
+                .objectImage {
+                    object-fit: contain;
+                    max-width: 100%;
+                    height: 100%;
                 }
                 .saveModify{
                     position: absolute;
@@ -158,3 +166,4 @@ label {
     align-items: center;
 
 }
+

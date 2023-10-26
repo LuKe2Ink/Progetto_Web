@@ -5,19 +5,19 @@ const moment = require('moment')
 
 const attachmentAdd = async (req, res) => {
     let data = req.body
-    console.log(data);
     if(!data.event_id)
         return res.status(412).send({'message': 'Prerequisited not valid'});;
 
     if(data.event_id=='')
         return res.status(412).send({'message': 'Prerequisited not valid'});;
     
-    const objId =new mongoose.mongo.ObjectId(data.event_id);
+    const objId = new mongoose.mongo.ObjectId(data.event_id);
+    console.log(objId);
     let attachment = [];
 
     let jsonAdd = {event: objId};
     if(data.link && data.link!=''){
-        let existingLink = await Attachment.findOne({event:objId, link:{$exists: 1}})
+        let existingLink = await Attachment.findOne({event: objId, link:{$exists: 1}})
         jsonAdd["link"] = data.link;
         jsonAdd["metadata"] = {
             date: moment().format("DD/MM/YYYY HH:mm")
@@ -31,15 +31,16 @@ const attachmentAdd = async (req, res) => {
             att = await Attachment.create(jsonAdd);
         attachment.push(att)
     }
+    jsonAdd = {event: objId}
     if(data.file && data.file!=''){
-        let existingLink = await Attachment.findOne({event:objId, file:{$exists: 1}})
-        const objId =new mongoose.mongo.ObjectId(data.file);
-        jsonAdd["file"] = objId;
+        let existingLink = await Attachment.findOne({event: objId, file:{$exists: 1}})
+        jsonAdd["file"] = data.file;
         jsonAdd["metadata"] = {
             fileName: data.fileName,
             date: moment().format("DD/MM/YYYY HH:mm"),
             size: data.size
         }
+        console.log(jsonAdd);
         let att = null; 
         if(existingLink){
             await Attachment.findOneAndUpdate({_id: existingLink._id},jsonAdd);
@@ -53,9 +54,9 @@ const attachmentAdd = async (req, res) => {
         return res.status(412).send({'message': 'Prerequisited not valid'});;
     }
 
-    console.log(attachment)
+    console.log(attachment) 
 
-    status(200).send({'data': attachment});
+    res.status(200).send({'data': attachment});
 }
 
 const attachmentDelete = async (req, res) => {

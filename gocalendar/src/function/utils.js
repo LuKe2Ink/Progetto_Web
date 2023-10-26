@@ -77,8 +77,6 @@ async function callApi(databody, route, type){
     break;
   }
 
-  console.log(response)
-
   if(response.status > 400){
     await swal.fire({
       title: "Error event",
@@ -92,7 +90,6 @@ async function callApi(databody, route, type){
 
     return 'ko';
   }
-  console.log(response.data=='', typeof response.data)
   if(response.data=='' && (typeof response.data) == 'object')
     return response.data
   

@@ -11,7 +11,7 @@ const attachmentSchema = new mongoose.Schema({
       required: true
     },
     file: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       required: false
     },
     metadata:{
