@@ -1,4 +1,7 @@
 
+$shadow-color: #00244B;
+$shadow-color-opacity: #00244be8;
+
 .modal-backdrop {
     position: fixed;
     top: 0;
@@ -12,8 +15,7 @@
   }
   
   .modal {
-    width: 70%;
-    background: #FFFFFF;
+    width: 30%;
     box-shadow: 2px 2px 20px 1px;
     display: flex;
     flex-direction: column;
@@ -32,14 +34,24 @@
   }
   
   .modal-header {
+    background-color: $shadow-color-opacity;
     justify-content: center;
     align-items: center;
     width: calc(100% - 30px);
     position: relative;
     border-bottom: 1px solid #eeeeee;
-    color: #4AAE9B;
+    color: #74d13a;
     justify-content: space-between;
-    font-size: 4vw;
+    font-size: 2vw;
+    h1{
+      width: 100%;
+      p{
+        width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
   }
   
   .modal-footer {
@@ -49,6 +61,10 @@
   }
   
   .modal-body {
+    background: #FFFFFF;
+    color: #3D7DBD;
+    font-weight: bolder;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     position: relative;
     padding: 20px 10px;
     .typesInput{
@@ -59,4 +75,28 @@
       margin-block: 40px;
     }
   }
+
+  
+  
+  .select{
+    width: 100px;
+    height: 25px;
+    font-size: medium;
+    background: #002951;
+    color: #74d13a;
+    font-weight: bold;
+    border-color: white;
+    border-radius: 5px;
+  }
+  .select-selected:after {
+    position: absolute;
+    content: "";
+    top: 14px;
+    right: 10px;
+    width: 0;
+    height: 0;
+    border: 6px solid transparent;
+    border-color: #fff transparent transparent transparent;
+  }
+
   

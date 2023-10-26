@@ -44,7 +44,11 @@
   }
   let monthTranslate = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"]
 
-
+  let stepSize = 10
+  if(user.graph_setting == 'hours')
+    stepSize = 0.2
+    if(user.graph_setting == 'seconds')
+    stepSize = 100
 
   export default defineComponent({
     data(){
@@ -55,7 +59,7 @@
         month: moment().month(),
         daysInMonth: 0,
         labels: [],
-        maxMinutes: 0,
+        maxTime: 0,
         datasets: [],
         data: [],
         chart: '',
@@ -114,10 +118,10 @@
                     text: 'Minuti'
                   },
                   min: 0,
-                  max: this.maxMinutes,
+                  max: this.maxTime,
                   ticks: {
                     // forces step size to be 50 units
-                    stepSize: 5
+                    stepSize: stepSize
                   }
                 }
               }
@@ -143,19 +147,28 @@
                   hist[0].metadata.duration += e.metadata.duration
               });
             }
-            if(hist.length >= 1)
-              dataSetData.push(hist[0].metadata.duration)
-            else
+            if(hist.length >= 1){
+              switch(user.graph_setting){
+                case 'minutes':
+                  dataSetData.push(hist[0].metadata.duration)
+                  break;
+                case 'hours':
+                  dataSetData.push(hist[0].metadata.duration/60)
+                  break;
+                case 'seconds':
+                  dataSetData.push(hist[0].metadata.duration*60)
+                  break;
+              }
+            } else
               dataSetData.push(0)
           })
+          console.log(dataSetData)
           let currentMax = dataSetData.max()
-          if(currentMax>this.maxMinutes)
-            this.maxMinutes = currentMax
+          console.log(dataSetData.max())
+          if(currentMax>this.maxTime){
+            this.maxTime = Math.ceil(currentMax)
+          }
 
-          if(this.maxMinutes == 0)
-            this.maxMinutes = 150
-
-          console.log(element.color)
           this.datasets.push({
             label: element.name,
             data: dataSetData,
@@ -163,6 +176,9 @@
             backgroundColor: element.color,
           })
         }
+        
+        if(this.maxTime == 0)
+          this.maxTime = 10
 
         this.data = {
           labels: this.labels,

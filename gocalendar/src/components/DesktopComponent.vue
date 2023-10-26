@@ -705,7 +705,8 @@
                 Persone: {{ persone }}
               </p>
               <div v-if="tipoInput" class="typesInput">
-                <select v-model="tipo" @click="changeObject(tipo)" required>
+                <p>Etichetta:</p>
+                <select v-model="tipo" @click="changeObject(tipo)" class="select" required>
                   <option v-for="option in options" :value="option.value">
                     {{ option.text }}
                   </option>
