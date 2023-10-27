@@ -83,6 +83,7 @@ $trans-time: 300ms;
     }
 }
 .contenitore {
+    color: white;
     max-width: 100%;
     margin: auto;
     margin-inline: 50px;
@@ -119,7 +120,7 @@ $trans-time: 300ms;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
-                    color: #4AAE9B;
+                    color: #74d13a !important;
                     background-color: $shadow-color;
                     span{
                         position: absolute;
@@ -158,6 +159,27 @@ $trans-time: 300ms;
         }
     }
 }
+
+
+input[type=color] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: transparent;
+    width: 29px;
+    height: 30px;
+    border: none;
+    cursor: pointer;
+}
+input[type=color]::-webkit-color-swatch {
+    border-radius: 75%;
+    border: 1px solid #000000;
+}
+input[type=color]::-moz-color-swatch {
+    border-radius: 50%;
+    border: 1px solid #000000;
+}
+
 
 .addObject {
     z-index: 99999;

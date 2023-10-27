@@ -665,7 +665,7 @@
                 <input v-model="titolo" class="inputTitle" type="text" required="required">
                 <span class="highlight"></span>
                 <span class="bar"></span>
-                <label>Titolo</label>
+                <label class="titleLabel">Titolo</label>
               </div>
               <p v-if="!titoloInput" @click="titoloInput = !titoloInput; modify = true">
                 {{ titolo }}
@@ -705,12 +705,16 @@
                 Persone: {{ persone }}
               </p>
               <div v-if="tipoInput" class="typesInput">
-                <p>Etichetta:</p>
-                <select v-model="tipo" @click="changeObject(tipo)" class="select" required>
-                  <option v-for="option in options" :value="option.value">
-                    {{ option.text }}
-                  </option>
-                </select>
+                <p>Etichetta:
+                  <div class="select-dropdown">
+                    <select v-model="tipo" @click="changeObject(tipo)" required>
+                      <option v-for="option in options" :value="option.value">
+                        {{ option.text }}
+                      </option>
+                    </select>
+                  </div>
+                </p>
+                  
               </div>
               <p v-if="!tipoInput" @click="tipoInput = !tipoInput; modify = true" class="typesInput">
                 Etichetta: {{ typeConvert[tipo] }}
@@ -743,9 +747,6 @@
               </div>
               <div class="group" v-if="fileInput">
                 <input ref="fileInput" v-on:change="onFileChange" type="file" required="required">
-                <span class="highlight"></span>
-                <span class="bar"></span>
-                <label>File</label>
               </div>
               <div v-if="!fileInput" class="fileButtonModify">
                 <span @click="fileInput = !fileInput; modify = true">

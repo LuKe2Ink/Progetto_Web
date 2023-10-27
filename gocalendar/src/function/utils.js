@@ -47,7 +47,7 @@ function createNotificationSocket(){
               let toast = createToastify(element, expirDateEvent)
               toast.showToast();
             }
-          }, 1000)
+          }, 60000)
         });
     })
 }

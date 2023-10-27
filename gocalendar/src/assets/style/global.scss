@@ -2,6 +2,9 @@
 $shadow-color: #00244B;
 $shadow-color-opacity: #00244be8;
 
+body{
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 .modal-backdrop {
     position: fixed;
     top: 0;
@@ -64,7 +67,6 @@ $shadow-color-opacity: #00244be8;
     background: #FFFFFF;
     color: #3D7DBD;
     font-weight: bolder;
-    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     position: relative;
     padding: 20px 10px;
     .typesInput{
@@ -76,27 +78,72 @@ $shadow-color-opacity: #00244be8;
     }
   }
 
-  
-  
-  .select{
-    width: 100px;
-    height: 25px;
-    font-size: medium;
-    background: #002951;
-    color: #74d13a;
-    font-weight: bold;
-    border-color: white;
-    border-radius: 5px;
+  .select-dropdown {
+    margin-left: 15px;
+    position: relative;
+    width: auto;
+    float: right;
+    background-color: #002951;
+    max-width: 100%;
+    border-radius: 2px;
+    select {
+      background-color: #002951;
+      color: #74d13a;
+      font-family: "helvetica neue", helvetica;
+      font-size: 1rem;
+      font-weight: 100;
+      max-width: 100%;
+      padding: 8px 24px 8px 10px;
+      border: none;
+      -webkit-appearance: none;
+        -moz-appearance: none;
+              appearance: none;
+      &:active,
+      &:focus {
+        outline: none;
+        box-shadow: none;
+      }
+    }
+    &:after {
+      content: " ";
+      position: absolute;
+      top: 50%;
+      margin-top: -2px;
+      right: 8px;
+      width: 0; 
+      height: 0; 
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid #EB9A28;
+    }
   }
-  .select-selected:after {
-    position: absolute;
-    content: "";
-    top: 14px;
-    right: 10px;
-    width: 0;
-    height: 0;
-    border: 6px solid transparent;
-    border-color: #fff transparent transparent transparent;
-  }
+
+  // select.select{
+  //   width: 100px;
+  //   height: 25px;
+  //   font-size: medium;
+  //   background: #002951;
+  //   color: #74d13a;
+  //   font-weight: bold;
+  //   border-color: white;
+  //   border-radius: 5px;
+  // }
+  // select.select:hover {
+  //   background-image:
+  //     linear-gradient(45deg, transparent 50%, blue 50%),
+  //     linear-gradient(135deg, blue 50%, transparent 50%),
+  //     linear-gradient(to right, skyblue, skyblue);
+  //   background-position:
+  //     calc(100% - 15px) 1em,
+  //     calc(100% - 20px) 1em,
+  //     100% 0;
+  //   background-size:
+  //     7px 7px,
+  //     7px 7px,
+  //     2em 2em;
+  //   background-repeat: no-repeat;
+  //   border-color: white;
+  //   outline: 0;
+  // }
 
   

@@ -203,42 +203,44 @@
         <div class="specialObjects">
             <div class="objectList" :ref="'typeListForm'">
                 <div v-for="_type in eventTypes" class="singleObject" v-bind:style="{ borderColor: _type.color }" :key="_type">
-                  <div :key="_type">
-                    <div :key="_type.name" class="objectName textInputOnly">
-                        <div hidden="true" :ref="_type.guidLabel">
-                            <input v-model="name" class="inputTitle" type="text" required="required">
-                            <span class="highlight"></span>
-                            <span class="bar"></span>
-                            <label>Titolo</label>
+                    <div :key="_type">
+                        <div :key="_type.name" class="objectName textInputOnly">
+                            <div hidden="true" :ref="_type.guidLabel">
+                                <input v-model="name" class="inputTitle" type="text" required="required">
+                                <span class="highlight"></span>
+                                <span class="bar"></span>
+                                <label>Titolo</label>
+                            </div>
+                            <span :ref="_type._id+_type.guidLabel" @click="showInput(_type.guidLabel, _type._id+_type.guidLabel, _type._id, _type)">
+                                {{ _type.name }}
+                            </span>
                         </div>
-                        <span :ref="_type._id+_type.guidLabel" @click="showInput(_type.guidLabel, _type._id+_type.guidLabel, _type._id, _type)">
-                            {{ _type.name }}
-                        </span>
+                        <div :key="_type" class="objectBody">
+                            <div  hidden="true" :ref="_type.guidColor" class="colorInput spaceBottom">
+                                <p>Colore:
+                                    <input v-model="color" type="color">
+                                </p> 
+                            </div>
+                            <p :ref="_type._id+_type.guidColor" @click="showInput(_type.guidColor, _type._id+_type.guidColor, _type._id, _type)">
+                                Colore: <span v-bind:style="{ color: _type.color }">{{ _type.color }}</span>
+                            </p>
+                            <div  hidden="true" :ref="_type.guidGraph" class="radioInput">
+                                <label for="graph">Grafico:</label>
+                                <input type="checkbox" name="graph" v-model="graph">
+                            </div>
+                            <p :ref="_type._id+_type.guidGraph" @click="showInput(_type.guidGraph, _type._id+_type.guidGraph, _type._id, _type)">
+                                Grafico: {{ _type.graph ? "Si" : "No" }}
+                            </p>
+                        </div>
                     </div>
-                    <div :key="_type" class="objectBody">
-                      <div  hidden="true" :ref="_type.guidColor" class="colorInput spaceBottom">
-                        <input v-model="color" type="color">
-                      </div>
-                      <p :ref="_type._id+_type.guidColor" @click="showInput(_type.guidColor, _type._id+_type.guidColor, _type._id, _type)">
-                          Colore: <span v-bind:style="{ color: _type.color }">{{ _type.color }}</span>
-                      </p>
-                      <div  hidden="true" :ref="_type.guidGraph" class="radioInput">
-                        <label for="graph">Grafico:</label>
-                        <input type="checkbox" name="graph" v-model="graph">
-                      </div>
-                      <p :ref="_type._id+_type.guidGraph" @click="showInput(_type.guidGraph, _type._id+_type.guidGraph, _type._id, _type)">
-                          Grafico: {{ _type.graph ? "Si" : "No" }}
-                      </p>
+                    <div class="buttonInputOnly">
+                        <button class="deleteObject" @click="deletObject(_type._id)">
+                        <i class="fa-solid fa-trash-can fa-xl"></i>
+                        </button>
+                        <button hidden="true" class="saveModify" :ref="_type._id" @click="modifySave(_type._id)">
+                            <i class="fa-solid fa-floppy-disk fa-xl"></i>
+                        </button>
                     </div>
-                  </div>
-                  <div class="buttonInputOnly">
-                    <button class="deleteObject" @click="deletObject(_type._id)">
-                      <i class="fa-solid fa-trash-can fa-xl"></i>
-                    </button>
-                    <button hidden="true" class="saveModify" :ref="_type._id" @click="modifySave(_type._id)">
-                        <i class="fa-solid fa-floppy-disk fa-xl"></i>
-                    </button>
-                  </div>
                 </div>
             </div>
         </div>
@@ -247,27 +249,29 @@
     <div hidden="true" class="singleObject" :ref="'formNewType'">
         <form @submit.prevent="addSave()">
             <div class="objectName textInputOnly">
-              <input v-model="nameInput" class="inputTitle" type="text" required="required">
-              <span class="highlight"></span>
-              <span class="bar"></span>
-              <label>Titolo</label>
+                <input v-model="nameInput" class="inputTitle" type="text" required="required">
+                <span class="highlight"></span>
+                <span class="bar"></span>
+                <label>Titolo</label>
             </div>
             <div class="objectBody">
-              <div class="colorInput spaceBottom">
-                <input v-model="colorInput" type="color">
-              </div>
-              <div class="radioInput">
-                <label for="graph">Grafico:</label>
-                <input type="checkbox" name="graph" v-model="graphInput">
-              </div>
+                <div class="colorInput spaceBottom">
+                    <p>Colore:
+                        <input v-model="color" type="color">
+                    </p> 
+                </div>
+                <div class="radioInput">
+                    <label for="graph">Grafico:</label>
+                    <input type="checkbox" name="graph" v-model="graphInput">
+                </div>
             </div>
             <div class="buttonInputOnly">
-              <button class="deleteObject" @click="resetForm()">
-                <i class="fa-solid fa-trash-can fa-xl"></i>
-              </button>
-              <button type="submit" class="saveModify">
-                  <i class="fa-solid fa-floppy-disk fa-xl"></i>
-              </button>
+                <button class="deleteObject" @click="resetForm()">
+                    <i class="fa-solid fa-trash-can fa-xl"></i>
+                </button>
+                <button type="submit" class="saveModify">
+                    <i class="fa-solid fa-floppy-disk fa-xl"></i>
+                </button>
             </div>
         </form>
     </div>

@@ -373,12 +373,14 @@
                     :ref="'imgFormInput'" src="/images/images.png" class="objectImage" 
                     @click="triggerInputImg(true)" />
             </div>
-            <div class="typesInput">
-                <select v-model="tipoAdd" required>
-                    <option v-for="option in options" :value="option.value">
-                    {{ option.text }}
-                    </option>
-                </select>
+            <div class="typeBackground">
+                <div class="typesInput">
+                    <select v-model="tipoAdd" required>
+                        <option v-for="option in options" :value="option.value">
+                        {{ option.text }}
+                        </option>
+                    </select>
+                </div>
             </div>
             <button class="deleteObject" @click="resetForm()">
                 <i class="fa-solid fa-trash-can fa-xl"></i>
