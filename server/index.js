@@ -79,13 +79,13 @@ io.on("connection", socket=>{
                 }
             })
         }
-    }, 5000)
+    }, 60000)
 })
 
 const server = http.createServer(app);
 const port = 3000; 
 server.listen(3000, () => {
-  console.log('Server listening on port '+3000);
+    console.log('Server listening on port '+3000);
 });
 
 process.env.PWD = process.cwd()

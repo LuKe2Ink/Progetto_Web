@@ -19,7 +19,18 @@ const specialObjectList = async (req, res) => {
     if(!user)
         return res.status(404).send({'message': 'The user is not found' });
     
-    const specialObjects = await SpecialObject.find({user: objId})
+    const specialObjects = await SpecialObject.aggregate([
+        {$match: {user: objId}},
+        {$lookup:
+            { 
+            from: 'events_type', 
+            localField:'event_type', 
+            foreignField:'_id',
+            as:'type'
+            }
+        },
+        {$unwind: '$type'},
+    ])
 
     res.status(200).send(specialObjects);
 }
@@ -50,7 +61,20 @@ const specialObjectAdd = async (req, res) => {
         user: userId
     })
 
-    res.status(200).send(specialObject);
+    const specialObjectAggregate = await SpecialObject.aggregate([
+        {$match: {_id: specialObject._id}},
+        {$lookup:
+            { 
+            from: 'events_type', 
+            localField:'event_type', 
+            foreignField:'_id',
+            as:'type'
+            }
+        },
+        {$unwind: '$type'},
+    ])
+
+    res.status(200).send(specialObjectAggregate[0]);
 }
 
 const specialObjectModify = async (req, res) => {
@@ -74,7 +98,18 @@ const specialObjectModify = async (req, res) => {
 
     let specialObject = await SpecialObject.findOneAndUpdate({_id: data.object_id}, update)
     const objId = new mongoose.Types.ObjectId(data.object_id);
-    specialObject = await SpecialObject.findById(objId)
+    specialObject = await SpecialObject.aggregate([
+        {$match: {_id: objId}},
+        {$lookup:
+            { 
+            from: 'events_type', 
+            localField:'event_type', 
+            foreignField:'_id',
+            as:'type'
+            }
+        },
+        {$unwind: '$type'},
+    ])
 
     res.status(200).send(specialObject);
 }

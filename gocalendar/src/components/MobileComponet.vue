@@ -1,73 +1,55 @@
 <script>
-    import { defineComponent, ref } from 'vue';
+    import { defineComponent, ref, toRaw } from 'vue';
     import axios from 'axios';
     import router from '../router/router';
     import swal from 'sweetalert2';
     import config from '../../configApi.json';
     import moment from 'moment';
     import tokenVerify from '../function/tokenSave';
+    import utils from '../function/utils';
 
     await tokenVerify.verifyAndSaveToken();
-    
+
     async function eventList(){
         const databody = {
             user_id: localStorage.getItem('user_id')
         }
-        const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/list', 
-            databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-        );
-        const data = response.data;
-        if(data.status == 'ko'){
-            await swal.fire({
-                title: "Error",
-                text: data.message,
-                icon: "error",
-                className: "sweetAlert"
-            })
+        const response = await utils.callApi(databody, '/events/list', "post")
+        if(response.status == 'ko'){
             localStorage.setItem('user_id', null)
             localStorage.setItem('token', null)
             await router.push("/login")
             return null
         }
-        return data;
+        return response;
     }
     
     async function typeList(){
         const databody = {
             user_id: localStorage.getItem('user_id')
         }
-        const response = await axios.post(config.apiAddress+':'+config.apiPort+'/types/list', 
-            databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-        );
-        const data = response.data;
-        if(data.status == 'ko'){
-            await swal.fire({
-                title: "Error",
-                text: data.message,
-                icon: "error",
-                className: "sweetAlert"
-            })
+        const response = await utils.callApi(databody, '/types/list', "post")
+        if(response.status == 'ko'){
+            localStorage.setItem('user_id', null)
+            localStorage.setItem('token', null)
+            await router.push("/login")
+            return null
         }
-        return data
+        return response;
     }
 
     async function objectList(){
         const databody = {
             user_id: localStorage.getItem('user_id')
         }
-        const response = await axios.post(config.apiAddress+':'+config.apiPort+'/object/list', 
-            databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-        );
-        const data = response.data;
-        if(data.status == 'ko'){
-            await swal.fire({
-                title: "Error",
-                text: data.message,
-                icon: "error",
-                className: "sweetAlert"
-            })
+        const response = await utils.callApi(databody, '/object/list', "post")
+        if(response.status == 'ko'){
+            localStorage.setItem('user_id', null)
+            localStorage.setItem('token', null)
+            await router.push("/login")
+            return null
         }
-        return data.data
+        return response;
     }
 
     function getDaysInMonth(month, year){
@@ -78,7 +60,7 @@
           let event = [];
           //mettere questo nel controller, passare, la month e lo year
           event = events.filter(element => (element.date.day == date.getDate() 
-            && element.date.month == month && element.date.year))
+            && element.date.month == month && element.date.year == year))
           result.push({
               day: date.getDate(),
               dayOfWeek:date.getDay(),
@@ -159,11 +141,13 @@
           this.episodio = ref('')
           this.orario = ref('')
           this.oggetto = ref('')
+          this.link = ref('')
+          this.file = ref('')
+          this.fileData = ''
           this.month = moment().get('M')
           this.year = moment().get('Y')
           //dinamico di default prende mese e anno corrente
           this.days = getDaysInMonth(this.month, this.year);
-          console.log(this.dayEvents)
         },
         data(){
             return{
@@ -177,6 +161,8 @@
                 personeInput: false,
                 tipoInput: false,
                 oraInput: false,
+                linkInput: false,
+                fileInput: false,
                 objectInput: false,
                 creationEvent: false,
                 modify: false,
@@ -198,6 +184,9 @@
                 episodio: null,
                 oggetto: null,
                 orario: null,
+                link: null,
+                fileData:null,
+                file: null,
                 options:null,
                 optionsObject: [],
                 typeConvert:null,
@@ -205,12 +194,38 @@
                 month:null,
                 year:null,
                 showHistory: false,
-                dayEvents: {event: [], day: 0},
-                globalIndexDay: 0,
-                globalIndexWeek: 0
+                dayEvents: {event: [], day: 0}
             }
         },
         methods: {
+          onFileChange(e) {
+                var files = e.target.files || e.dataTransfer.files;
+                if (!files.length)
+                    return;
+                this.setFile(files[0]);
+            },
+            async setFile(file) {
+              let sizeMB = file.size/(1024*1024)
+                if(sizeMB>15){
+                  await swal.fire({
+                    title:"La grandezza del file supera i 15 MB",
+                    icon:'error'
+                  })
+                  this.$refs.fileInput.value = ''
+                } else {
+                  var reader = new FileReader();
+                  reader.onload = (e) => {
+                      // var file = new File();
+                      file.src = e.target.result;
+                      this.fileData = {
+                        fileName: file.name,
+                        size: file.size
+                      }
+                      this.file = file.src; 
+                  };
+                  reader.readAsDataURL(file);
+                }
+            },
             changeMonth(sequence){
               this.month += sequence;
               if(this.month==-1){
@@ -229,7 +244,7 @@
               this.creationEvent = false;
               this.singleEvent = null
               this.histories = null
-              this.setInput(false);
+              this.setInput(false, 'close');
               if(fakeEvent.date)
                 delete fakeEvent.date
               this.oggetto = ref('')
@@ -263,12 +278,15 @@
                 }
               }
               await tokenVerify.verifyAndSaveToken();
-              const response = await axios.post(config.apiAddress+':'+config.apiPort+'/history/get', 
-                body, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-              );
-              console.log(response.data)
-              if(response.data.data && response.data.data.length){
-                response.data.data.map((element)=>{
+              const response = await utils.callApi(body, '/history/get', "post")
+              if(response.status == 'ko'){
+                  localStorage.setItem('user_id', null)
+                  localStorage.setItem('token', null)
+                  await router.push("/login")
+                  return null
+              }
+              if(response && response.length){
+                response.map((element)=>{
                   if(element.time){
                     let hours = element.time%360
                     let minutes = (element.time-(hours*360))%60
@@ -277,7 +295,7 @@
                   }
                   return element;
                 })
-                this.histories = response.data.data
+                this.histories = response
               } else {
                 this.histories = []
               }
@@ -311,42 +329,34 @@
                   if(this.oggetto != ''){
                     databody["special_object"] = this.oggetto;
                   }
-                  const response = await axios.put(config.apiAddress+':'+config.apiPort+'/events/create', 
-                    databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-                  );
-                  const data = response.data;
-                  if(data.status == 'ko'){
-                      swal.fire({
-                          title: "Error",
-                          text: data.message,
-                          icon: "error",
-                          className: "sweetAlert"
-                      })
+                  const response = await utils.callApi(databody, '/events/create', "put")
+                  if(response.status == 'ko'){
+                      localStorage.setItem('user_id', null)
+                      localStorage.setItem('token', null)
+                      await router.push("/login")
+                      return null
                   } else {
-                    this.days[this.selectedCell.week][this.selectedCell.day].event.push(data.data)
+                    this.days[this.selectedCell.week][this.selectedCell.day].event.push(response) 
+                    this.addLinkOrFile(response._id)
                   }
                 }
               } else {
                 //modifica
+                this.addLinkOrFile(this.singleEvent._id)
                 let databody = this.checkInput(this.singleEvent);
                 if(databody){
                   databody["date"]=this.singleEvent.date
                   databody.date.time = this.oraInizio
                   if(this.oraFine != '')
                     databody.date["finished_time"] = this.oraFine
-                  const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/modify', 
-                      databody, {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-                  );
-                  const data = response.data;
-                  if(data.status == 'ko'){
-                      await swal.fire({
-                          title: "Error",
-                          text: data.message,
-                          icon: "error",
-                          className: "sweetAlert"
-                      })
+                  const response = await utils.callApi(databody, '/events/modify', "post")
+                  if(response.status == 'ko'){
+                      localStorage.setItem('user_id', null)
+                      localStorage.setItem('token', null)
+                      await router.push("/login")
+                      return null
                   } else {
-                    if(this.oraFine != '' && data.data.event_type.tipology != 'special '){
+                    if(this.oraFine != '' && response.event_type.tipology != 'special '){
                       let date = moment()
                       date.set('hours', this.oraInizio.split(":")[0])
                       date.set('minutes', this.oraInizio.split(":")[1])
@@ -358,14 +368,20 @@
                       let end = date.clone()
                       var duration = moment.duration(end.diff(startTime));
                       var minutes = duration.asMinutes();
-                      const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', 
-                        {event_type_id: databody.event_type_id, event_id: databody.event_id, duration: minutes, user_id: localStorage.getItem('user_id')}, 
-                        {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-                      );
+                      await tokenVerify.verifyAndSaveToken();
+                      const response = await utils.callApi(
+                        {event_type_id: databody.event_type_id, event_id: databody.event_id, duration: minutes, user_id: localStorage.getItem('user_id')},
+                          '/history/add', "put")
+                      if(response.status == 'ko'){
+                          localStorage.setItem('user_id', null)
+                          localStorage.setItem('token', null)
+                          await router.push("/login")
+                          return null
+                      }
                     }
-                    let predicate = (element) => element._id == data.data._id;
+                    let predicate = (element) => element._id == response._id;
                     let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
-                    this.days[this.selectedCell.week][this.selectedCell.day].event[index] = data.data
+                    this.days[this.selectedCell.week][this.selectedCell.day].event[index] = response
                   }
                 }
                 this.setInput(false);
@@ -391,17 +407,20 @@
                 user_id: localStorage.getItem('user_id')
               }
               await tokenVerify.verifyAndSaveToken();
-              const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', databody, 
-                {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-              );
-              if(response.data.data){
+              const response = await utils.callApi(databody, '/history/add', "put")
+              if(response.status == 'ko'){
+                  localStorage.setItem('user_id', null)
+                  localStorage.setItem('token', null)
+                  await router.push("/login")
+                  return null
+              } else {
                 await swal.fire({
                   title: "Storico dell'evento",
                   text: "Lo storico dell'evento è stato aggiunto con successo",
                   icon: "success",
                   className: "sweetAlert"
                 })
-                this.histories.unshift(response.data.data)
+                this.histories.unshift(response)
               }
             },
             async submitTypePaper(type_id, event_id){
@@ -414,17 +433,20 @@
                 user_id: localStorage.getItem('user_id')
               }
               await tokenVerify.verifyAndSaveToken();
-              const response = await axios.put(config.apiAddress+':'+config.apiPort+'/history/add', databody, 
-                {headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-              );
-              if(response.data.data){
+              const response = await utils.callApi(databody, '/history/add', "put")
+              if(response.status == 'ko'){
+                  localStorage.setItem('user_id', null)
+                  localStorage.setItem('token', null)
+                  await router.push("/login")
+                  return null
+              } else {
                 await swal.fire({
                   title: "Storico dell'evento",
                   text: "Lo storico dell'evento è stato aggiunto con successo",
                   icon: "success",
                   className: "sweetAlert"
                 })
-                this.histories.unshift(response.data.data)
+                this.histories.unshift(response)
               }
             },
             checkInput(event){
@@ -452,7 +474,7 @@
               }
               return databody;
             },
-            setInput(bool){
+            setInput(bool, event=null){
               if(!this.creationEvent){
                 this.descrizioneInput = bool
                 this.titoloInput = bool
@@ -460,14 +482,34 @@
                 this.personeInput = bool
                 this.tipoInput = bool
                 this.oraInput = bool
-                this.modify = bool
                 this.objectInput = bool
+                if(event == 'close'){
+                    this.modify = bool
+                    this.linkInput = bool
+                    this.fileInput = bool
+                } else if(this.link == '' && this.file == ''){
+                    this.modify = bool
+                    this.linkInput = bool
+                    this.fileInput = bool
+                  }
               }
+              console.log(this.linkInput)
             },
             setInputValue(jsonEvent){
               this.descrizione = ref(jsonEvent.description)
               this.titolo = ref(jsonEvent.title)
-              this.luogo = ref(jsonEvent.location) 
+              this.luogo = ref(jsonEvent.location)
+              if(jsonEvent.attachment){
+                let predicate = (element) => element.link;
+                let indexLink = jsonEvent.attachment.findIndex(predicate)
+                predicate = (element) => element.file;
+                let indexFile = jsonEvent.attachment.findIndex(predicate)
+                this.link = ref(indexLink > -1  ? jsonEvent.attachment[indexLink].link : '')
+                this.fileData = indexFile > -1 ? jsonEvent.attachment[indexFile].metadata : ''
+              } else {
+                this.link = ref('')
+                this.fileData = ''
+              }
               let people = jsonEvent.people.join(', ')
               this.persone = ref(people)
               this.tipo = ref(jsonEvent.event_type)
@@ -486,13 +528,89 @@
             },
             async deleteEvent(){
               await tokenVerify.verifyAndSaveToken();
-              const response = await axios.post(config.apiAddress+':'+config.apiPort+'/events/delete', 
-                {event_id:this.singleEvent._id},{headers: { 'Authorization': 'Bearer '+localStorage.getItem('token')}}
-              );
-              let predicate = (element) => element._id == response.data.event;
-              let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
-              this.days[this.selectedCell.week][this.selectedCell.day].event.splice(index, 1)
+              const response = await utils.callApi({event_id:this.singleEvent._id}, '/events/delete', "post")
+              if(response.status == 'ko'){
+                  localStorage.setItem('user_id', null)
+                  localStorage.setItem('token', null)
+                  await router.push("/login")
+                  return null
+              }
+              let predicate = (element) => element._id == response;
+              let index = this.days[this.selectedCell.week][this.selectedCell.day].event.attachment.findIndex(predicate)
+              this.days[this.selectedCell.week][this.selectedCell.day].event.attachment.splice(index, 1)
               this.modalSwitch()
+            },
+            async addLinkOrFile(event_id){
+              if(this.link!='' || this.file!=''){
+                const databody = {
+                  event_id: event_id,
+                  link: this.link,
+                  file: this.file,
+                  user_id: localStorage.getItem('user_id')
+                }
+                if(this.fileData != ''){
+                  databody["fileName"] = this.fileData.fileName
+                  databody["size"] = this.fileData.size
+                }
+                const response = await utils.callApi(databody, '/attachment/add', "put")
+                if(response.status == 'ko'){
+                    localStorage.setItem('user_id', null)
+                    localStorage.setItem('token', null)
+                    await router.push("/login")
+                    return null
+                } else {
+                  let predicate = (element) => element._id == event_id;
+                  let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
+                  if(this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment)
+                    this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment=response.data;
+                  else
+                    this.days[this.selectedCell.week][this.selectedCell.day].event[index]['attachment']=response.data
+                  
+                }
+              }
+            },
+            openLink(link){
+              window.open(link, '_blank');
+            },
+            async deleteLinkFile(type){
+              let indexAtt;
+              if(type == 'link'){
+                let predicate = (element) => element.link;
+                indexAtt = this.singleEvent.attachment.findIndex(predicate)
+                if(indexAtt < 0)
+                  this.link = ref('')
+              } else {
+                let predicate = (element) => element.file;
+                indexAtt = this.singleEvent.attachment.findIndex(predicate)
+                if(indexAtt < 0)
+                  this.file = ref('')
+              }
+              if(indexAtt >= 0){
+                const databody = {
+                  attachment_id: this.singleEvent.attachment[indexAtt]._id
+                }
+                await tokenVerify.verifyAndSaveToken();
+                const response = await utils.callApi(databody, '/attachment/delete', "post")
+                if(response.status == 'ko'){
+                    localStorage.setItem('user_id', null)
+                    localStorage.setItem('token', null)
+                    await router.push("/login")
+                    return null
+                } else {
+                  if(type == 'link'){
+                    let predicate = (element) => element._id = this.singleEvent._id;
+                    let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
+                    this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment.splice(indexAtt, 1);
+                    this.link = ref('')
+                  } else {
+                    let predicate = (element) => element._id = this.singleEvent._id;
+                    let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
+                    this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment.splice(indexAtt, 1);
+                    this.file = ref('')
+                    this.fileData = ''
+                  }
+                }
+              }
             },
             listEvents(day, indexWeek, indexDay){
                 this.dayEvents = day
@@ -552,6 +670,7 @@
                 <div :key="event" v-bind:style="{ borderColor: event.type.color }"
                     @click="eventSingle(event, globalIndexWeek, globalIndexDay)" 
                     class="eventSingle" v-for="event in dayEvents.event">
+                    <div class="timeEvent">{{ event.date.time }}</div>
                     <p>{{ event.title }}</p>
                 </div>
             </div>
@@ -568,7 +687,7 @@
                 <input v-model="titolo" class="inputTitle" type="text" required="required">
                 <span class="highlight"></span>
                 <span class="bar"></span>
-                <label>Titolo</label>
+                <label class="titleLabel">Titolo</label>
               </div>
               <p v-if="!titoloInput" @click="titoloInput = !titoloInput; modify = true">
                 {{ titolo }}
@@ -608,11 +727,15 @@
                 Persone: {{ persone }}
               </p>
               <div v-if="tipoInput" class="typesInput">
-                <select v-model="tipo" @click="changeObject(tipo)" required>
-                  <option v-for="option in options" :value="option.value">
-                    {{ option.text }}
-                  </option>
-                </select>
+                <p>Etichetta:
+                  <div class="select-dropdown">
+                    <select v-model="tipo" @click="changeObject(tipo)" required>
+                      <option v-for="option in options" :value="option.value">
+                        {{ option.text }}
+                      </option>
+                    </select>
+                  </div>
+                </p>
               </div>
               <p v-if="!tipoInput" @click="tipoInput = !tipoInput; modify = true" class="typesInput">
                 Etichetta: {{ typeConvert[tipo] }}
@@ -630,6 +753,29 @@
                   Ora Fine: {{ oraFine }} 
                 </p>
               </p>
+              <div class="group" v-if="linkInput">
+                <input v-model="link" type="text" required="required">
+                <span class="highlight"></span>
+                <span class="bar"></span>
+                <label>Link</label>
+              </div>
+              <div v-if="!linkInput" class="linkButtonModify">
+                <span @click="linkInput = !linkInput; modify = true">
+                  Link 
+                </span>
+                <button type="button" v-if="link == ''" @click="linkInput = !linkInput; modify = true"><i class="fa-solid fa-plus"></i></button>
+                <button type="button" v-if="link != '' " @click="deleteLinkFile('link')"><i class="fa-solid fa-trash-can"></i></button>
+              </div>
+              <div class="group" v-if="fileInput">
+                <input ref="fileInput" v-on:change="onFileChange" type="file">
+              </div>
+              <div v-if="!fileInput" class="fileButtonModify">
+                <span @click="fileInput = !fileInput; modify = true">
+                  File <span v-if="fileData != ''">name: {{ fileData.fileName }} size: {{ fileData.size }}</span>  
+                </span>
+                <button type="button" v-if="fileData == ''" @click="fileInput = !fileInput; modify = true"><i class="fa-solid fa-plus"></i></button>
+                <button type="button" v-if="fileData != '' " @click="deleteLinkFile('file')"><i class="fa-solid fa-trash-can"></i></button>
+              </div>
               <div v-if="objectInput && optionsObject.length>0 " class="typesInput">
                 <select :key="oggetto" v-model="oggetto" required>
                   <option v-for="option in optionsObject" :value="option.value">

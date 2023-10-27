@@ -45,10 +45,10 @@ const eventsTypeCreate = async (req, res) => {
   let data = req.body
   if(!data || !data.user_id || !data.name || !data.color 
     || (data.graph==null || data.graph==undefined))
-    return res.status(412).send({'message': 'Prerequisited not valid'});;
+    return res.status(412).send({'message': 'Uno o più campi non presenti'});;
 
   if(data.user_id==''|| data.name=='' || data.color=='')
-    return res.status(412).send({'message': 'Prerequisited not valid'});;
+    return res.status(412).send({'message': 'Uno o più campi vuoti'});;
 
   const type = await EventsType.create({
     name: data.name,

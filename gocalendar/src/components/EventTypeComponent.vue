@@ -51,10 +51,10 @@
                 eventTypes: eventTypes,
                 name: ref(''),
                 color: ref(''),
-                graph: ref(''),
+                graph: ref(''), 
                 nameInput: ref(''),
                 colorInput: ref(''),
-                graphInput: ref(''),
+                graphInput: false,
             }
         },
         methods: {
@@ -121,42 +121,40 @@
                 }
             },
             showInput(show, hide, save, type){
-              console.log(toRaw(type))
-              if(!type.defaults){
-                // console.log(show, hide, save)
-                if(this.prev.save != undefined && this.prev.save != save){
-                  this.setModifyForm(type)
-                  this.$refs[this.prev.save][0].hidden = true;
-                  console.log(this.prev.type)
-                  this.hideModify(this.prev.type)
-                } else if(this.prev.save == undefined){
-                  this.setModifyForm(type)
-                }
+                if(!type.defaults){
+                    if(this.prev.save != undefined && this.prev.save != save){
+                        this.setModifyForm(type)
+                        this.$refs[this.prev.save][0].hidden = true;
+                        console.log(this.prev.type)
+                        this.hideModify(this.prev.type)
+                    } else if(this.prev.save == undefined){
+                        this.setModifyForm(type)
+                    }
 
-                this.prev = {
-                  save: save,
-                  type: type 
+                    this.prev = {
+                        save: save,
+                        type: type 
+                    }
+                    this.$refs[save][0].hidden = false;
+                    this.$refs[show][0].hidden = false;
+                    this.$refs[hide][0].hidden = true;
                 }
-                this.$refs[save][0].hidden = false;
-                this.$refs[show][0].hidden = false;
-                this.$refs[hide][0].hidden = true;
-              }
             },
             hideModify(type){
-              console.log(toRaw(type))
-              console.log(this.$refs[type._id+type.guidLabel])
-              this.$refs[type._id+type.guidLabel][0].hidden = false;
-              this.$refs[type._id+type.guidColor][0].hidden = false;
-              this.$refs[type._id+type.guidGraph][0].hidden = false;
+                console.log(toRaw(type))
+                console.log(this.$refs[type._id+type.guidLabel])
+                this.$refs[type._id+type.guidLabel][0].hidden = false;
+                this.$refs[type._id+type.guidColor][0].hidden = false;
+                this.$refs[type._id+type.guidGraph][0].hidden = false;
               //input
-              this.$refs[type.guidLabel][0].hidden = true;
-              this.$refs[type.guidColor][0].hidden = true;
-              this.$refs[type.guidGraph][0].hidden = true;
+                this.$refs[type.guidLabel][0].hidden = true;
+                this.$refs[type.guidColor][0].hidden = true;
+                this.$refs[type.guidGraph][0].hidden = true;
             },
             setModifyForm(type){
-              this.name = type.name
-              this.color = type.color
-              this.graph = type.graph
+                this.name = type.name
+                this.color = type.color
+                this.graph = type.graph
             },
             addCard(){
                 this.resetForm()
@@ -167,10 +165,11 @@
             async addSave(){
                 const databody = {
                     name: this.nameInput,
-                    color: this.colorInput,
-                    graph: this.graphInput,
+                    color: this.colorInput==''?'#FFFFFF':this.colorInput,
+                    graph: this.graphInput==''?false:this.graphInput,
                     user_id: localStorage.getItem('user_id'),
                 }
+                console.log(databody)
                 await tokenVerify.verifyAndSaveToken();
                 const response = await utils.callApi(databody, '/types/create', "put")
                 if(response.status == 'ko'){
@@ -257,7 +256,7 @@
             <div class="objectBody">
                 <div class="colorInput spaceBottom">
                     <p>Colore:
-                        <input v-model="color" type="color">
+                        <input v-model="colorInput" type="color">
                     </p> 
                 </div>
                 <div class="radioInput">

@@ -60,7 +60,7 @@
           let event = [];
           //mettere questo nel controller, passare, la month e lo year
           event = events.filter(element => (element.date.day == date.getDate() 
-            && element.date.month == month && element.date.year))
+            && element.date.month == month && element.date.year == year))
           result.push({
               day: date.getDate(),
               dayOfWeek:date.getDay(),
@@ -97,7 +97,6 @@
     let events = await eventList();
     let eventTypes = await typeList();
     let special_object = await objectList();
-    console.log(special_object)
     let fakeEvent = {
       description: '',
       title: '',
@@ -211,7 +210,6 @@
                   reader.onload = (e) => {
                       // var file = new File();
                       file.src = e.target.result;
-                      console.log(this.fileData)
                       this.fileData = {
                         fileName: file.name,
                         size: file.size
@@ -272,7 +270,6 @@
                   event_id: event._id
                 }
               }
-              console.log(body)
               await tokenVerify.verifyAndSaveToken();
               const response = await utils.callApi(body, '/history/get', "post")
               if(response.status == 'ko'){
@@ -281,7 +278,6 @@
                   await router.push("/login")
                   return null
               }
-              console.log(response)
               if(response && response.length){
                 response.map((element)=>{
                   if(element.time){
@@ -297,7 +293,6 @@
                 this.histories = []
               }
               this.changeObject(event.event_type)
-              console.log(toRaw(event))
               this.setInputValue(event)
             },
             createEvent(day, week, Indexday){
@@ -380,7 +375,6 @@
                     let predicate = (element) => element._id == response._id;
                     let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
                     this.days[this.selectedCell.week][this.selectedCell.day].event[index] = response
-                    console.log(this.days[this.selectedCell.week][this.selectedCell.day].event[index])
                   }
                 }
                 this.setInput(false);
@@ -498,7 +492,6 @@
               this.titolo = ref(jsonEvent.title)
               this.luogo = ref(jsonEvent.location)
               if(jsonEvent.attachment){
-                console.log(jsonEvent.attachment)
                 let predicate = (element) => element.link;
                 let indexLink = jsonEvent.attachment.findIndex(predicate)
                 predicate = (element) => element.file;
@@ -535,8 +528,8 @@
                   return null
               }
               let predicate = (element) => element._id == response;
-              let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
-              this.days[this.selectedCell.week][this.selectedCell.day].event.splice(index, 1)
+              let index = this.days[this.selectedCell.week][this.selectedCell.day].event.attachment.findIndex(predicate)
+              this.days[this.selectedCell.week][this.selectedCell.day].event.attachment.splice(index, 1)
               this.modalSwitch()
             },
             async addLinkOrFile(event_id){
@@ -547,7 +540,6 @@
                   file: this.file,
                   user_id: localStorage.getItem('user_id')
                 }
-                console.log(this.file)
                 if(this.fileData != ''){
                   databody["fileName"] = this.fileData.fileName
                   databody["size"] = this.fileData.size
@@ -562,11 +554,10 @@
                   let predicate = (element) => element._id == event_id;
                   let index = this.days[this.selectedCell.week][this.selectedCell.day].event.findIndex(predicate)
                   if(this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment)
-                    this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment=response;
+                    this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment=response.data;
                   else
-                    this.days[this.selectedCell.week][this.selectedCell.day].event[index]['attachment']=response
+                    this.days[this.selectedCell.week][this.selectedCell.day].event[index]['attachment']=response.data
                   
-                  console.log(this.days[this.selectedCell.week][this.selectedCell.day].event[index].attachment)
                 }
               }
             },
@@ -574,7 +565,6 @@
               window.open(link, '_blank');
             },
             async deleteLinkFile(type){
-              console.log("ciao ciao", type)
               let indexAtt;
               if(type == 'link'){
                 let predicate = (element) => element.link;
@@ -613,7 +603,6 @@
                   }
                 }
               }
-              
             }
         },
     });
@@ -623,7 +612,7 @@
     <div class="contenitore">
       <div class="month">
         <div class="prevMonth" @click="changeMonth(-1)"><i class="fa-solid fa-circle-left"></i></div>
-        <h1>{{ monthName[month] }}</h1>
+        <h1>{{ monthName[month] +" "+year }}</h1>
         <div class="nextMonth" @click="changeMonth(+1)"><i class="fa-solid fa-circle-right"></i></div>
       </div>
         <table>
@@ -714,7 +703,6 @@
                     </select>
                   </div>
                 </p>
-                  
               </div>
               <p v-if="!tipoInput" @click="tipoInput = !tipoInput; modify = true" class="typesInput">
                 Etichetta: {{ typeConvert[tipo] }}

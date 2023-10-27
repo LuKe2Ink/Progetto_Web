@@ -1,9 +1,3 @@
-<template>
-  <button style="margin-top: 200px;" @click="changeMonth(-1)">Indietro</button>
-  <button @click="changeMonth(+1)">Avanti</button>
-  <div id="divChart" style="width: 800px; height: max-content;"><canvas id="acquisitions"></canvas></div>
-</template>
-
 <script>
   import Chart from 'chart.js/auto'
   import { defineComponent, ref, toRaw } from 'vue';
@@ -100,27 +94,36 @@
               },
               stacked: false,
               plugins: {
+                legend: {
+                  labels: {
+                      color: 'white'
+                  }
+                },
                 title: {
+                  color: 'white',
                   display: true,
                   text: monthTranslate[this.month]+" "+this.year
                 }
               },
               scales: {
                 x: {
+                  ticks: { color: 'white'},
                   title: {
+                    color: 'white',
                     display: true,
                     text: 'Giorno del mese'
                   }
                 },
                 y: {
                   title: {
+                    color: 'white',
                     display: true,
                     text: 'Minuti'
                   },
                   min: 0,
                   max: this.maxTime,
                   ticks: {
-                    // forces step size to be 50 units
+                    color: 'white',
                     stepSize: stepSize
                   }
                 }
@@ -195,20 +198,16 @@
   });
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+<template>
+  <div class="container">
+    <div class="switchMonth">
+      <div class="prevMonth" @click="changeMonth(-1)"><i class="fa-solid fa-circle-left"></i></div>
+      <div class="nextMonth" @click="changeMonth(+1)"><i class="fa-solid fa-circle-right"></i></div>
+    </div>
+    <div id="divChart" style="width: 800px; height: max-content;"><canvas id="acquisitions"></canvas></div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+  @import '../assets/style/graphRouteStyle.scss'; 
 </style>

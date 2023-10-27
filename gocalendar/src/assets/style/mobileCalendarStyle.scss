@@ -1,11 +1,15 @@
 $primary-color: #0085b6;
-$secondary-color: #3D7DBD;
-$text-color: #CDF6FF;
+$secondary-color: #0085B6;
+$text-color: #eeeeee;
 $border-color: #6573BC;
 $shadow-color: #00244B;
 $header-height: 100px;
 $icon-color: #EB9A28;
 $tr-height: 50px;
+
+.modal {
+  width: 80%;
+}
 
 .contenitore {
     text-align: center;
@@ -15,6 +19,7 @@ $tr-height: 50px;
     border: 1px solid $border-color;
     max-width: 100%;
     margin: auto;
+    margin-inline: 5px;
     margin-top: $header-height;
     color: $text-color;
 
@@ -29,11 +34,13 @@ $tr-height: 50px;
       }
     }
 
-
     table, td, th{
         border-right: solid black;
         border-collapse: collapse; 
         word-wrap:break-word 
+    }
+    table{
+      border-right: 0;
     }
     tr{
       width: 100%;
@@ -55,10 +62,14 @@ $tr-height: 50px;
     .dayNumberList{
       width: 25px;
       height: 25px;
-      background-color: #00244B;
+      margin-left: 20px;
+      background-color:#EB9A28;
       padding: 2px;
+      border: 3px solid $shadow-color;
       border-radius: 50%;
       p{
+        font-weight: bolder;
+        color: #00244B;
         font-size: 20px;
         margin: 0;
       }
@@ -73,6 +84,7 @@ $tr-height: 50px;
       padding: 2px;
       border-radius: 50%;
       p{
+        color:#EB9A28;
         font-size: 20px;
         margin: 0;
       }
@@ -82,7 +94,7 @@ $tr-height: 50px;
       height: 25px;
       position: absolute;
       left: 2px;
-      bottom: 10px;
+      bottom: 3px;
       i{
         font-size: 20px;
         margin: 0;
@@ -112,11 +124,19 @@ $tr-height: 50px;
       overflow: overlay;
     }
     .eventSingle{
+      position: relative;
       margin-top: 3px;
       border: 1px solid white;
       border-radius: 5px;
       height: 40px;
+      .timeEvent{
+        color:#EB9A28;
+        position: absolute;
+        top: 2px;
+        right: 5px;
+      }
       p{
+        color:#EB9A28;
         text-align: start;
         width: calc(100% - 10px);
         margin: auto;
@@ -151,7 +171,7 @@ $tr-height: 50px;
     }
 
     table{
-        font-size: 200%;
+        font-size: large;
         width: 100%;
     }
 }
@@ -344,4 +364,34 @@ label {
 .historyTable{
   width: 100%;
   overflow: auto;
+}
+
+.trashButton{
+  right: 60px;
+}
+.submitButton{
+  right: 20px;
+}
+.linkButton{
+  left: 20px;
+  a{
+    color: $icon-color;
+  }
+}
+
+input[type=file]{
+  width: 80%;
+}
+
+input[type=file]::file-selector-button{
+  background: #002951;
+  border-radius: 10px;
+  color: #74d13a;
+  font-weight: bold;
+}
+input[type=file]::file-selector-button:hover {
+  background: #0d45a5;
+}
+.titleLabel{
+  color: white;
 }

@@ -1,0 +1,46 @@
+
+.container{
+    width: fit-content;
+    margin-inline: auto;
+    margin-top: 100px;
+    background-color: #0085B6;
+    border-radius: 10px;
+    
+    .prevMonth, .nextMonth{
+        color: #EB9A28;
+        font-size: larger;
+        cursor: pointer;
+    }
+}
+
+#divChart{
+    width: 500px;
+    margin: auto;
+    color: white;
+}
+
+.switchMonth{
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+    margin: auto;
+}
+
+
+h3 {
+    margin: 40px 0 0;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    display: inline-block;
+    margin: 0 10px;
+}
+
+a {
+    color: #42b983;
+}

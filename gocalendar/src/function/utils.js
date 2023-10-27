@@ -79,8 +79,8 @@ async function callApi(databody, route, type){
 
   if(response.status > 400){
     await swal.fire({
-      title: "Error event",
-      text: response.message,
+      title: "Errore nel server",
+      text: response.data.message,
       icon: "error",
       className: "sweetAlert"
     })

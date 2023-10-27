@@ -105,27 +105,36 @@
                     return;
                 this.createImage(files[0]);
             },
-            createImage(file) {
-                var image = new Image();
-                var reader = new FileReader();
-
-                reader.onload = (e) => {
+            async createImage(file) {
+                let sizeMB = file.size/(1024*1024)
+                if(sizeMB>15){
+                    await swal.fire({
+                        title:"La grandezza del file supera i 15 MB",
+                        icon:'error'
+                    })
+                    this.$refs.fileInput.value = ''
+                } else {
                     var image = new Image();
-                    image.src = e.target.result;
-                    if(this.$refs.imgFormInput["inputFormImg"]){
-                        this.$refs.imgFormInput.src = e.target.result;
-                    } else {
-                        this.img = e.target.result;
-                        if(this.imgIdClicked != ''){
-                            let predicate = (element) => element._id == this.imgIdClicked;
-                            let index = this.objectsList.findIndex(predicate)
-                            console.log(this.imgIdClicked, this.prevSave)
-                            if(this.prevImg == '')
-                                this.prevImg = this.objectsList[index].img
-                            this.objectsList[index].img = this.img
+                    var reader = new FileReader();
+
+                    reader.onload = (e) => {
+                        var image = new Image();
+                        image.src = e.target.result;
+                        if(this.$refs.imgFormInput["inputFormImg"]){
+                            this.$refs.imgFormInput.src = e.target.result;
+                        } else {
+                            this.img = e.target.result;
+                            if(this.imgIdClicked != ''){
+                                let predicate = (element) => element._id == this.imgIdClicked;
+                                let index = this.objectsList.findIndex(predicate)
+                                console.log(this.imgIdClicked, this.prevSave)
+                                if(this.prevImg == '')
+                                    this.prevImg = this.objectsList[index].img
+                                this.objectsList[index].img = this.img
+                            }
                         }
-                    }
-                };
+                    };
+                }
                 reader.readAsDataURL(file);
             },
             async modifySave(id){
@@ -209,10 +218,8 @@
                             text: "L'oggetto è stato eliminato con successo",
                             icon: "success"
                         }) 
-                        
                     }
                 }
-
             },
             showInput(save, show, hide, name){
                 if(this.prevSave != save && this.prevSave != ''){
@@ -321,7 +328,7 @@
     <div class="contenitore">
         <div class="specialObjects">
             <div class="objectList" :ref="'objectListForm'" :key="objectsList">
-                <div v-for="object in objectsList" class="singleObject">
+                <div v-for="object in objectsList" class="singleObject" v-bind:style="{ borderColor: object.type.color }">
                     <div class="objectName">
                         <div hidden="true" :ref="object.guidInput">
                             <input v-model="name" class="inputTitle" type="text" required="required">
@@ -337,7 +344,7 @@
                         @dragover="dragover"
                         @dragleave="dragleave"
                         @drop="(e)=>{triggerInputImg(false, object._id, object.name, false); drop(e)}">
-                        <img accept="image/*,image/jpeg" v-bind:src="object.img" class="objectImage" 
+                        <img v-bind:src="object.img" class="objectImage" :title="object.type.name"
                             @click="triggerInputImg(false, object._id, object.name)" />
                     </div>
                     <button class="deleteObject" @click="deletObject(object._id)">
@@ -351,7 +358,7 @@
         </div>
     </div>
     <div hidden="true">
-        <input :ref="'imgInput'" v-on:change="onFileChange" type="file"/>
+        <input accept="image/*,image/jpeg" :ref="'imgInput'" v-on:change="onFileChange" type="file"/>
     </div>
     <button class="addObject" @click = "addCard()"><i class="fa-solid fa-add fa-2xl"></i></button>
     <!-- form per aggiunta di nuovi oggetti -->
