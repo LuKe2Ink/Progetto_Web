@@ -94,12 +94,12 @@
             },
             drop(e) {
                 e.preventDefault();
-                console.log("hello there")
+                
                 this.onFileChange(e);
                 this.isDragging = false;
             },
             onFileChange(e) {
-                console.log("entra")
+                
                 var files = e.target.files || e.dataTransfer.files;
                 if (!files.length)
                     return;
@@ -127,7 +127,7 @@
                             if(this.imgIdClicked != ''){
                                 let predicate = (element) => element._id == this.imgIdClicked;
                                 let index = this.objectsList.findIndex(predicate)
-                                console.log(this.imgIdClicked, this.prevSave)
+                                
                                 if(this.prevImg == '')
                                     this.prevImg = this.objectsList[index].img
                                 this.objectsList[index].img = this.img
@@ -232,7 +232,9 @@
                 }
             },
             showInput(save, show, hide, name){
+                console.log(objectsList)
                 if(this.prevSave != save && this.prevSave != ''){
+                    console.log(this.prevSave, this.prevName.hide)
                     this.$refs[this.prevSave][0].hidden = true;
                     this.$refs[this.prevName.show][0].hidden = false;
                     this.$refs[this.prevName.hide][0].hidden = true;
@@ -256,6 +258,8 @@
                     this.name = name;
                     if(this.prevSave != id && this.prevSave != ''){
                         this.$refs[this.prevSave][0].hidden = true;
+                        this.$refs[this.prevName.show][0].hidden = false;
+                        this.$refs[this.prevName.hide][0].hidden = true;
                         this.img = '';
                         this.imgIdClicked = ''
                         this.$refs.imgInput.value = ''

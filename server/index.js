@@ -21,7 +21,7 @@ const connectDB = () => {
     try {
         mongoose.connect(config.mongoAddress+':'+config.mongoPort+'/'+config.mongoDb)
         .then(() => {
-            console.log('Connected to MongoDB');
+            
         })
     } catch (e) {
         e => console.error('Error connecting to MongoDB:', e);
@@ -29,7 +29,7 @@ const connectDB = () => {
 }
 
 // app.listen('3000', () => {
-//   console.log('Node API server started on port ' + '3000');
+//   
 // });
 let users_id = []
 io.on("connection", socket=>{
@@ -85,7 +85,7 @@ io.on("connection", socket=>{
 const server = http.createServer(app);
 const port = 3000; 
 server.listen(3000, () => {
-    console.log('Server listening on port '+3000);
+    
 });
 
 process.env.PWD = process.cwd()
@@ -106,6 +106,6 @@ app.use('/user', require('./router/userRouter'));
 app.use('/object', require('./router/specialObjectRouter'))
 
 
-// console.log(app._router)
+// 
 
 module.exports = app;

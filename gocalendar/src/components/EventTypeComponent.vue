@@ -114,7 +114,7 @@
                     if(resultSwal.isConfirmed){
                         const databody = {
                             type_id: id,
-                            chain_events: resultSwalEvents,
+                            chain_events: true,
                         }
                         await tokenVerify.verifyAndSaveToken();
                         const response = await utils.callApi(databody, '/types/delete', "post")
@@ -141,7 +141,7 @@
                     if(this.prev.save != undefined && this.prev.save != save){
                         this.setModifyForm(type)
                         this.$refs[this.prev.save][0].hidden = true;
-                        console.log(this.prev.type)
+                        
                         this.hideModify(this.prev.type)
                     } else if(this.prev.save == undefined){
                         this.setModifyForm(type)
@@ -157,8 +157,8 @@
                 }
             },
             hideModify(type){
-                console.log(toRaw(type))
-                console.log(this.$refs[type._id+type.guidLabel])
+                
+                
                 this.$refs[type._id+type.guidLabel][0].hidden = false;
                 this.$refs[type._id+type.guidColor][0].hidden = false;
                 this.$refs[type._id+type.guidGraph][0].hidden = false;
@@ -185,7 +185,7 @@
                     graph: this.graphInput==''?false:this.graphInput,
                     user_id: localStorage.getItem('user_id'),
                 }
-                console.log(databody)
+                
                 await tokenVerify.verifyAndSaveToken();
                 const response = await utils.callApi(databody, '/types/create', "put")
                 if(response.status == 'ko' || response == 'ko'){

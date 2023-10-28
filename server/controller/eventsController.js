@@ -110,7 +110,7 @@ const eventModify = async (req, res) => {
   if(data.finished_time)
     update["finished_time"] = data.finished_time
 
-    console.log(update);
+    
 
   let event = await Events.findOneAndUpdate({_id:data.event_id}, update)
 

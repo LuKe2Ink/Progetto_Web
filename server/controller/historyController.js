@@ -58,12 +58,12 @@ const historyAdd = async (req, res) => {
 const historyGet = async (req, res) => {
     let data = req.body
     
-    // console.log(data.event_id)
+    // 
 
     if((!data.event_id && data.event_id!='') && (!data.special_object && data.special_object!=''))
         return res.status(412).send({'message': 'Prerequisited not valid'});
     
-    console.log(data)
+    
     let match = null;
     if(data.event_id){
         const event = await Events.findById(data.event_id);
@@ -121,7 +121,7 @@ const historyForGraph = async (req, res) => {
             }
         },
     ]);
-    console.log(histories);
+    
     res.status(200).send(histories);
 }
 

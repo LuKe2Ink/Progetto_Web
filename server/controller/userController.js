@@ -1,5 +1,10 @@
 const User = require('../models/Users');
 const Token = require('../models/Token');
+const Events = require('../models/Events');
+const EventsType = require('../models/EventsType');
+const SpecialObject = require('../models/SpecialObject');
+const Attachment = require('../models/Attachment');
+const History = require('../models/EventHistory');
 const mongoose = require('mongoose')
 const moment = require('moment') 
 const jwt = require("jsonwebtoken");
@@ -59,7 +64,7 @@ const usersList= async (req, res) => {
   let data = req.body
   let user = await checkPassword(data, res);
   if(user.status)
-    return;
+    return user;
   if(user[0].role == 'admin'){
     const users = await User.find();
     return res.status(200).send(users);
@@ -135,14 +140,70 @@ const userChangePassword = async (req, res) => {
 const userDelete = async (req, res) => {
   //lo faccio perché per eliminare richiede user e password
   let data = req.body
+  console.log(data)
   const objId = new mongoose.Types.ObjectId(data.user_id);
   let findUser = await User.findById(objId)
   if(!findUser)
-    return res.status(404).send({'message': 'Prerequisited not valid'});
+    return res.status(412).send({'message': 'Prerequisited not valid'});
   const oldUser = await checkPassword(data, res) 
   if(oldUser.status)
     return oldUser;
   const user = await User.findByIdAndDelete(objId)
+
+  //events, history con event, attachment con event 
+  let events = await Events.find({user: data.user_id});
+  console.log("Eventi: "+events.length)
+  if(events){
+    let events_id=[]
+    for (let index = 0; index < events.length; index++) {
+        const element = events[index];
+        await Events.findByIdAndDelete(element._id)
+        events_id.push(element._id)
+    }
+    for (let index = 0; index < events_id.length; index++) {
+        let event_history = await History.find({event: events_id[index]});
+        console.log("History: "+event_history.length)
+        let events_attachment = await Attachment.find({event: events_id[index]});
+        console.log("Attachment: "+events_attachment.length)
+        for (let index = 0; index < event_history.length; index++) {
+            const element = event_history[index];
+            await History.findByIdAndDelete(element._id)
+        }
+        for (let index = 0; index < events_attachment.length; index++) {
+          const element = events_attachment[index];
+          await Attachment.findByIdAndDelete(element._id)
+      }
+    }
+  }
+  //event_type
+  let event_types = await EventsType.find({user: data.user_id});
+  console.log("EventsType: "+event_types.length)
+  if(event_types){
+    for (let index = 0; index < event_types.length; index++) {
+        const element = event_types[index];
+        await EventsType.findByIdAndDelete(element._id)
+    }
+  }
+  //special_objects
+  let special_objects = await SpecialObject.find({user: data.user_id});
+  console.log("SpecialObject: "+special_objects.length)
+  if(special_objects){
+    //event_type
+    for (let index = 0; index < special_objects.length; index++) {
+        const element = special_objects[index];
+        await SpecialObject.findByIdAndDelete(element._id)
+    }
+  }
+
+  let token = await Token.find({user: data.user_id});
+  console.log("Token: "+token.length)
+  if(token){
+    //event_type
+    for (let index = 0; index < token.length; index++) {
+        const element = token[index];
+        await Token.findByIdAndDelete(element._id)
+    }
+  }
   //eliminazione di anche tutti i dati
   res.status(204).send({})
 }

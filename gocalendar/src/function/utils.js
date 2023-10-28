@@ -42,7 +42,7 @@ function createNotificationSocket(){
             //   'month': date.month+1,
             //   'year': date.year
             // })
-            console.log(expireDateEvent);
+            
             let checkExpireDate = expireDateEvent
             if(checkExpireDate.add(1, 'D')<=moment.now()){
               let toast = createToastify(element, expireDateEvent)
@@ -91,6 +91,8 @@ async function callApi(databody, route, type){
 
     return 'ko';
   }
+
+  console.log(response)
   if(response.data=='' && (typeof response.data) == 'object')
     return response.data
   

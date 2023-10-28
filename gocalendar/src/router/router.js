@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 const requireAuth = (to, from, next) => {
   const token = localStorage.getItem('token');
-  console.log(token);
+  
   if (token != null) {
     next();
   } else {
@@ -15,7 +15,7 @@ const routes = [
       path: '/',
       alias: '/home',
       name: 'home',
-      component: () => import('../components/HomeComponent.vue'),
+      component: () => import('../pages/HomePage.vue'),
       beforeEnter: requireAuth
     },
     {
@@ -33,13 +33,13 @@ const routes = [
     {
       path: '/graph',
       name: 'graph',
-      component: () => import('../components/GraphComponent.vue'),
+      component: () => import('../pages/GraphPage.vue'),
       beforeEnter: requireAuth
     },
     {
       path: '/register',
       name: 'register',
-      component: () => import('../components/RegisterComponent.vue'),
+      component: () => import('../pages/RegisterPage.vue'),
     },
     {
       path: '/login',
@@ -49,12 +49,12 @@ const routes = [
     {
       path: '/object',
       name: 'SpecialObject',
-      component: () => import('../components/SpecialObjectComponent.vue'),
+      component: () => import('../pages/SpecialObjectPage.vue'),
     },
     {
       path: '/event/type',
       name: 'Event Type',
-      component: () => import('../components/EventTypeComponent.vue'),
+      component: () => import('../pages/EventTypePage.vue'),
     }
   ]
 

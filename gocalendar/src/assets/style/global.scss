@@ -4,7 +4,14 @@ $shadow-color-opacity: #00244be8;
 
 body{
   font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-image: url('~@/assets/background.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  height: 100%;
 }
+
 .modal-backdrop {
     position: fixed;
     top: 0;

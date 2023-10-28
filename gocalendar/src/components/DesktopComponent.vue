@@ -189,6 +189,7 @@
                 year:null,
                 showHistory: false,
                 isSpecialObject: false,
+                oldTime: null
 
             }
         },
@@ -296,6 +297,10 @@
               } else {
                 this.histories = []
               }
+              if(event.date.finished_time)
+                this.oldTime = event.date.finished_time
+              else
+                this.oldTime = null
               this.changeObject(event.event_type)
               this.setInputValue(event)
             },
@@ -334,6 +339,7 @@
                       await router.push("/login")
                       return null
                   } else {
+                    console.log(this.days[this.selectedCell.week][this.selectedCell.day].event, this.days[this.selectedCell.week][this.selectedCell.day])
                     this.days[this.selectedCell.week][this.selectedCell.day].event.push(response) 
                     this.addLinkOrFile(response._id)
                   }
@@ -353,8 +359,27 @@
                   if(databody){
                     databody["date"]=this.singleEvent.date
                     databody.date.time = this.oraInizio
-                    if(this.oraFine != '')
+                    if(this.oraFine != ''){
                       databody.date["finished_time"] = this.oraFine
+                      let date = moment()
+                      date.set('hours', this.oraInizio.split(":")[0])
+                      date.set('minutes', this.oraInizio.split(":")[1])
+                      date.set('seconds', 0)
+                      let startTime = date.clone()
+                      date.set('hours', this.oraFine.split(":")[0])
+                      date.set('minutes', this.oraFine.split(":")[1])
+                      date.set('seconds', 0)
+                      let end = date.clone()
+                      if(startTime>=end){
+                        await swal.fire({
+                          title: "L'orario di fine non è valido, riprovare",
+                          icon: "error"
+                        })
+                        this.singleEvent.date.finished_time = this.oldTime
+                        this.setInputValue(this.singleEvent)
+                        return;
+                      }
+                    }
                     const response = await utils.callApi(databody, '/events/modify', "post")
                     if(response.status == 'ko' || response == 'ko'){
                         localStorage.setItem('user_id', null)
@@ -515,7 +540,6 @@
                 this.link = ref(indexLink > -1  ? jsonEvent.attachment[indexLink].link : '')
                 this.file = indexFile > -1 ? jsonEvent.attachment[indexFile].file : ''
                 this.fileData = indexFile > -1 ? jsonEvent.attachment[indexFile].metadata : ''
-
               } else {
                 this.link = ref('')
                 this.fileData = ''
@@ -535,7 +559,6 @@
               }
               if(jsonEvent.special_object)
                 this.oggetto = jsonEvent.special_object._id
-
             },
             async deleteEvent(){
               let swalResponse = await swal.fire({
@@ -887,7 +910,7 @@
             <div v-if="!creationEvent" class="underButton trashButton">
               <button type="button" @click="deleteEvent"><i class="fa-solid fa-trash-can fa-xl"></i></button>
             </div>
-            <div v-if="modify" class="underButton submitButton">
+            <div v-if="modify || creationEvent" class="underButton submitButton">
               <button type="submit"><i class="fa-solid fa-floppy-disk fa-xl"></i></button>
             </div>
             <div v-if="link" class="underButton linkButton">

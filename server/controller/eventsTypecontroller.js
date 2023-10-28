@@ -18,7 +18,7 @@ const eventsTypeListFiltered = async (req, res) => {
     tipology = 'special'
 
   const typesDefault = await EventsType.find({defaults: true, tipology: tipology});
-  // console.log(typesDefault)
+  // 
   const objId = new mongoose.Types.ObjectId(data.user_id);
   const userTypes = await EventsType.find({user: objId, tipology: tipology})
   let eventsType = typesDefault.concat(userTypes)
@@ -34,7 +34,7 @@ const eventsTypeList = async (req, res) => {
     return res.status(412).send({'message': 'Prerequisited not valid'});;
 
   const typesDefault = await EventsType.find({defaults: true});
-  // console.log(typesDefault)
+  // 
   const objId = new mongoose.Types.ObjectId(data.user_id);
   const userTypes = await EventsType.find({user: objId})
   let eventsType = typesDefault.concat(userTypes)
@@ -107,10 +107,11 @@ const eventsTypeDelete = async (req, res) => {
             await Events.findByIdAndDelete(element._id)
             events_id.push(element._id)
         }
+        console.log(events_id)
         //attached histories to events
         for (let index = 0; index < events_id.length; index++) {
             let event_history = await History.find({event: events_id[index]});
-            console.log(events_id[index], event_history)
+            console.log(event_history)
             for (let index = 0; index < event_history.length; index++) {
                 const element = event_history[index];
                 await History.findByIdAndDelete(element._id)

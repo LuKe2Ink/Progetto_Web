@@ -152,6 +152,10 @@ $header-height: 150px;
     .submitButton{
         right: 50px;
     }
+    .deleteButton{
+        top: auto;
+        bottom: 10px;
+    }
 
     .link{
         text-decoration: none;
@@ -195,6 +199,11 @@ $header-height: 150px;
         .underButton{
             top: auto;
             bottom: 10px;
+        }
+        .deleteButton{
+            top: auto;
+            bottom: 10px;
+            left: 0px;
         }
     }
     input, select {

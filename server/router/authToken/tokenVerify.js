@@ -25,7 +25,7 @@ function isExpired(token){
     valid = true;
     try {
         const decoded = jwt.decode(token, "accessSecret");
-        // console.log(decoded.exp, moment.now().valueOf(), decoded.exp < moment.now().valueOf())
+        // 
         if(decoded.exp < moment.now().add(1, 'm').valueOf())
             valid = false
     } catch (error) {

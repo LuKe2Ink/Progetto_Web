@@ -194,7 +194,8 @@
                 month:null,
                 year:null,
                 showHistory: false,
-                dayEvents: {event: [], day: 0}
+                dayEvents: {event: [], day: 0},
+                oldTime: null
             }
         },
         methods: {
@@ -301,6 +302,10 @@
               } else {
                 this.histories = []
               }
+              if(event.date.finished_time)
+                this.oldTime = event.date.finished_time
+              else
+                this.oldTime = null
               this.changeObject(event.event_type)
               this.setInputValue(event)
             },
@@ -339,7 +344,7 @@
                       await router.push("/login")
                       return null
                   } else {
-                    this.days[this.selectedCell.week][this.selectedCell.day].event.push(response) 
+                    this.days[this.selectedCell.week][this.selectedCell.day].event.push(response)
                     this.addLinkOrFile(response._id)
                   }
                 }
@@ -358,8 +363,28 @@
                   if(databody){
                     databody["date"]=this.singleEvent.date
                     databody.date.time = this.oraInizio
-                    if(this.oraFine != '')
+                    if(this.oraFine != ''){
                       databody.date["finished_time"] = this.oraFine
+                      databody.date["finished_time"] = this.oraFine
+                      let date = moment()
+                      date.set('hours', this.oraInizio.split(":")[0])
+                      date.set('minutes', this.oraInizio.split(":")[1])
+                      date.set('seconds', 0)
+                      let startTime = date.clone()
+                      date.set('hours', this.oraFine.split(":")[0])
+                      date.set('minutes', this.oraFine.split(":")[1])
+                      date.set('seconds', 0)
+                      let end = date.clone()
+                      if(startTime>=end){
+                        await swal.fire({
+                          title: "L'orario di fine non è valido, riprovare",
+                          icon: "error"
+                        })
+                        this.singleEvent.date.finished_time = this.oldTime
+                        this.setInputValue(this.singleEvent)
+                        return;
+                      }
+                    }
                     const response = await utils.callApi(databody, '/events/modify', "post")
                     if(response.status == 'ko' || response == 'ko'){
                         localStorage.setItem('user_id', null)
@@ -716,7 +741,7 @@
                     <p>{{ event.title }}</p>
                 </div>
             </div>
-            <div @click="createEvent(dayEvents.day, indexWeek, indexDay)" v-if="dayEvents.day != ''" class="addEvent"><i class="fa-solid fa-calendar-plus fa-2xs"></i></div>
+            <div @click="createEvent(dayEvents.day, globalIndexWeek, globalIndexDay)" v-if="dayEvents.day != ''" class="addEvent"><i class="fa-solid fa-calendar-plus fa-2xs"></i></div>
         </div>
     </div>
     <transition v-if="show" name="modal-fade">
@@ -812,7 +837,7 @@
                 </p>
               </p>
               <div class="group" v-if="linkInput">
-                <input v-model="link" type="text" required="required">
+                <input v-model="link" type="text">
                 <span class="highlight"></span>
                 <span class="bar"></span>
                 <label>Link</label>

@@ -12,7 +12,7 @@ const attachmentAdd = async (req, res) => {
         return res.status(412).send({'message': 'Prerequisited not valid'});;
     
     const objId = new mongoose.mongo.ObjectId(data.event_id);
-    console.log(objId);
+    
     let attachment = [];
 
     let jsonAdd = {event: objId};
@@ -40,7 +40,7 @@ const attachmentAdd = async (req, res) => {
             date: moment().format("DD/MM/YYYY HH:mm"),
             size: data.size
         }
-        console.log(jsonAdd);
+        
         let att = null; 
         if(existingLink){
             await Attachment.findOneAndUpdate({_id: existingLink._id},jsonAdd);
@@ -54,7 +54,7 @@ const attachmentAdd = async (req, res) => {
         return res.status(412).send({'message': 'Prerequisited not valid'});;
     }
 
-    console.log(attachment) 
+    
 
     res.status(200).send({'data': attachment});
 }

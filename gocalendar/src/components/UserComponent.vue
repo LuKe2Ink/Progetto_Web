@@ -20,7 +20,7 @@
         },
         methods:{
             setInput(){
-                console.log(user)
+                
                 this.username = ref(user.username)
                 this.oldPass = ref('')
                 this.newPass = ref('')
@@ -38,22 +38,21 @@
                 let result;
                 if(adminLogin){
                     result = await swal.fire({
-                        title: 'Login Form',
+                        title: 'Accedi per confermare la tua identità',
                         html: `<input type="text" id="login" class="swal2-input" placeholder="Username">
                         <input type="password" id="password" class="swal2-input" placeholder="Password">`,
-                        confirmButtonText: 'Sign in',
+                        confirmButtonText: 'Accedi',
                         focusConfirm: false,
                         preConfirm: () => {
                             const login = swal.getPopup().querySelector('#login').value
                             const password = swal.getPopup().querySelector('#password').value
                             if (!login || !password) {
-                            swal.showValidationMessage(`Please enter login and password`)
+                            swal.showValidationMessage('Inserisci sia username che password')
                             }
                             return { login: login, password: password }
                         }
                     })
                 }
-
                 if(result.isConfirmed == true){
                     const databody = {
                         username: result.value.login,
@@ -67,7 +66,7 @@
                             if(usersList.length > 0){  
                                 let predicate = (element) => element._id != localStorage.getItem("user_id");
                                 usersList=usersList.filter(predicate)
-                                console.log(usersList)
+                                
                                 this.usersList = usersList
                                 this.calendarSettings = false
                                 this.userSettings = false
@@ -83,7 +82,7 @@
                 //     this.flagChangePassword = true
                 // } else {
                 let result = await swal.fire({
-                    title: 'Cambio Password',
+                    title: 'Cambia Password',
                     html: `<input type="password" id="oldPass" class="swal2-input" placeholder="Vecchia Password">
                     <input type="password" id="newPass" class="swal2-input" placeholder="Nuova Password">
                     <input type="password" id="againNewPass" class="swal2-input" placeholder="Conferma Nuova Password">`,
@@ -168,7 +167,7 @@
                         user_id: this.usersList[index]._id
                     }
                     let response = await utils.callApi(databody, "/user/active", 'post') 
-                    console.log(response)
+                    
                     if(response=='ok') 
                         this.usersList[index].active = !this.usersList[index].active
                 }
@@ -183,7 +182,46 @@
                     denyButtonText: 'No'
                 })
                 if(swalResponse.isConfirmed){
-                    //fai chiamata API
+                    let result = await swal.fire({
+                        title: "Esegui l'accesso per confermare",
+                        html: `<input type="text" id="login" class="swal2-input" placeholder="Username">
+                        <input type="password" id="password" class="swal2-input" placeholder="Password">`,
+                        confirmButtonText: 'Conferma',
+                        focusConfirm: false,
+                        preConfirm: () => {
+                            const login = swal.getPopup().querySelector('#login').value
+                            const password = swal.getPopup().querySelector('#password').value
+                            if (!login || !password) {
+                            swal.showValidationMessage('Inserisci sia username che password')
+                            }
+                            return { login: login, password: password }
+                        }
+                    })
+                    if(result.isConfirmed == true){
+                        const databody = {
+                            user_id: localStorage.getItem('user_id'),
+                            username: result.value.login,
+                            password: result.value.password
+                        } 
+                        let response = await utils.callApi(databody, "/user/login", 'post')
+                        if(response.user_id){
+                            let response = await utils.callApi(databody, "/user/delete", 'post')
+                            if(response.status == 'ko' || response == 'ko'){
+                                    await swal.fire({
+                                        title: "Non è stato possibile elaborare la richiesta",
+                                        icon:"error"
+                                    })
+                            } else {
+                                socket.emit("disconnection", localStorage.getItem('user_id'))
+                                localStorage.setItem('user_id', null)
+                                localStorage.setItem('token', null)
+                                
+                                setTimeout(() => {
+                                    router.push('/home')
+                                }, 300);
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -223,13 +261,15 @@
         </div>
         <div class="settings">
             <div class="underButton linkButton">
-              <button class="miniButton" type="button" @click="modify = !modify"><i class="fa-xs fa-solid fa-pencil "></i></button>
+                <button class="miniButton" type="button" @click="modify = !modify"><i class="fa-xs fa-solid fa-pencil"></i></button>
             </div>
             <div v-if="modify" class="underButton submitButton">
-              <button class="miniButton" type="button" @click="modifyUser()"><i class="fa-xs fa-solid fa-floppy-disk"></i></button>
+                <button class="miniButton" type="button" @click="modifyUser()"><i class="fa-xs fa-solid fa-floppy-disk"></i></button>
+            </div>
+            <div class="underButton deleteButton">
+                <button class="miniButton" type="button" @click="deleteAccount()"><i class="fa-xs fa-solid fa-trash-can"></i></button>
             </div>
             <div class="userSettings" v-if="userSettings">
-            <!-- <form @submit.prevent="submitForm"> -->
                 <div class="row">
                     <label for="username">Username</label>
                     <input :disabled="!modify" type="username" id="username" v-model="username" required>
@@ -247,10 +287,8 @@
                     <input type="password" id="password" v-model="newPass" required>
                 </div>
                 <button type="button" @click="changePassword()">Cambia Password</button>
-            <!-- </form> -->
             </div>
             <div class="calendarSetting" v-if="calendarSettings">
-                <!-- <form @submit.prevent="submitForm"> -->
                     <div class="row">
                         <label for="notification">Notifiche:</label>
                         <input :disabled="!modify" type="checkbox" id="notification" v-model="notification" required>
@@ -270,7 +308,6 @@
                             </option>
                         </select>
                     </div>
-                <!-- </form> -->
             </div>
             <div class="adminList" v-if="adminList">
                 <div v-for="(user, index) in usersList" class="usersList">
@@ -278,10 +315,10 @@
                         v-bind:class="{borderActive:user.active, borderDisabled: !user.active}"
                         @click="switchActiveUser(index)" :key="user.active">
                         <div>
-                           <span> Username: {{user.username}}</span>
+                            <span> Username: {{user.username}}</span>
                         </div>
                         <div>
-                           <span> Mail: {{user.mail}}</span>
+                            <span> Mail: {{user.mail}}</span>
                         </div>
                     </div>
                 </div>

@@ -150,6 +150,23 @@ label {
                     bottom: -10px;
                     right: 1px;
                 }
+
+                @media (max-width : 620px) {
+                    .saveModify{
+                        top: -25px;
+                        bottom: auto;
+                    }
+                    .deleteObject{
+                        top: -25px;
+                        bottom: auto;
+                    }
+                }
+            }
+            
+            @media (max-width: 620px) {
+                .singleObject{
+                    margin-top: 20px;
+                }
             }
         }
     }
@@ -214,5 +231,4 @@ label {
     padding-block: 20px;
     padding-inline: 15px;
     align-items: center;
-
 }

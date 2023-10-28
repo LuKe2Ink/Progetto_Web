@@ -42,6 +42,44 @@
   function showMenu(value){
     document.getElementById("rightMenu").hidden = value
   }
+
+  let home = ref(false)
+  let calendar = ref(false)
+  let object = ref(false)
+  let type = ref(false)
+  let graph = ref(false)
+  let login = ref(false)
+  let user = ref(false)
+
+  function changeRoute(route){
+    const currentUrl = window.location.href;
+    var route = currentUrl.split("/").pop();
+    switch(route){
+      case 'home':
+        home = true;
+        break;
+      case 'calendar':
+      calendar = true;
+        break;
+      case 'object':
+        object = true;
+        break;
+      case 'type':
+        type = true;
+        break;
+      case 'graph':
+        graph = true;
+        break;
+      case 'login':
+        login = true;
+        break;
+      case 'user':
+        user = true;
+        break;
+    }
+  }
+
+  changeRoute();
 </script>
 
 <template id="app">
@@ -50,18 +88,18 @@
     <div class="nav">
       <div class="navList" v-if="screenSize >= 1050">
         <nav>
-          <div v-if="logged" class="logout" :key="logged"><a href="/home" class="link"> Home</a></div>
-          <div v-if="!logged" class="logged" :key="logged"><a href="/calendar" class="link">Calendario</a></div>
-          <div v-if="!logged" class="logged" :key="logged"><a href="/object" class="link">Oggetti</a></div>
-          <div v-if="!logged" class="logged" :key="logged"><a href="/event/type" class="link">Etichette</a></div>
-          <div v-if="!logged" class="logged" :key="logged"><a href="/graph" class="link">Grafico</a></div>
+          <div v-if="logged" class="logout" :key="logged"><a href="/home" class="link" v-bind:class="{ active: home }" :key="home"> Home</a></div>
+          <div v-if="!logged" class="logged" :key="logged"><a href="/calendar" class="link" v-bind:class="{ active: calendar }" :key="calendar">Calendario</a></div>
+          <div v-if="!logged" class="logged" :key="logged"><a href="/object" class="link" v-bind:class="{ active: object }" :key="object">Oggetti</a></div>
+          <div v-if="!logged" class="logged" :key="logged"><a href="/event/type" class="link" v-bind:class="{ active: type }" :key="type">Etichette</a></div>
+          <div v-if="!logged" class="logged" :key="logged"><a href="/graph" class="link" v-bind:class="{ active: graph }" :key="graph">Grafico</a></div>
         </nav>
       </div>
       <div class="navHeader" v-if="screenSize >= 1050">
         <nav>
-          <div v-if="logged" class="login" :key="logged"><a href="/login" class="link"><i class="fa-solid fa-right-to-bracket"></i> Login</a></div>
-          <div v-if="!logged" class="login" :key="logged"><a href="/login" class="link" @click ="logout"><i class="fa-solid fa-right-to-bracket"></i> Logout</a></div>
-          <div v-if="!logged" class="user" :key="logged"><a href="/user" class="link user"><i class="fa-solid fa-user-pen"></i></a></div>
+          <div v-if="logged" class="login" :key="logged"><a href="/login" class="link" v-bind:class="{ active: login }" :key="login"><i class="fa-solid fa-right-to-bracket"></i> Login</a></div>
+          <div v-if="!logged" class="login" :key="logged"><a href="/login" class="link" @click ="logout" ><i class="fa-solid fa-right-to-bracket"></i> Logout</a></div>
+          <div v-if="!logged" class="user" :key="logged"><a href="/user" class="link user" v-bind:class="{ active: user }" :key="user"><i class="fa-solid fa-user-pen"></i></a></div>
         </nav>
       </div>
     </div>
@@ -73,15 +111,15 @@
     <div hidden="true" id="rightMenu" class="lateralMenu">
         <div class="top">
           <div class="login close" @click="showMenu(true)"><i class="fa-solid fa-xmark"></i></div>
-          <div v-if="!logged" class="user" :key="logged"><a href="/user" class="link"><i class="fa-solid fa-user-pen"></i></a></div>
+          <div v-if="!logged" class="user" :key="logged"><a href="/user" class="link" v-bind:class="{ active: user }" :key="user"><i class="fa-solid fa-user-pen"></i></a></div>
         </div>
-        <div v-if="logged" class="login" :key="logged"><a href="/login" class="link"><i class="fa-solid fa-right-to-bracket"></i> Login</a></div>
+        <div v-if="logged" class="login" :key="logged"><a href="/login" class="link" v-bind:class="{ active: login }" :key="login"><i class="fa-solid fa-right-to-bracket"></i> Login</a></div>
         <div v-if="!logged" class="login" :key="logged"><a href="/login" class="link" @click ="logout"><i class="fa-solid fa-right-to-bracket"></i> Logout</a></div>
-        <div v-if="logged" class="logout" :key="logged"><a href="/home" class="link"> Home</a></div>
-        <div v-if="!logged" class="logged" :key="logged"><a href="/calendar" class="link">Calendario</a></div>
-        <div v-if="!logged" class="logged" :key="logged"><a href="/object" class="link">Oggetti</a></div>
-        <div v-if="!logged" class="logged" :key="logged"><a href="/event/type" class="link">Etichette</a></div>
-        <div v-if="!logged" class="logged" :key="logged"><a href="/graph" class="link">Grafico</a></div>
+        <div v-if="logged" class="logout" :key="logged"><a href="/home" class="link" v-bind:class="{ active: home }" :key="home"> Home</a></div>
+        <div v-if="!logged" class="logged" :key="logged"><a href="/calendar" class="link" v-bind:class="{ active: calendar }" :key="calendar">Calendario</a></div>
+        <div v-if="!logged" class="logged" :key="logged"><a href="/object" class="link" v-bind:class="{ active: object }" :key="object">Oggetti</a></div>
+        <div v-if="!logged" class="logged" :key="logged"><a href="/event/type" class="link" v-bind:class="{ active: type }" :key="type">Etichette</a></div>
+        <div v-if="!logged" class="logged" :key="logged"><a href="/graph" class="link" v-bind:class="{ active: graph }" :key="graph">Grafico</a></div>
     </div>
   </header>
 

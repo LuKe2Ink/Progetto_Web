@@ -227,11 +227,11 @@
         );
       },
       createData(){
-        console.log(moment(this.year+'-'+(this.month+1)));
+        
         this.daysInMonth = moment(this.year+'-'+(this.month+1)).daysInMonth()
         this.labels = Array.from({length: this.daysInMonth}, (_, i) => i + 1)
         this.colorLabel = Array.from({length: this.daysInMonth}, () => 'white')
-        console.log(this.colorLabel)
+        
         for (let index = 0; index < this.type.length; index++) {
           const element = this.type[index];
           // const result = this.histories.filter((el) => el.type[0]._id == element._id);
@@ -266,7 +266,7 @@
           if(currentMax>this.maxTime){
             this.maxTime = Math.ceil(currentMax)
           }
-          console.log(element.name);
+          
           this.datasets.push({
             label: element.name,
             data: dataSetData,
