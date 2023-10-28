@@ -24,7 +24,7 @@
             user_id: localStorage.getItem('user_id')
         }
         const response = await utils.callApi(databody, '/types/list', "post")
-        if(response.status == 'ko'){
+        if(response.status == 'ko' || response == 'ko'){
             localStorage.setItem('user_id', null)
             localStorage.setItem('token', null)
             await router.push("/login")
@@ -59,65 +59,81 @@
         },
         methods: {
             async modifySave(id){
-                let predicate = (element) => element._id == this.prev.save;
-                let index = this.eventTypes.findIndex(predicate)
-                const databody = {
-                    type_id: id,
-                    name: this.name,
-                    color: this.color,
-                    tipology: this.prev.type.tipology,
-                    graph: this.graph
-                }
-                await tokenVerify.verifyAndSaveToken();
-                const response = await utils.callApi(databody, '/types/modify', "post")
-                if(response.status == 'ko'){
-                    localStorage.setItem('user_id', null)
-                    localStorage.setItem('token', null)
-                    await router.push("/login")
-                    return null
-                } else {
-                    this.eventTypes[index] = response
-                    this.eventTypes[index].guidLabel = uuidv4()
-                    this.eventTypes[index].guidColor = uuidv4()
-                    this.eventTypes[index].guidGraph = uuidv4()
-                    this.prev.type = this.eventTypes[index]
-                    this.$refs[this.prev.save][0].hidden = true;
+                let swalResponse = await swal.fire({
+                    title: 'Sei sicuro di voler modificare questa etichetta?',
+                    showDenyButton: true,
+                    showCancelButton: false,
+                    confirmButtonText: 'Si',
+                    denyButtonText: 'No'
+                })
+                if(swalResponse.isConfirmed){
+                    let predicate = (element) => element._id == this.prev.save;
+                    let index = this.eventTypes.findIndex(predicate)
+                    const databody = {
+                        type_id: id,
+                        name: this.name,
+                        color: this.color,
+                        tipology: this.prev.type.tipology,
+                        graph: this.graph
+                    }
+                    await tokenVerify.verifyAndSaveToken();
+                    const response = await utils.callApi(databody, '/types/modify', "post")
+                    if(response.status == 'ko' || response == 'ko'){
+                        localStorage.setItem('user_id', null)
+                        localStorage.setItem('token', null)
+                        await router.push("/login")
+                        return null
+                    } else {
+                        this.eventTypes[index] = response
+                        this.eventTypes[index].guidLabel = uuidv4()
+                        this.eventTypes[index].guidColor = uuidv4()
+                        this.eventTypes[index].guidGraph = uuidv4()
+                        this.prev.type = this.eventTypes[index]
+                        this.$refs[this.prev.save][0].hidden = true;
+                    }
                 }
             },
-            async deletObject(id){
-                const resultSwalEvents = await swal.fire({
-                    title: "Attenzione",
-                    text: "Si vuole anche eliminare tutti gli eventi collegati all'etichetta?",
-                    icon: "warning",
-                    buttons: {
-                        cancel: "Annulla",
-                        confirm: {
-                            text: "Conferma",
-                            value: true,
+            async deleteObject(id){
+                let swalResponse = await swal.fire({
+                    title: 'Sei sicuro di voler eliminare questa etichetta?',
+                    showDenyButton: true,
+                    showCancelButton: false,
+                    confirmButtonText: 'Si',
+                    denyButtonText: 'No'
+                })
+                if(swalResponse.isConfirmed){
+                    const resultSwal = await swal.fire({
+                        title: "Attenzione",
+                        text: "Procedendo verranno eliminati anche tutti gli eventi collegati all'etichetta e se presenti anche tutti gli oggetti collegati, si vuole comunque procedere?",
+                        icon: "warning",
+                        showDenyButton: true,
+                        showCancelButton: false,
+                        confirmButtonText: 'Si',
+                        denyButtonText: 'No'
+                    })
+                    if(resultSwal.isConfirmed){
+                        const databody = {
+                            type_id: id,
+                            chain_events: resultSwalEvents,
+                        }
+                        await tokenVerify.verifyAndSaveToken();
+                        const response = await utils.callApi(databody, '/types/delete', "post")
+                        if(response.status == 'ko' || response == 'ko'){
+                            localStorage.setItem('user_id', null)
+                            localStorage.setItem('token', null)
+                            await router.push("/login")
+                            return null
+                        } else {
+                            let predicate = (element) => element._id == response._id;
+                            let index = this.eventTypes.findIndex(predicate)
+                            this.eventTypes.splice(index, 1)
+                            await swal.fire({
+                                title: "Successo",
+                                text: "L'oggetto è stato eliminato con successo",
+                                icon: "success"
+                            }) 
                         }
                     }
-                })
-                const databody = {
-                    type_id: id,
-                    chain_events: resultSwalEvents,
-                }
-                await tokenVerify.verifyAndSaveToken();
-                const response = await utils.callApi(databody, '/types/delete', "post")
-                if(response.status == 'ko'){
-                    localStorage.setItem('user_id', null)
-                    localStorage.setItem('token', null)
-                    await router.push("/login")
-                    return null
-                } else {
-                    let predicate = (element) => element._id == response._id;
-                    let index = this.eventTypes.findIndex(predicate)
-                    this.eventTypes.splice(index, 1)
-                    await swal.fire({
-                        title: "Successo",
-                        text: "L'oggetto è stato eliminato con successo",
-                        icon: "success"
-                    }) 
-                    
                 }
             },
             showInput(show, hide, save, type){
@@ -165,14 +181,14 @@
             async addSave(){
                 const databody = {
                     name: this.nameInput,
-                    color: this.colorInput==''?'#FFFFFF':this.colorInput,
+                    color: this.colorInput==''?'#000000':this.colorInput,
                     graph: this.graphInput==''?false:this.graphInput,
                     user_id: localStorage.getItem('user_id'),
                 }
                 console.log(databody)
                 await tokenVerify.verifyAndSaveToken();
                 const response = await utils.callApi(databody, '/types/create', "put")
-                if(response.status == 'ko'){
+                if(response.status == 'ko' || response == 'ko'){
                     localStorage.setItem('user_id', null)
                     localStorage.setItem('token', null)
                     await router.push("/login")
@@ -233,7 +249,7 @@
                         </div>
                     </div>
                     <div class="buttonInputOnly">
-                        <button class="deleteObject" @click="deletObject(_type._id)">
+                        <button v-if="!_type.defaults" class="deleteObject" @click="deleteObject(_type._id)">
                         <i class="fa-solid fa-trash-can fa-xl"></i>
                         </button>
                         <button hidden="true" class="saveModify" :ref="_type._id" @click="modifySave(_type._id)">

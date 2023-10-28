@@ -8,7 +8,15 @@ $icon-color: #EB9A28;
 $tr-height: 50px;
 
 .modal {
+  margin-top: 70px;
   width: 80%;
+}
+.modal-header{
+  h1{
+    p{
+      font-size: 40px;
+    }
+  }
 }
 
 .contenitore {
@@ -178,6 +186,14 @@ $tr-height: 50px;
 .histories{
   width: 200px;
   height: 100px;
+  th{
+    text-align: start;
+    width: 100px;
+  }
+  td{
+    padding-left: 10px;
+    text-align: start;
+  }
 }
 
 .submitButton{
@@ -356,6 +372,65 @@ label {
   }
 }
 
+.linkButtonModify, .fileButtonModify{
+  // width: 25px;
+  // height: 25px;
+  button{
+    border: solid #EB9A28 1px;
+    cursor: pointer;
+    background-color: #00244B;
+    color: $icon-color;
+    padding: 10px;
+    border-radius: 50%;
+  }
+}
+.fileButtonModify{
+  padding: 10px;
+  border: 2px solid $shadow-color;
+  border-radius: 10px;
+  .fileName{
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.underButton{
+  z-index: 99;
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  bottom: -15px;
+  justify-content: center;
+  align-items: center;
+  button{
+    border: 0;
+    cursor: pointer;
+    background-color: #00244B;
+    color: $icon-color;
+    padding: 10px;
+    border-radius: 50%;
+  }
+}
+.trashButton{
+  right: 60px;
+}
+.submitButton{
+  right: 20px;
+}
+
+.linkButton{
+  left: 2px;
+  a{
+    color: $icon-color;
+  }
+}
+
+.fileButton{
+  left: 40px;
+}
+
 .btn-box {
   text-align: center;
   margin: 50px 0;
@@ -366,18 +441,6 @@ label {
   overflow: auto;
 }
 
-.trashButton{
-  right: 60px;
-}
-.submitButton{
-  right: 20px;
-}
-.linkButton{
-  left: 20px;
-  a{
-    color: $icon-color;
-  }
-}
 
 input[type=file]{
   width: 80%;

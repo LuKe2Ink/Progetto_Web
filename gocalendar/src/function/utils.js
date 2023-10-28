@@ -30,24 +30,25 @@ function createNotificationSocket(){
         events.forEach(element => {
           setTimeout(function(){
             var date = element.date
-            var stringDate = date.day+"/"+date.month+"/"+date.year
-            let expirDateEvent = moment(stringDate, 'D/M/YYYY')
-            expirDateEvent.set({
+            var stringDate = date.day+"/"+(date.month+1)+"/"+date.year
+            let expireDateEvent = moment(stringDate, 'D/M/YYYY')
+            expireDateEvent.set({
               'hour': date.time?date.time.split(':')[0]:"00",
               'minute': date.time?date.time.split(':')[1]:"00",
               'second': '00'
             });
-            expirDateEvent.set({ 
-              'day': date.day,
-              'month': date.month,
-              'year': date.year
-            })
-            let checkExpireDate = expirDateEvent
+            // expireDateEvent.set({ 
+            //   'day': date.day,
+            //   'month': date.month+1,
+            //   'year': date.year
+            // })
+            console.log(expireDateEvent);
+            let checkExpireDate = expireDateEvent
             if(checkExpireDate.add(1, 'D')<=moment.now()){
-              let toast = createToastify(element, expirDateEvent)
+              let toast = createToastify(element, expireDateEvent)
               toast.showToast();
             }
-          }, 60000)
+          }, 2000)
         });
     })
 }
@@ -96,8 +97,24 @@ async function callApi(databody, route, type){
   return response.data==''?'ok':response.data;
 }
 
+
+function checkPassword(password){
+  if(password.length < 8) {  
+    return false; 
+  } else if(password.search(/[a-z]/) < 0) {  
+    return false; 
+  } else if(password.search(/[A-Z]/) < 0) {  
+    return false; 
+  } else if(password.search(/[0-9]/) < 0) { 
+    return false; 
+  } 
+  
+  return true;
+}
+
 module.exports = {
     createToastify,
     createNotificationSocket,
-    callApi
+    callApi,
+    checkPassword
 }

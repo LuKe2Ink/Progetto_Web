@@ -14,9 +14,18 @@
 }
 
 #divChart{
-    width: 500px;
+    padding-right: 5px;
+    height: 400px;
+    width: 800px;
     margin: auto;
     color: white;
+}
+
+@media (max-width: 820px) {
+    #divChart{
+        height: 700px;
+        width: 380px;
+    }
 }
 
 .switchMonth{

@@ -13,22 +13,32 @@
       const password = ref('')
 
       const submitForm = async () => {
-        console.log(username, password)
-        const formData = {
+        if(!utils.checkPassword(password.value)){
+          await swal.fire({
+            title: "La password deve contere almeno un lettera maiuscola, una minuscola, un numero e un carattere speciale",
+            icon:"error"
+          })
+        } else {
+          const formData = {
             username: username.value,
             password: password.value,
             mail: email.value,
-        };
-
-        // Send the login request to the server
-        const response = await utils.callApi(formData, '/user/register', "put")
-        if(response.status == 'ko'){
-            localStorage.setItem('user_id', null)
-            localStorage.setItem('token', null)
-            await router.push("/register")
-            return null
-        }else 
-          router.push('/login')
+          };
+            // Send the login request to the server
+          const response = await utils.callApi(formData, '/user/register', "put")
+          if(response.status == 'ko' || response == 'ko'){
+              localStorage.setItem('user_id', null)
+              localStorage.setItem('token', null)
+              await router.push("/register")
+              return null
+          }else {
+            await swal.fire({
+              title: "Utente creato con successo",
+              icon:"success"
+            })
+            router.push('/login')
+          }
+        }
       }
 
       return {

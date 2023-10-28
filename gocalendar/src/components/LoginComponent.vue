@@ -21,12 +21,14 @@
 
         // Send the login request to the server
         const response = await utils.callApi(formData, '/user/login', "post")
-        if(response.status == 'ko'){
+        console.log(response);
+        if(response.status == 'ko' || response == 'ko'){
             localStorage.setItem('user_id', null)
             localStorage.setItem('token', null)
             await router.push("/login")
             return null
-        }else {
+        } else {
+          console.log("entra")
           localStorage.setItem('token', response.accessToken);
           localStorage.setItem('user_id', response.user_id);
           socket.emit("notification", localStorage.getItem('user_id'))

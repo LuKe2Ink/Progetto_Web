@@ -74,3 +74,10 @@ $header-height: 150px;
     }
 }
 
+
+@media (max-width: 620px) {
+    .container{
+        width: 95%;
+    }
+}
+

@@ -24,7 +24,7 @@
             special: true
         }
         const response = await utils.callApi(databody, '/types/list/filtered', "post")
-        if(response.status == 'ko'){
+        if(response.status == 'ko' || response == 'ko'){
             localStorage.setItem('user_id', null)
             localStorage.setItem('token', null)
             await router.push("/login")
@@ -38,7 +38,7 @@
             user_id: localStorage.getItem('user_id')
         }
         const response = await utils.callApi(databody, '/object/list', "post")
-        if(response.status == 'ko'){
+        if(response.status == 'ko' || response == 'ko'){
             localStorage.setItem('user_id', null)
             localStorage.setItem('token', null)
             await router.push("/login")
@@ -138,86 +138,96 @@
                 reader.readAsDataURL(file);
             },
             async modifySave(id){
-                let predicate = (element) => element._id == this.prevSave;
-                let index = this.objectsList.findIndex(predicate)
-                const databody = {
-                    object_id: id,
-                    img: this.img ? this.img : this.prevImg,
-                    name: this.name,
-                    event_type_id: this.objectsList[index].event_type
-                }
-                await tokenVerify.verifyAndSaveToken();
-                const response = await utils.callApi(databody, '/object/modify', "post")
-                if(response.status == 'ko'){
-                    localStorage.setItem('user_id', null)
-                    localStorage.setItem('token', null)
-                    await router.push("/login")
-                    return null
-                } else {
-                    this.$refs[this.objectsList[index].guidInput].hidden = true;
-                    this.$refs[this.objectsList[index].guidLabel].hidden = false;
-                    if(!this.img && this.img!=''){
-                        this.objectsList[index].img = this.img
-                        this.prevImg = this.img
-                    }
-                    if(!this.prevImg && this.prevImg != ''){
-                        this.objectsList[index].img = this.prevImg
-                    }
-
-                    this.$refs[this.prevSave][0].hidden = true;
-                    if(this.prevName != ''){
-                        this.$refs[this.prevName.show][0].hidden = false;
-                        this.objectsList[index].name = this.name
-                        this.$refs[this.prevName.hide][0].hidden = true;
-                    }
-                    this.prevSave = '';
-                    this.prevImg = '';
-                    this.prevName = '';
-
-                    if(this.$refs[this.prevName] && this.$refs[this.prevName] !=''){
-                        this.$refs[this.prevSave][0].hidden = true;
-                        this.$refs[this.prevName.show][0].hidden = false;
-                        this.$refs[this.prevName.hide][0].hidden = true;
-                    }
-                }
-            },
-            async deletObject(id){
-                const resultSwal = await swal.fire({
-                    title: "Attenzione",
-                    text: "Si vuole anche eliminare tutti gli eventi collegati all'oggetto?",
-                    icon: "warning",
-                    buttons: {
-                        cancel: "Annulla",
-                        confirm: {
-                            text: "Conferma",
-                            value: true,
-                        }
-                    }
+                let swalResponse = await swal.fire({
+                    title: 'Sei sicuro di voler modificare questo oggetto?',
+                    showDenyButton: true,
+                    showCancelButton: false,
+                    confirmButtonText: 'Si',
+                    denyButtonText: 'No'
                 })
-                if(resultSwal.isConfirmed){
+                if(swalResponse.isConfirmed){
+                    let predicate = (element) => element._id == this.prevSave;
+                    let index = this.objectsList.findIndex(predicate)
                     const databody = {
                         object_id: id,
-                        chain_events: resultSwal
+                        img: this.img ? this.img : this.prevImg,
+                        name: this.name,
+                        event_type_id: this.objectsList[index].event_type
                     }
                     await tokenVerify.verifyAndSaveToken();
-                    const response = await utils.callApi(databody, '/object/delete', "post")
-                    if(response.status == 'ko'){
+                    const response = await utils.callApi(databody, '/object/modify', "post")
+                    if(response.status == 'ko' || response == 'ko'){
                         localStorage.setItem('user_id', null)
                         localStorage.setItem('token', null)
                         await router.push("/login")
                         return null
                     } else {
-                        let predicate = (element) => element._id == response;
-                        let index = this.objectsList.findIndex(predicate)
-                        this.objectsList.splice(index, 1)
-                        this.prevImg = ''
-                        this.prevName = ''
-                        this.prevSave = ''
-                        await swal.fire({
-                            title: "Successo",
-                            text: "L'oggetto è stato eliminato con successo",
-                            icon: "success"
-                        }) 
+                        this.$refs[this.objectsList[index].guidInput].hidden = true;
+                        this.$refs[this.objectsList[index].guidLabel].hidden = false;
+                        if(!this.img && this.img!=''){
+                            this.objectsList[index].img = this.img
+                            this.prevImg = this.img
+                        }
+                        if(!this.prevImg && this.prevImg != ''){
+                            this.objectsList[index].img = this.prevImg
+                        }
+
+                        this.$refs[this.prevSave][0].hidden = true;
+                        if(this.prevName != ''){
+                            this.$refs[this.prevName.show][0].hidden = false;
+                            this.objectsList[index].name = this.name
+                            this.$refs[this.prevName.hide][0].hidden = true;
+                        }
+                        this.prevSave = '';
+                        this.prevImg = '';
+                        this.prevName = '';
+
+                        if(this.$refs[this.prevName] && this.$refs[this.prevName] !=''){
+                            this.$refs[this.prevSave][0].hidden = true;
+                            this.$refs[this.prevName.show][0].hidden = false;
+                            this.$refs[this.prevName.hide][0].hidden = true;
+                        }
+                    }
+                }
+            },
+            async deletObject(id){
+                let swalResponse = await swal.fire({
+                    title: 'Sei sicuro di voler eliminare questo oggetto?',
+                    showDenyButton: true,
+                    showCancelButton: false,
+                    confirmButtonText: 'Si',
+                    denyButtonText: 'No'
+                })
+                if(swalResponse.isConfirmed){
+                    const resultSwal = await swal.fire({
+                        title: "Attenzione",
+                        text: "Procedendo verranno eliminati anche tutti gli eventi collegati all'oggetto, si vuole comunque procedere?",
+                        icon: "warning",
+                        showDenyButton: true,
+                        showCancelButton: false,
+                        confirmButtonText: 'Si',
+                        denyButtonText: 'No'
+                    })
+                    if(resultSwal.isConfirmed){
+                        const databody = {
+                            object_id: id,
+                            chain_events: true
+                        }
+                        await tokenVerify.verifyAndSaveToken();
+                        const response = await utils.callApi(databody, '/object/delete', "post")
+                        if(response.status == 'ko' || response == 'ko'){
+                            localStorage.setItem('user_id', null)
+                            localStorage.setItem('token', null)
+                            await router.push("/login")
+                            return null
+                        } else {
+                            let predicate = (element) => element._id == response;
+                            let index = this.objectsList.findIndex(predicate)
+                            this.objectsList.splice(index, 1)
+                            this.prevImg = ''
+                            this.prevName = ''
+                            this.prevSave = ''
+                        }
                     }
                 }
             },
@@ -297,7 +307,7 @@
                     }  
                     await tokenVerify.verifyAndSaveToken();
                     const response = await utils.callApi(databody, '/object/add', "put")
-                    if(response.status == 'ko'){
+                    if(response.status == 'ko' || response == 'ko'){
                         localStorage.setItem('user_id', null)
                         localStorage.setItem('token', null)
                         await router.push("/login")

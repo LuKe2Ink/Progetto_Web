@@ -41,6 +41,8 @@ const userRegister = async (req, res) => {
     creation: moment().format('DD/MM/YYYY HH:mm')
   })
 
+  const objId = new mongoose.Types.ObjectId(user._id);
+
   const refreshToken = jwt.sign({ username: req.body.username }, "refreshSecret");
   let token = await Token.create({
     type: "refreshToken",
@@ -49,7 +51,7 @@ const userRegister = async (req, res) => {
     user: objId
   })
 
-  res.status(200).send({user_id: user.id, refreshToken: refreshToken});
+  res.status(200).send();
 }
 
 const usersList= async (req, res) => {
@@ -149,9 +151,10 @@ const userLogin = async (req, res) => {
   let data = req.body
 
   let user = await checkPassword(data, res)
-  if(user.status)
+  if(user.status){
     return user;
-  
+  }
+
   user = user[0]
   
   let accessToken;

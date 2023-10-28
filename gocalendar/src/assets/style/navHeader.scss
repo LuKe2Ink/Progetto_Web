@@ -47,31 +47,26 @@ header{
                 border: 0;
             }
         }
-        .close{
-            border-bottom: 0px;
-            margin-top: 10px;
-            margin-left: 15px;
-        }
-    }
 
-    
-    .navList{
-        width: 60%;
-        nav {
-            .logged{
-                margin: auto;
-                margin-inline: auto;
-                // width: calc(100%/4);
+        .top{
+            margin-bottom: 30px;
+            margin-top: 15px;
+            padding-bottom: 10px;
+            margin-inline: auto;
+            display: flex;
+            justify-content: space-between;
+            .close, .user{
+                margin: 0;
+                border-bottom: 0px;
             }
+            border: 0;
+            width: 90%;
+            display: flex;
+            border-bottom: 1px solid  #EB9A28;
         }
-    }
-
-    .navHeader nav, .navList nav, .navHeaderReduce nav{
-        height: 100%;
-        align-items: center;
-        display: flex;
     }
     .navHeaderReduce{
+        align-items: center;
         margin-right: 20px;
         width: 100%;
         display: flex;
@@ -81,24 +76,56 @@ header{
         }
     }
 
-    .navHeader{
-        width: 20%;
-        display: flex;
-        flex-wrap: wrap-reverse;
-        align-content: flex-end;
-        justify-content: end;
-    }
-
-    .navList nav{
-        margin-inline: auto;
-    }
-
     .link{
         border-radius: 5px;
         border: 1px solid $icon-color;
         color: $icon-color;
         text-decoration: none;
         padding: 5px;
+    }
+
+    .nav{
+        display: inline-flex;
+        justify-content: space-between;
+        width: calc(100% - 187px);
+
+        .navList{
+            justify-content: space-between;
+            width: 80%;
+            nav {
+                .logged{
+                    margin: auto;
+                    margin-inline: auto;
+                    // width: calc(100%/4);
+                }
+            }
+        }
+
+        .navHeader nav, .navList nav, .navHeaderReduce nav{
+            height: 100%;
+            align-items: center;
+            justify-content: space-between;
+            display: flex;
+        }
+
+        .navHeader{
+            margin-right: 10px;
+            width: 30%;
+            display: flex;
+            flex-wrap: wrap-reverse;
+            align-content: flex-end;
+            justify-content: end;
+            div.user{
+                margin-left: 15px;
+                .user{
+                    border: 0;
+                }
+            }
+        }
+
+        .navList nav{
+            margin-inline: auto;
+        }
     }
 }
 

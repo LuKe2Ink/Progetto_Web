@@ -8,7 +8,7 @@ const verifyAndSaveToken = async () => {
         user_id: localStorage.getItem('user_id')
     });
     const data = response.data;
-    if(response.status == 'ko'){
+    if(response.status == 'ko' || response == 'ko'){
         await swal.fire({
         title: "Error token",
         text: data.message,

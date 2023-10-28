@@ -84,30 +84,27 @@ $trans-time: 300ms;
 }
 .contenitore {
     color: white;
-    max-width: 100%;
-    margin: auto;
-    margin-inline: 50px;
+    width: 90%;
+    margin-inline: auto;
     margin-top: $header-height;
     // color: $text-color;
-    display: inline-flex;
+    display: block;
     .specialObjects{
         display: flex;
         justify-content: start;
         .objectList {
-            max-width: 100%;
-            margin: auto;
-            margin-inline: 20px;
+            width: 100%;
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
             align-items: flex-start;
-            justify-content: start;
+            justify-content: space-evenly;
             .singleObject {
                 border: solid 4px;
                 border-radius: 4px;
                 margin-left: calc(10%/4);
-                margin-bottom: 15px;
-                width: 200px;
+                margin-bottom: 25px;
+                width: 15%;
                 position: relative;
                 .objectName {
                     position: relative;
@@ -147,12 +144,12 @@ $trans-time: 300ms;
                 }
                 .saveModify{
                     position: absolute;
-                    bottom: -10px;
+                    top: -20px;
                     right: 40px;
                 }
                 .deleteObject{
                     position: absolute;
-                    bottom: -10px;
+                    top: -20px;
                     right: 1px;
                 }
             }
@@ -195,4 +192,20 @@ input[type=color]::-moz-color-swatch {
     background-color: #00244B;
     color: $icon-color;
     border-radius: 50%;
+}
+
+
+
+@media (max-width: 870px){
+    .contenitore {
+        .specialObjects{
+            display: flex;
+            justify-content: start;
+            .objectList {
+                .singleObject {
+                    width: 30%;
+                }
+            }
+        }
+    }
 }

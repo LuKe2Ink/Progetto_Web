@@ -100,37 +100,57 @@
                     }
                 })
                 if(result.isConfirmed == true){
-                    let databody={
-                        username: user.username,
-                        user_id: localStorage.getItem("user_id"),
-                        password: result.value.oldPass,
-                        newPassword: result.value.newPass
-                    };
-                    await utils.callApi(databody, '/user/modify/password', 'post')
-                    this.oldPass = ref('')
-                    this.newPass = ref('')
-                    this.flagChangePassword = false
+                    if(!utils.checkPassword(result.value.newPass)){
+                        await swal.fire({
+                            title: "La password deve contere almeno un lettera maiuscola, una minuscola, un numero e un carattere speciale",
+                            icon:"error"
+                        })
+                    } else {
+                        let databody={
+                            username: user.username,
+                            user_id: localStorage.getItem("user_id"),
+                            password: result.value.oldPass,
+                            newPassword: result.value.newPass
+                        };
+                        await utils.callApi(databody, '/user/modify/password', 'post')
+                        this.oldPass = ref('')
+                        this.newPass = ref('')
+                        this.flagChangePassword = false
+                        await swal.fire({
+                            title: "Password salvata con successo",
+                            icon: "success"
+                        })
+                    }
                 }
                 // }
             },
             async modifyUser(){
-                let databody={};
-                if(this.calendarSettings){
-                    databody = {
-                        notification: this.notification==user.notification?'':this.notification,
-                        graph_setting: this.graph_setting==user.graph_setting?'':this.graph_setting
+                let res = await swal.fire({
+                    title:"Sei sicuro di voler modificare le impostazioni del tuo utente?",
+                    icon: "warning",
+                    showDenyButton: true,
+                    denyButtonText:"No",
+                    confirmButtonText: 'Si'
+                })
+                if(res.isConfirmed){
+                    let databody={};
+                    if(this.calendarSettings){
+                        databody = {
+                            notification: this.notification==user.notification?'':this.notification,
+                            graph_setting: this.graph_setting==user.graph_setting?'':this.graph_setting
+                        }
+                    } else {
+                        databody = {
+                            username: this.username==user.username?'':this.username,
+                            mail: this.mail==user.mail?'':this.mail
+                        }
                     }
-                } else {
-                    databody = {
-                        username: this.username==user.username?'':this.username,
-                        mail: this.mail==user.mail?'':this.mail
-                    }
+                    databody["user_id"]=localStorage.getItem("user_id");
+                    const response = await utils.callApi(databody, '/user/modify', 'post');
+                    user = response.user
+                    this.setInput()
+                    this.modify = false;
                 }
-                databody["user_id"]=localStorage.getItem("user_id");
-                const response = await utils.callApi(databody, '/user/modify', 'post');
-                user = response.user
-                this.setInput()
-                this.modify = false;
             },
             async switchActiveUser(index){
                 let question = this.usersList[index].active?"disattivare":"riattivare"
@@ -151,6 +171,19 @@
                     console.log(response)
                     if(response=='ok') 
                         this.usersList[index].active = !this.usersList[index].active
+                }
+            },
+            async deleteAccount(){
+                //inserisci password
+                let swalResponse = await swal.fire({
+                    title: 'Sei sicuro di voler eliminare il tuo utente?',
+                    showDenyButton: true,
+                    showCancelButton: false,
+                    confirmButtonText: 'Si',
+                    denyButtonText: 'No'
+                })
+                if(swalResponse.isConfirmed){
+                    //fai chiamata API
                 }
             }
         },

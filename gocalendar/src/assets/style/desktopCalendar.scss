@@ -137,9 +137,17 @@ $tr-height: 100px;
 .histories{
   width: 200px;
   height: 100px;
+  th{
+    text-align: start;
+    width: 100px;
+  }
+  td{
+    padding-left: 10px;
+    text-align: start;
+  }
 }
 
-.linkButtonModify{
+.linkButtonModify, .fileButtonModify{
   // width: 25px;
   // height: 25px;
   button{
@@ -149,6 +157,17 @@ $tr-height: 100px;
     color: $icon-color;
     padding: 10px;
     border-radius: 50%;
+  }
+}
+.fileButtonModify{
+  padding: 10px;
+  border: 2px solid $shadow-color;
+  border-radius: 10px;
+  .fileName{
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -180,6 +199,9 @@ $tr-height: 100px;
   a{
     color: $icon-color;
   }
+}
+.fileButton{
+  left: 40px;
 }
 
 .btn-close {
