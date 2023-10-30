@@ -26,7 +26,7 @@ async function createWindow() {
   })
   win.maximize()
   win.webContents.setWindowOpenHandler(({ url }) => {
-    require('electron').shell.openExternal(url);
+    require('electron').shell.openPath(url);
     return { action: 'deny' };
   });
 

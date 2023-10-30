@@ -12,6 +12,18 @@ const moment = require('moment');
 const axios = require('axios');
 const fs = require('fs')
 const path = require('path')
+const dbpopolate = require('./utils/dbPopolate')
+
+const popolateDb = async () => {
+    console.log("entra")
+    try {
+        await dbpopolate.makePopolation();
+    } catch (error) {console.log("FAIL"+error)}
+};
+
+(async() => {
+    await popolateDb();
+})()
 
 const fileIcs = fs.readFileSync(path.resolve(__dirname, 'Italy-Holidays.ics'), 'utf8')
 

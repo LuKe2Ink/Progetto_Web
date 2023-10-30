@@ -1,0 +1,75 @@
+[{
+  "_id": "649c6dada50adc1f49329171",
+  "name": "Festività",
+  "color": "#000000",
+  "tipology": "normal",
+  "graph": false,
+  "defaults": true,
+  "user": null
+},
+{
+  "_id":"649c6dada50adc1f49329172",
+  "name": "Libro",
+  "color": "#000000",
+  "tipology": "special",
+  "graph": false,
+  "defaults": true,
+  "user": null
+},
+{
+  "_id": "649c6dada50adc1f49329132",
+  "name": "Fumetto",
+  "color": "#000000",
+  "tipology": "special",
+  "graph": false,
+  "defaults": true,
+  "user": null
+},
+{
+  "_id":"649c6dada50adc1f49329173",
+  "name": "Film",
+  "color": "#000000",
+  "tipology": "special",
+  "graph": false,
+  "defaults": true,
+  "user": null
+},
+{
+  "_id": "649c6dada50adc1f49329174",
+  "name": "Serie tv",
+  "color": "#000000",
+  "tipology": "special",
+  "graph": false,
+  "defaults": true,
+  "user": null
+},
+{
+  "_id":"64f39f2a30cb0116899c0538",
+  "name": "Hobby",
+  "color": "#635bcd",
+  "tipology": "normal",
+  "graph": true,
+  "defaults": false,
+  "user": "64a97bf07f07d89b5a547f36",
+  "__v": 0
+},
+{
+  "_id": "653d13ac89c4d0d16a0b5bae",
+  "name": "Festa",
+  "color": "#FFFFFF",
+  "tipology": "normal",
+  "graph": true,
+  "defaults": false,
+  "user": "64a97bf07f07d89b5a547f36",
+  "__v": 0
+},
+{
+  "_id": "653d7c6fdff28b2493c7c902",
+  "name": "Studio",
+  "color": "#ff0000",
+  "tipology": "normal",
+  "graph": true,
+  "defaults": false,
+  "user": "64a97bf07f07d89b5a547f36",
+  "__v": 0
+}]
