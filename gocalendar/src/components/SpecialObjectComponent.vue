@@ -413,6 +413,6 @@
     </div>
 </template>
 
-<style lang="scss" scooped>
+<style lang="scss" scoped>
     @import '../assets/style/specialObjectStyle.scss'; 
 </style>
