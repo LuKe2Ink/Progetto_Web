@@ -84,7 +84,6 @@ async function createHolidayForUser(user_id){
         "date.year":yearCheck,
         "holiday": true
     })
-    console.log(holidayCheck)
 
     if(holidayCheck.length==0){
         holidaysApiList.forEach(async (element) => {
@@ -126,9 +125,8 @@ async function createHolidayForUser(user_id){
         "date.year":yearCheck,
         "holiday": true
     })
-    console.log(holidayCheckIcs)
+
     if(holidayCheckIcs.length==0){
-        console.log("entra")
         holidayIcs.forEach(async (element)=>{
             let date = moment(element.DTSTART, 'YYYYMMDD')
             let day = date.get('D')
