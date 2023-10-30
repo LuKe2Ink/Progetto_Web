@@ -32,10 +32,8 @@ const makePopolation = async () => {
 const checkCollection = async (filename, Model) => {
     try {
         const dataPath = path.join(__dirname, `${filename}.json`);
-        console.log(dataPath)
         const data = await readFileAsync(dataPath, 'utf8');
         let datas = JSON.parse(data);
-        console.log(datas)
 
         const count = await Model.countDocuments();
 
@@ -47,7 +45,6 @@ const checkCollection = async (filename, Model) => {
             if(element.event_type)
                 element.user = new mongoose.mongo.ObjectId(element.event_type)
         });
-        console.log(datas)
 
         if (count === 0) {
             await Model.insertMany(datas);

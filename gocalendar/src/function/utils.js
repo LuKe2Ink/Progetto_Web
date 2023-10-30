@@ -92,7 +92,6 @@ async function callApi(databody, route, type){
     return 'ko';
   }
 
-  console.log(response)
   if(response.data=='' && (typeof response.data) == 'object')
     return response.data
   
