@@ -25,10 +25,10 @@ const eventsTypeSchema = new mongoose.Schema({
         default: false
     },
     user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Users",
-      required: false
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Users",
+        required: false
     }
-  }, { collection: 'events_type' });
+}, { collection: 'events_type' });
 
 module.exports = mongoose.model('EventsType', eventsTypeSchema);

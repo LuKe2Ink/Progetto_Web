@@ -105,7 +105,8 @@
       type: {
         tipology: 'normal',
         _id:''
-      }
+      },
+      holiday: false
     }
 
     export default defineComponent({
@@ -189,8 +190,8 @@
                 year:null,
                 showHistory: false,
                 isSpecialObject: false,
-                oldTime: null
-
+                oldTime: null,
+                holiday: false,
             }
         },
         methods: {
@@ -265,6 +266,7 @@
               this.selectedCell.day = day;
               this.show = true
               this.singleEvent = event
+              this.holiday = event.holiday?event.holiday:false
               let body = {}
               if(event.special_object){
                 body = {
@@ -724,7 +726,7 @@
                 <span class="bar"></span>
                 <label class="titleLabel">Titolo</label>
               </div>
-              <p v-if="!titoloInput" @click="titoloInput = !titoloInput; modify = true">
+              <p v-if="!titoloInput" @click="if(!holiday){titoloInput = !titoloInput; modify = true}">
                 {{ titolo }}
               </p>
             </h1>
@@ -740,7 +742,7 @@
                 <span class="bar"></span>
                 <label>Descrizione</label>
               </div>
-              <p v-if="!descrizioneInput" @click="descrizioneInput = !descrizioneInput; modify = true">
+              <p v-if="!descrizioneInput" @click="if(!holiday){descrizioneInput = !descrizioneInput; modify = true}">
                 Descrizione: {{ descrizione }}
               </p>
               <div class="group" v-if="luogoInput">
@@ -749,7 +751,7 @@
                 <span class="bar"></span>
                 <label>Luogo</label>
               </div>
-              <p v-if="!luogoInput" @click="luogoInput = !luogoInput; modify = true">
+              <p v-if="!luogoInput && !holiday" @click="if(holiday){luogoInput = !luogoInput; modify = true}">
                 Luogo: {{ luogo }}
               </p>
               <div class="group" v-if="personeInput">
@@ -758,7 +760,7 @@
                 <span class="bar"></span>
                 <label>Persone</label>
               </div>
-              <p v-if="!personeInput" @click="personeInput = !personeInput; modify = true">
+              <p v-if="!personeInput && !holiday" @click="if(holiday){personeInput = !personeInput; modify = true}">
                 Persone: {{ persone }}
               </p>
               <div v-if="tipoInput" class="typesInput">
@@ -794,11 +796,11 @@
                 <input v-if="singleEvent != null && singleEvent.type.tipology =='normal'" v-model="oraFine" type="time">
                 <label class="labelOrario">Orario</label>
               </div>
-              <p v-if="!oraInput " @click="oraInput = !oraInput; modify = true">
+              <p v-if="!oraInput  && !holiday" @click="if(holiday){oraInput = !oraInput; modify = true}">
                 <p>
                   Ora inizio: {{ oraInizio }} 
                 </p>
-                <p v-if="singleEvent != null && singleEvent.type.tipology =='normal' ">
+                <p v-if="singleEvent != null && singleEvent.type.tipology =='normal' && !holiday ">
                   Ora Fine: {{ oraFine }} 
                 </p>
               </p>
@@ -808,7 +810,7 @@
                 <span class="bar"></span>
                 <label>Link</label>
               </div>
-              <div v-if="!linkInput" class="linkButtonModify">
+              <div v-if="!linkInput && !holiday" class="linkButtonModify">
                 <span @click="linkInput = !linkInput; modify = true">
                   Link 
                 </span>
@@ -818,7 +820,7 @@
               <div class="group" v-if="fileInput">
                 <input ref="fileInput" v-on:change="onFileChange" type="file">
               </div>
-              <div v-if="!fileInput" class="fileButtonModify">
+              <div v-if="!fileInput && !holiday" class="fileButtonModify">
                 <span @click="fileInput = !fileInput; modify = true">
                   File:
                   <button  type="button" v-if="fileData != '' " @click="deleteLinkFile('file')"><i class="fa-solid fa-trash-can"></i></button>
@@ -907,7 +909,7 @@
                 </div>
               </div>
             </slot>
-            <div v-if="!creationEvent" class="underButton trashButton">
+            <div v-if="!creationEvent && !holiday" class="underButton trashButton">
               <button type="button" @click="deleteEvent"><i class="fa-solid fa-trash-can fa-xl"></i></button>
             </div>
             <div v-if="modify || creationEvent" class="underButton submitButton">

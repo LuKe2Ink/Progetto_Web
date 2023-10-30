@@ -53,6 +53,11 @@ const eventSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "SpecialObject",
       required: false
+    },
+    holiday: {
+      type: Boolean,
+      require: false,
+      default: false
     }
   }, { collection: 'events' });
 

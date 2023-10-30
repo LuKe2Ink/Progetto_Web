@@ -1,0 +1,118 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID: https://giorni-festivi.eu/
+METHOD:PUBLISH
+CALSCALE:GREGORIAN
+NAME:Giorni festivi Italia 2023
+X-WR-CALNAME:Giorni festivi Italia 2023
+DESCRIPTION:A service of giorni-festivi.eu. All data without guarantee! / Alle Angaben ohne Gewähr!
+X-WR-CALDESC:A service of giorni-festivi.eu. All data without guarantee! / Alle Angaben ohne Gewähr!
+BEGIN:VEVENT
+UID:italia--2023-1@giorni-festivi.eu
+DTSTAMP:20230101T000000
+DTSTART;VALUE=DATE:20230101
+DTEND;VALUE=DATE:20230101
+SUMMARY:Capodanno 
+DESCRIPTION:giorno festivo nazionale in Italia | giorni-festivi.eu. All data without guarantee! / Alle Angaben ohne Gewähr!
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:italia--2023-2@giorni-festivi.eu
+DTSTAMP:20230106T000000
+DTSTART;VALUE=DATE:20230106
+DTEND;VALUE=DATE:20230106
+SUMMARY:Epifania 
+DESCRIPTION:giorno festivo nazionale in Italia | giorni-festivi.eu. All data without guarantee! / Alle Angaben ohne Gewähr!
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:italia--2023-5@giorni-festivi.eu
+DTSTAMP:20230410T000000
+DTSTART;VALUE=DATE:20230410
+DTEND;VALUE=DATE:20230410
+SUMMARY:Lunedì di Pasqua 
+DESCRIPTION:giorno festivo nazionale in Italia | giorni-festivi.eu. All data without guarantee! / Alle Angaben ohne Gewähr!
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:italia--2023-6@giorni-festivi.eu
+DTSTAMP:20230425T000000
+DTSTART;VALUE=DATE:20230425
+DTEND;VALUE=DATE:20230425
+SUMMARY:Liberazione Italia 
+DESCRIPTION:giorno festivo nazionale in Italia | giorni-festivi.eu. All data without guarantee! / Alle Angaben ohne Gewähr!
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:italia--2023-7@giorni-festivi.eu
+DTSTAMP:20230501T000000
+DTSTART;VALUE=DATE:20230501
+DTEND;VALUE=DATE:20230501
+SUMMARY:Festa del lavoro 
+DESCRIPTION:giorno festivo nazionale in Italia | giorni-festivi.eu. All data without guarantee! / Alle Angaben ohne Gewähr!
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:italia--2023-9@giorni-festivi.eu
+DTSTAMP:20230529T000000
+DTSTART;VALUE=DATE:20230529
+DTEND;VALUE=DATE:20230529
+SUMMARY:Lunedì di Pentecoste 
+DESCRIPTION:giorno festivo regionale | giorni-festivi.eu. All data without guarantee! / Alle Angaben ohne Gewähr!
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:italia--2023-10@giorni-festivi.eu
+DTSTAMP:20230602T000000
+DTSTART;VALUE=DATE:20230602
+DTEND;VALUE=DATE:20230602
+SUMMARY:Festa della Repubblica Italia 
+DESCRIPTION:giorno festivo nazionale in Italia | giorni-festivi.eu. All data without guarantee! / Alle Angaben ohne Gewähr!
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:italia--2023-11@giorni-festivi.eu
+DTSTAMP:20230815T000000
+DTSTART;VALUE=DATE:20230815
+DTEND;VALUE=DATE:20230815
+SUMMARY:Ferragosto 
+DESCRIPTION:giorno festivo nazionale in Italia | giorni-festivi.eu. All data without guarantee! / Alle Angaben ohne Gewähr!
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:italia--2023-12@giorni-festivi.eu
+DTSTAMP:20231101T000000
+DTSTART;VALUE=DATE:20231101
+DTEND;VALUE=DATE:20231101
+SUMMARY:Ognissanti 
+DESCRIPTION:giorno festivo nazionale in Italia | giorni-festivi.eu. All data without guarantee! / Alle Angaben ohne Gewähr!
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:italia--2023-13@giorni-festivi.eu
+DTSTAMP:20231208T000000
+DTSTART;VALUE=DATE:20231208
+DTEND;VALUE=DATE:20231208
+SUMMARY:Immacolata Concezione 
+DESCRIPTION:giorno festivo nazionale in Italia | giorni-festivi.eu. All data without guarantee! / Alle Angaben ohne Gewähr!
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:italia--2023-14@giorni-festivi.eu
+DTSTAMP:20231225T000000
+DTSTART;VALUE=DATE:20231225
+DTEND;VALUE=DATE:20231225
+SUMMARY:Natale 
+DESCRIPTION:giorno festivo nazionale in Italia | giorni-festivi.eu. All data without guarantee! / Alle Angaben ohne Gewähr!
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:italia--2023-15@giorni-festivi.eu
+DTSTAMP:20231226T000000
+DTSTART;VALUE=DATE:20231226
+DTEND;VALUE=DATE:20231226
+SUMMARY:Santo Stefano 
+DESCRIPTION:giorno festivo nazionale in Italia | giorni-festivi.eu. All data without guarantee! / Alle Angaben ohne Gewähr!
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR

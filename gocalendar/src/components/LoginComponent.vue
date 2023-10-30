@@ -34,7 +34,7 @@
           utils.createNotificationSocket()
           setTimeout(() => {
             router.push('/calendar')
-          }, 300);
+          }, 500);
         }
       }
 

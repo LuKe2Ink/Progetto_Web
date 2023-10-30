@@ -1,0 +1,186 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Mozilla.org/NONSGML Mozilla Calendar V1.1//EN
+BEGIN:VEVENT
+SUMMARY:Capodanno
+DTSTART:20230101
+DTEND;VALUE=DATE:20230102
+DTSTAMP:20230623T220053Z
+UID:italy/new-year-day-2023
+CATEGORIES:Holidays
+CLASS:public
+DESCRIPTION:National holiday - New Year’s Day is celebrated in Italy on 
+ January 1 each year.
+LAST-MODIFIED:20230623T220053Z
+TRANSP:transparent
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Epifania
+DTSTART:20230106
+DTEND;VALUE=DATE:20230107
+DTSTAMP:20230623T220053Z
+UID:italy/epiphany-2023
+CATEGORIES:Holidays
+CLASS:public
+DESCRIPTION:National holiday - Epiphany is a national holiday in Italy cel
+ ebrated annually on January 6.
+LAST-MODIFIED:20230623T220053Z
+TRANSP:transparent
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Liberazione
+DTSTART:20230425
+DTEND;VALUE=DATE:20230426
+DTSTAMP:20230623T220053Z
+UID:italy/liberation-day-2023
+CATEGORIES:Holidays
+CLASS:public
+DESCRIPTION:National holiday - Celebrated on April 25 each year\, Italy’
+ s Liberation Day commemorates when the Allied troops liberated the country
+  from the Nazi occupation during World War II.
+LAST-MODIFIED:20230623T220053Z
+TRANSP:transparent
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Festa del Lavoro
+DTSTART:20230501
+DTEND;VALUE=DATE:20230502
+DTSTAMP:20230623T220053Z
+UID:italy/labor-day-2023
+CATEGORIES:Holidays
+CLASS:public
+DESCRIPTION:National holiday - Labor Day is a national holiday annually he
+ ld in Italy on May 1.
+LAST-MODIFIED:20230623T220053Z
+TRANSP:transparent
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Festa della Repubblica
+DTSTART:20230602
+DTEND;VALUE=DATE:20230603
+DTSTAMP:20230623T220053Z
+UID:italy/republic-day-2023
+CATEGORIES:Holidays
+CLASS:public
+DESCRIPTION:National holiday - Italy’s Republic Day is an annual public 
+ holiday on June 2 to commemorates the date Italians voted for their countr
+ y end the monarchy and become a republic.
+LAST-MODIFIED:20230623T220053Z
+TRANSP:transparent
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Assunzione
+DTSTART:20230815
+DTEND;VALUE=DATE:20230816
+DTSTAMP:20230623T220053Z
+UID:italy/assumption-day-2023
+CATEGORIES:Holidays
+CLASS:public
+DESCRIPTION:National holiday - Assumption Day\, also known as the Feast of
+  the Assumption\, is an annual public holiday in Italy on August 15.
+LAST-MODIFIED:20230623T220053Z
+TRANSP:transparent
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Tutti i Santi
+DTSTART:20231101
+DTEND;VALUE=DATE:20231102
+DTSTAMP:20230623T220053Z
+UID:italy/all-saints-day-2023
+CATEGORIES:Holidays
+CLASS:public
+DESCRIPTION:National holiday - In Italy All Saints’ Day is a national pu
+ blic holiday celebrated on November 1 to commemorate the Catholic saints.
+LAST-MODIFIED:20230623T220053Z
+TRANSP:transparent
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Immacolata
+DTSTART:20231208
+DTEND;VALUE=DATE:20231209
+DTSTAMP:20230623T220053Z
+UID:italy/immaculate-conception-day-2023
+CATEGORIES:Holidays
+CLASS:public
+DESCRIPTION:National holiday - Immaculate Conception Day is a nationwide h
+ oliday in Italy on December 8 that celebrates the belief that Jesus’ mot
+ her Mary is “free of sin”.
+LAST-MODIFIED:20230623T220053Z
+TRANSP:transparent
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Natale
+DTSTART:20231225
+DTEND;VALUE=DATE:20231226
+DTSTAMP:20230623T220053Z
+UID:italy/christmas-day-2023
+CATEGORIES:Holidays
+CLASS:public
+DESCRIPTION:National holiday - Christmas Day is a public holiday in Italy 
+ on December 25 to celebrate the birth of Jesus Christ.
+LAST-MODIFIED:20230623T220053Z
+TRANSP:transparent
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Santo Stefano
+DTSTART:20231226
+DTEND;VALUE=DATE:20231227
+DTSTAMP:20230623T220053Z
+UID:italy/st-stephen-day-2023
+CATEGORIES:Holidays
+CLASS:public
+DESCRIPTION:National holiday - St Stephen’s Day is a public holiday in I
+ taly on December 26.
+LAST-MODIFIED:20230623T220053Z
+TRANSP:transparent
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Festa del Papà
+DTSTART:20230319
+DTEND;VALUE=DATE:20230320
+DTSTAMP:20230623T220053Z
+UID:italy/fathers-day-2023
+CATEGORIES:Holidays
+CLASS:public
+DESCRIPTION:Observance - Father’s Day celebrates fatherhood and male par
+ enting on different dates worldwide.
+LAST-MODIFIED:20230623T220053Z
+TRANSP:transparent
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:L'equinozio di marzo
+DTSTART:20230320
+DTEND;VALUE=DATE:20230321
+DTSTAMP:20230623T220053Z
+UID:seasons/vernal-equinox-2023
+CATEGORIES:Holidays
+CLASS:public
+DESCRIPTION:Season
+LAST-MODIFIED:20230623T220053Z
+TRANSP:transparent
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:La Festa della Mamma
+DTSTART:20230514
+DTEND;VALUE=DATE:20230515
+DTSTAMP:20230623T220053Z
+UID:italy/mothers-day-2023
+CATEGORIES:Holidays
+CLASS:public
+DESCRIPTION:Observance - Mother’s Day celebrates the achievements and ef
+ forts of mothers and mother figures.
+LAST-MODIFIED:20230623T220053Z
+TRANSP:transparent
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Ferragosto
+DTSTART:20230815
+DTEND;VALUE=DATE:20230816
+DTSTAMP:20230623T220053Z
+UID:italy/ferragosto-2023
+CATEGORIES:Holidays
+CLASS:public
+DESCRIPTION:Observance
+LAST-MODIFIED:20230623T220053Z
+TRANSP:transparent
+END:VEVENT
