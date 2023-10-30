@@ -43,7 +43,7 @@ const checkCollection = async (filename, Model) => {
             if(element._id)
                 element._id = new mongoose.mongo.ObjectId(element._id)
             if(element.event_type)
-                element.user = new mongoose.mongo.ObjectId(element.event_type)
+                element.event_type = new mongoose.mongo.ObjectId(element.event_type)
         });
 
         if (count === 0) {
