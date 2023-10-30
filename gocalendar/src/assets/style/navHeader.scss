@@ -83,7 +83,7 @@ header{
         text-decoration: none;
         padding: 5px;
     }
-    .active{
+    .router-link-exact-active{
         background-color: #0085b6;
         color: #EB9A28;
     }
@@ -118,7 +118,7 @@ header{
             display: flex;
             flex-wrap: wrap-reverse;
             align-content: flex-end;
-            justify-content: end;
+            justify-content: flex-end;
             div.user{
                 margin-left: 15px;
                 .user{

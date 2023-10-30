@@ -88,18 +88,18 @@
     <div class="nav">
       <div class="navList" v-if="screenSize >= 1050">
         <nav>
-          <div v-if="logged" class="logout" :key="logged"><a href="/home" class="link" v-bind:class="{ active: home }" :key="home"> Home</a></div>
-          <div v-if="!logged" class="logged" :key="logged"><a href="/calendar" class="link" v-bind:class="{ active: calendar }" :key="calendar">Calendario</a></div>
-          <div v-if="!logged" class="logged" :key="logged"><a href="/object" class="link" v-bind:class="{ active: object }" :key="object">Oggetti</a></div>
-          <div v-if="!logged" class="logged" :key="logged"><a href="/event/type" class="link" v-bind:class="{ active: type }" :key="type">Etichette</a></div>
-          <div v-if="!logged" class="logged" :key="logged"><a href="/graph" class="link" v-bind:class="{ active: graph }" :key="graph">Grafico</a></div>
+          <div v-if="logged" class="logout" :key="logged"><RouterLink to="/home" class="link" v-bind:class="{ active: home }" :key="home"> Home</RouterLink></div>
+          <div v-if="!logged" class="logged" :key="logged"><RouterLink to="/calendar" class="link" v-bind:class="{ active: calendar }" :key="calendar">Calendario</RouterLink></div>
+          <div v-if="!logged" class="logged" :key="logged"><RouterLink to="/object" class="link" v-bind:class="{ active: object }" :key="object">Oggetti</RouterLink></div>
+          <div v-if="!logged" class="logged" :key="logged"><RouterLink to="/event/type" class="link" v-bind:class="{ active: type }" :key="type">Etichette</RouterLink></div>
+          <div v-if="!logged" class="logged" :key="logged"><RouterLink to="/graph" class="link" v-bind:class="{ active: graph }" :key="graph">Grafico</RouterLink></div>
         </nav>
       </div>
       <div class="navHeader" v-if="screenSize >= 1050">
         <nav>
-          <div v-if="logged" class="login" :key="logged"><a href="/login" class="link" v-bind:class="{ active: login }" :key="login"><i class="fa-solid fa-right-to-bracket"></i> Login</a></div>
-          <div v-if="!logged" class="login" :key="logged"><a href="/login" class="link" @click ="logout" ><i class="fa-solid fa-right-to-bracket"></i> Logout</a></div>
-          <div v-if="!logged" class="user" :key="logged"><a href="/user" class="link user" v-bind:class="{ active: user }" :key="user"><i class="fa-solid fa-user-pen"></i></a></div>
+          <div v-if="logged" class="login" :key="logged"><RouterLink to="/login" class="link" v-bind:class="{ active: login }" :key="login"><i class="fa-solid fa-right-to-bracket"></i> Login</RouterLink></div>
+          <div v-if="!logged" class="login" :key="logged"><RouterLink to="/login" class="link" @click ="logout" ><i class="fa-solid fa-right-to-bracket"></i> Logout</RouterLink></div>
+          <div v-if="!logged" class="user" :key="logged"><RouterLink to="/user" class="link user" v-bind:class="{ active: user }" :key="user"><i class="fa-solid fa-user-pen"></i></RouterLink></div>
         </nav>
       </div>
     </div>
@@ -111,15 +111,15 @@
     <div hidden="true" id="rightMenu" class="lateralMenu">
         <div class="top">
           <div class="login close" @click="showMenu(true)"><i class="fa-solid fa-xmark"></i></div>
-          <div v-if="!logged" class="user" :key="logged"><a href="/user" class="link" v-bind:class="{ active: user }" :key="user"><i class="fa-solid fa-user-pen"></i></a></div>
+          <div v-if="!logged" class="user" :key="logged"><RouterLink to="/user" class="link" v-bind:class="{ active: user }" :key="user"><i class="fa-solid fa-user-pen"></i></RouterLink></div>
         </div>
-        <div v-if="logged" class="login" :key="logged"><a href="/login" class="link" v-bind:class="{ active: login }" :key="login"><i class="fa-solid fa-right-to-bracket"></i> Login</a></div>
-        <div v-if="!logged" class="login" :key="logged"><a href="/login" class="link" @click ="logout"><i class="fa-solid fa-right-to-bracket"></i> Logout</a></div>
-        <div v-if="logged" class="logout" :key="logged"><a href="/home" class="link" v-bind:class="{ active: home }" :key="home"> Home</a></div>
-        <div v-if="!logged" class="logged" :key="logged"><a href="/calendar" class="link" v-bind:class="{ active: calendar }" :key="calendar">Calendario</a></div>
-        <div v-if="!logged" class="logged" :key="logged"><a href="/object" class="link" v-bind:class="{ active: object }" :key="object">Oggetti</a></div>
-        <div v-if="!logged" class="logged" :key="logged"><a href="/event/type" class="link" v-bind:class="{ active: type }" :key="type">Etichette</a></div>
-        <div v-if="!logged" class="logged" :key="logged"><a href="/graph" class="link" v-bind:class="{ active: graph }" :key="graph">Grafico</a></div>
+        <div v-if="logged" class="login" :key="logged"><RouterLink to="/login" class="link" v-bind:class="{ active: login }" :key="login"><i class="fa-solid fa-right-to-bracket"></i> Login</RouterLink></div>
+        <div v-if="!logged" class="login" :key="logged"><RouterLink to="/login" class="link" @click ="logout"><i class="fa-solid fa-right-to-bracket"></i> Logout</RouterLink></div>
+        <div v-if="logged" class="logout" :key="logged"><RouterLink to="/home" class="link" v-bind:class="{ active: home }" :key="home"> Home</RouterLink></div>
+        <div v-if="!logged" class="logged" :key="logged"><RouterLink to="/calendar" class="link" v-bind:class="{ active: calendar }" :key="calendar">Calendario</RouterLink></div>
+        <div v-if="!logged" class="logged" :key="logged"><RouterLink to="/object" class="link" v-bind:class="{ active: object }" :key="object">Oggetti</RouterLink></div>
+        <div v-if="!logged" class="logged" :key="logged"><RouterLink to="/event/type" class="link" v-bind:class="{ active: type }" :key="type">Etichette</RouterLink></div>
+        <div v-if="!logged" class="logged" :key="logged"><RouterLink to="/graph" class="link" v-bind:class="{ active: graph }" :key="graph">Grafico</RouterLink></div>
     </div>
   </header>
 
@@ -129,7 +129,7 @@
   </div>
 </template>
 
-<!-- <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"></link> -->
+<!-- <link rel="stylesheet" type="text/css" to="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"></link> -->
 <style lang="scss">
   @import './assets/style/navHeader.scss'; 
 </style>
