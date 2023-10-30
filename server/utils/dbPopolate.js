@@ -20,7 +20,7 @@ const makePopolation = async () => {
     } catch (error) {
         console.log(error)}
     try {
-        await checkCollection('event_type', EventsType);
+        await checkCollection('event_types', EventsType);
     } catch (error) {
         console.log(error)}
     try { 
