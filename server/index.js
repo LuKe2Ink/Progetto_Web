@@ -15,7 +15,6 @@ const path = require('path')
 const dbpopolate = require('./utils/dbPopolate')
 
 const popolateDb = async () => {
-    console.log("entra")
     try {
         await dbpopolate.makePopolation();
     } catch (error) {console.log("FAIL"+error)}
@@ -94,7 +93,8 @@ async function createHolidayForUser(user_id){
         "date.day":dayCheck,
         "date.month":monthCheck,
         "date.year":yearCheck,
-        "holiday": true
+        "holiday": true,
+        "user": user
     })
 
     if(holidayCheck.length==0){
@@ -135,7 +135,8 @@ async function createHolidayForUser(user_id){
         "date.day":dayCheck,
         "date.month":monthCheck,
         "date.year":yearCheck,
-        "holiday": true
+        "holiday": true,
+        "user": user
     })
 
     if(holidayCheckIcs.length==0){
@@ -188,7 +189,7 @@ io.on("connection", socket=>{
                 let user = await Users.findById(objId)
                 if(user.notification){
                     let event = await Events.aggregate([
-                        {$match: {user: objId}},
+                        {$match: {user: objId, holiday: {$ne:true} }},
                         {$lookup:
                         { 
                             from: 'events_type', 
@@ -211,6 +212,7 @@ io.on("connection", socket=>{
                         "preserveNullAndEmptyArrays": true
                         }},
                         {$match: { "history": {$exists: false} } },
+
                     ]);
                     socket.emit("notifications-"+element,event)
                 }

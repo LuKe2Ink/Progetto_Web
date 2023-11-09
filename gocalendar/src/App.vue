@@ -33,6 +33,7 @@
   })
 
   function logout(){
+  console.log("si")
     socket.emit("disconnection", localStorage.getItem('user_id'))
     localStorage.setItem('token',null);
     localStorage.setItem('user_id',null);
@@ -98,7 +99,7 @@
       <div class="navHeader" v-if="screenSize >= 1050">
         <nav>
           <div v-if="logged" class="login" :key="logged"><RouterLink to="/login" class="link" v-bind:class="{ active: login }" :key="login"><i class="fa-solid fa-right-to-bracket"></i> Login</RouterLink></div>
-          <div v-if="!logged" class="login" :key="logged"><RouterLink to="/login" class="link" @click ="logout" ><i class="fa-solid fa-right-to-bracket"></i> Logout</RouterLink></div>
+          <div v-if="!logged" class="login" :key="logged" @click ="logout" ><RouterLink to="/login" class="link" ><i class="fa-solid fa-right-to-bracket"></i> Logout</RouterLink></div>
           <div v-if="!logged" class="user" :key="logged"><RouterLink to="/user" class="link user" v-bind:class="{ active: user }" :key="user"><i class="fa-solid fa-user-pen"></i></RouterLink></div>
         </nav>
       </div>

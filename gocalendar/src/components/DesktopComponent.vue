@@ -9,6 +9,7 @@
     import utils from '../function/utils';
 
     await tokenVerify.verifyAndSaveToken();
+    console.log(localStorage.getItem('user_id'))
 
     async function eventList(){
         const databody = {
@@ -110,7 +111,10 @@
     }
 
     export default defineComponent({
-        created(){
+        async created(){
+          events = await eventList()
+          eventTypes = await typeList();
+          special_object = await objectList();
           this.typeConvert = {};
           let jsonOptions = [];
           eventTypes.forEach(element => {
@@ -751,7 +755,7 @@
                 <span class="bar"></span>
                 <label>Luogo</label>
               </div>
-              <p v-if="!luogoInput && !holiday" @click="if(holiday){luogoInput = !luogoInput; modify = true}">
+              <p v-if="!luogoInput && !holiday" @click="if(!holiday){luogoInput = !luogoInput; modify = true}">
                 Luogo: {{ luogo }}
               </p>
               <div class="group" v-if="personeInput">
@@ -760,7 +764,7 @@
                 <span class="bar"></span>
                 <label>Persone</label>
               </div>
-              <p v-if="!personeInput && !holiday" @click="if(holiday){personeInput = !personeInput; modify = true}">
+              <p v-if="!personeInput && !holiday" @click="if(!holiday){personeInput = !personeInput; modify = true}">
                 Persone: {{ persone }}
               </p>
               <div v-if="tipoInput" class="typesInput">
@@ -796,7 +800,7 @@
                 <input v-if="singleEvent != null && singleEvent.type.tipology =='normal'" v-model="oraFine" type="time">
                 <label class="labelOrario">Orario</label>
               </div>
-              <p v-if="!oraInput  && !holiday" @click="if(holiday){oraInput = !oraInput; modify = true}">
+              <p v-if="!oraInput  && !holiday" @click="if(!holiday){oraInput = !oraInput; modify = true}">
                 <p>
                   Ora inizio: {{ oraInizio }} 
                 </p>

@@ -32,8 +32,9 @@
           localStorage.setItem('user_id', response.user_id);
           socket.emit("notification", localStorage.getItem('user_id'))
           utils.createNotificationSocket()
-          setTimeout(() => {
-            router.push('/calendar')
+          setTimeout(async () => {
+            await router.push('/calendar')
+            // location.reload()
           }, 500);
         }
       }

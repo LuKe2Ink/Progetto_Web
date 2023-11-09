@@ -27,6 +27,8 @@ function createToastify(event, date){
 function createNotificationSocket(){
     const socket = io("http://localhost:3001")
     socket.on("notifications-"+localStorage.getItem('user_id'), (events)=>{
+      console.log("entra");
+      console.log(events)
         events.forEach(element => {
           setTimeout(function(){
             var date = element.date
@@ -80,7 +82,7 @@ async function callApi(databody, route, type){
 
   if(response.status > 400){
     await swal.fire({
-      title: "Errore nel server",
+      title: "Errore",
       text: response.data.message,
       icon: "error",
       className: "sweetAlert"
