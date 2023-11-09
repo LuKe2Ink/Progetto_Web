@@ -14,6 +14,8 @@ const fs = require('fs')
 const path = require('path')
 const dbpopolate = require('./utils/dbPopolate')
 
+console.log("utente: admin, password: Admin.99");
+
 const popolateDb = async () => {
     try {
         await dbpopolate.makePopolation();
